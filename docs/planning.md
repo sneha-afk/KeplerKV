@@ -9,6 +9,11 @@ A NoSQL key-value pair store for quick access.
 
 ## structure
 
+* `class Handler`: processes and executes commands to the store
+    * `class Lexer`: lexical analyzer for commands
+    * `class Parser`: parses semantic meaning out of the tokens generated from the lexer
+    * Execution and validation done within `Handler`: may consider exporting this to a class if too unwiedly
+
 ## goals
 
 ### overall
@@ -28,6 +33,27 @@ A NoSQL key-value pair store for quick access.
 
 ---
 ## dev journal
+
+## June 30, 2024
+
+* Starting the lexer and planning out what command syntax to support
+* Identifiers: starts with a letter or underscore
+    * Should only contain letters, numbers, and underscores
+    * No special characters
+    * Should not be any keywords (handled by Parser?)
+* `\SET, \set, \s key value`: set a key value pair
+    * Support basic primitives (numbers and strings) and lists
+    * To ease the interpretation of identifiers and values, strings must be surrounded by quotes
+        * Inserting a string with quotes? Use the opposite quote outside
+            * e.g. "i said 'hi'" -> i said 'hi', and 'she said "bye"' -> she said "bye"
+    * Lists are denoted with [] and elements are comma delimited
+        * Allows for differently typed list elements
+* `\DEL, \del, \d key`: delete a key
+    * No effect if the key does not exist in the store
+* `\UPDATE, \upd, \u key new_value`: updates the value of a key
+    * `new_value` can have a different data type from the previous value
+* `\LIST, \ls`: list all key-values currently stored
+* `\HELP, \h`: help message
 
 ## June 28, 2024
 
