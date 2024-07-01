@@ -40,7 +40,6 @@ A NoSQL key-value pair store for quick access.
 * Identifiers: starts with a letter or underscore
     * Should only contain letters, numbers, and underscores
     * No special characters
-    * Should not be any keywords (handled by Parser?)
 * `\SET, \set, \s key value`: set a key value pair
     * Support basic primitives (numbers and strings) and lists
     * To ease the interpretation of identifiers and values, strings must be surrounded by quotes
@@ -58,3 +57,8 @@ A NoSQL key-value pair store for quick access.
 ## June 28, 2024
 
 A key-value store is far less coupled than a relational database and I intend to focus my efforts in learning how to make an effective CLI that is easy to expand and interpret.
+
+## resources used
+
+1. [How to Write a Programming Language](https://accu.org/journals/overload/26/145/balaam_2510/) series by Andy Balaam
+2. [TosLang](https://faouellet.github.io/categories/toslang/) series by Félix-Antoine Ouellet

@@ -1,12 +1,20 @@
 #pragma once
 
+#include <ostream>
 #include <string>
 #include <vector>
+
+#define WHITESPACE   ' '
+#define BACKSLASH    '\\'
+#define SINGLE_QUOTE '\''
+#define DOUBLE_QUOTE '\"'
+#define UNDERSCORE   '_'
 
 enum class TokenType {
     COMMAND,
     IDENTIIFER,
-    PRIMITIVE,
+    NUMBER,
+    STRING,
     LIST_START,
     LIST_END,
     END,
@@ -24,6 +32,8 @@ public:
     Token(TokenType type, char c)
         : type(type)
         , value(std::string(1, c)) {};
+
+    friend std::ostream &operator<<(std::ostream &os, const Token &t);
 };
 
 class Lexer {
@@ -39,5 +49,4 @@ private:
     Token lexIdentifier_();
     Token lexNumber_();
     Token lexString_();
-    Token lexList_();
 };
