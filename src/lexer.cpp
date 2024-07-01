@@ -15,11 +15,13 @@ std::vector<Token> Lexer::tokenize(std::string &query) {
     inp_end_ = query.end();
     while (it_ != inp_end_) {
         const char &c = *it_;
-
         switch (c) {
             case WHITESPACE:
                 it_++;
-                continue;
+                break;
+            case COMMA:
+                tokens.push_back(Token(TokenType::DELIMITER, c));
+                it_++;
                 break;
             case BACKSLASH: tokens.push_back(lexCommand_()); break;
             case UNDERSCORE: tokens.push_back(lexIdentifier_()); break;
@@ -107,6 +109,7 @@ std::ostream &operator<<(std::ostream &os, const Token &t) {
         case TokenType::STRING: os << "STRING"; break;
         case TokenType::LIST_START: os << "LIST_START"; break;
         case TokenType::LIST_END: os << "LIST_END"; break;
+        case TokenType::DELIMITER: os << "DELIMITER"; break;
         case TokenType::END: os << "END"; break;
         case TokenType::UNKNOWN:
         default: os << "UNKNOWN"; break;

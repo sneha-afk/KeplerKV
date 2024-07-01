@@ -9,6 +9,7 @@
 #define SINGLE_QUOTE '\''
 #define DOUBLE_QUOTE '\"'
 #define UNDERSCORE   '_'
+#define COMMA        ','
 
 enum class TokenType {
     COMMAND,
@@ -17,6 +18,7 @@ enum class TokenType {
     STRING,
     LIST_START,
     LIST_END,
+    DELIMITER,
     END,
     UNKNOWN
 };
