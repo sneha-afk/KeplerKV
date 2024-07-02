@@ -4,11 +4,9 @@
 #include <cctype>
 #include <stdexcept>
 
-Lexer::Lexer() {
-    tokens = std::vector<Token>(2);
-}
+Lexer::Lexer() { tokens = std::vector<Token>(2); }
 
-std::vector<Token> & Lexer::tokenize(std::string &query) {
+std::vector<Token> &Lexer::tokenize(std::string &query) {
     tokens.clear();
     if (query.empty()) return tokens;
 
@@ -52,7 +50,7 @@ std::vector<Token> & Lexer::tokenize(std::string &query) {
         }
     }
 
-    tokens.push_back(Token(TokenType::END, ""));
+    tokens.push_back(Token(TokenType::END, ";"));
     return tokens;
 }
 

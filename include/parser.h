@@ -1,6 +1,8 @@
 #pragma once
 
 #include "syntax_tree.h"
+#include "token.h"
+
 #include <vector>
 
 class Parser {
@@ -14,5 +16,5 @@ private:
 
     SyntaxNode parseCmd_(Token &);
     SyntaxNode parsePrimitive_(Token &);
-    SyntaxNode parseList_(Token &);
+    SyntaxNode parseList_();
 };

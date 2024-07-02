@@ -9,5 +9,6 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 add_executable(${PROJECT_NAME}
     src/main.cpp
     src/lexer.cpp
+    src/parser.cpp
     src/handler.cpp
 )

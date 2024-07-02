@@ -34,7 +34,7 @@ A NoSQL key-value pair store for quick access.
 ---
 ## dev journal
 
-## July 1, 2024
+### July 1, 2024
 
 * Done with the first iteration of the lexer, moving onto the parser
 * [Parse tree](https://en.wikipedia.org/wiki/Parse_tree), related to CSE103!
@@ -44,7 +44,7 @@ A NoSQL key-value pair store for quick access.
 * List values: denoted with LIST_START and LIST_END
     * Turn on an "inside list" flag
 
-## June 30, 2024
+### June 30, 2024
 
 * Starting the lexer and planning out what command syntax to support
 * Identifiers: starts with a letter or underscore
@@ -64,7 +64,7 @@ A NoSQL key-value pair store for quick access.
 * `\LIST, \ls`: list all key-values currently stored
 * `\HELP, \h`: help message
 
-## June 28, 2024
+### June 28, 2024
 
 A key-value store is far less coupled than a relational database and I intend to focus my efforts in learning how to make an effective CLI that is easy to expand and interpret.
 

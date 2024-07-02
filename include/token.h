@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include <ostream>
+#include <string>
 
 #define WHITESPACE   ' '
 #define BACKSLASH    '\\'
@@ -22,8 +22,7 @@ enum class TokenType {
     UNKNOWN
 };
 
-class Token {
-public:
+struct Token {
     TokenType type;
     std::string value;
 
