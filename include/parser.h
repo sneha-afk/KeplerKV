@@ -1,14 +1,18 @@
 #pragma once
 
-#include <string>
-#include <unordered_map>
+#include "syntax_tree.h"
 #include <vector>
 
 class Parser {
 public:
-    Parser()
-        : temp_(1) {};
+    std::vector<SyntaxNode> nodes;
+    std::vector<SyntaxNode> &parse(std::vector<Token> &);
 
 private:
-    int temp_;
+    std::vector<Token>::iterator tt_;
+    std::vector<Token>::iterator tend_;
+
+    SyntaxNode parseCmd_(Token &);
+    SyntaxNode parsePrimitive_(Token &);
+    SyntaxNode parseList_(Token &);
 };

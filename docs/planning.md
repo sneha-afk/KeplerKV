@@ -34,13 +34,23 @@ A NoSQL key-value pair store for quick access.
 ---
 ## dev journal
 
+## July 1, 2024
+
+* Done with the first iteration of the lexer, moving onto the parser
+* [Parse tree](https://en.wikipedia.org/wiki/Parse_tree), related to CSE103!
+    * Need to build a structure from the lexer's tokens
+* Commands: have one keyword in the beginning, then a list of arguments
+* Primitive values: simple need to typecast the value
+* List values: denoted with LIST_START and LIST_END
+    * Turn on an "inside list" flag
+
 ## June 30, 2024
 
 * Starting the lexer and planning out what command syntax to support
 * Identifiers: starts with a letter or underscore
     * Should only contain letters, numbers, and underscores
     * No special characters
-* `\SET, \set, \s key value`: set a key value pair
+* `\SET, \set, \s key value [key value]*`: set a key value pair(s)
     * Support basic primitives (numbers and strings) and lists
     * To ease the interpretation of identifiers and values, strings must be surrounded by quotes
         * Inserting a string with quotes? Use the opposite quote outside

@@ -3,22 +3,22 @@
 #include <algorithm>
 #include <cctype>
 #include <stdexcept>
-#include <string>
-#include <vector>
 
-std::vector<Token> Lexer::tokenize(std::string &query) {
-    if (query.empty()) return {};
+Lexer::Lexer() {
+    tokens = std::vector<Token>(2);
+}
 
-    std::vector<Token> tokens;
+std::vector<Token> & Lexer::tokenize(std::string &query) {
+    tokens.clear();
+    if (query.empty()) return tokens;
+
     input_ = query;
     it_ = query.begin();
-    inp_end_ = query.end();
-    while (it_ != inp_end_) {
+    iend_ = query.end();
+    while (it_ != iend_) {
         const char &c = *it_;
         switch (c) {
-            case WHITESPACE:
-                it_++;
-                break;
+            case WHITESPACE: it_++; break;
             case COMMA:
                 tokens.push_back(Token(TokenType::DELIMITER, c));
                 it_++;
@@ -58,7 +58,8 @@ std::vector<Token> Lexer::tokenize(std::string &query) {
 
 Token Lexer::lexCommand_() {
     std::string s;
-    while (it_ != inp_end_ && *it_ != WHITESPACE) {
+    while (it_ != iend_ && *it_ != WHITESPACE) {
+        // Represent as uppercase internally
         s.push_back(toupper(*it_));
         it_++;
     }
@@ -67,7 +68,7 @@ Token Lexer::lexCommand_() {
 
 Token Lexer::lexIdentifier_() {
     std::string s;
-    while (it_ != inp_end_ && (isalpha(*it_) || *it_ == UNDERSCORE)) {
+    while (it_ != iend_ && (isalpha(*it_) || *it_ == UNDERSCORE)) {
         s.push_back(*it_);
         it_++;
     }
@@ -76,7 +77,21 @@ Token Lexer::lexIdentifier_() {
 
 Token Lexer::lexNumber_() {
     std::string s;
-    while (it_ != inp_end_ && (isdigit(*it_) || *it_ == '-' || *it_ == '+')) {
+
+    // Flags for symbols that can only appear once
+    bool signF = false;
+    bool decimalF = false;
+    while (it_ != iend_ && (isdigit(*it_) || *it_ == '-' || *it_ == '+' || *it_ == '.')) {
+        if ((*it_ == '-' || *it_ == '+') && signF)
+            return Token(TokenType::UNKNOWN, "");
+        else
+            signF = true;
+
+        if (*it_ == '.' && decimalF)
+            return Token(TokenType::UNKNOWN, "");
+        else
+            decimalF = true;
+
         s.push_back(*it_);
         it_++;
     }
@@ -88,7 +103,7 @@ Token Lexer::lexString_() {
 
     const char &toMatch = *it_;
     s.push_back(*it_++); // Start quote
-    while (it_ != inp_end_ && *it_ != toMatch) {
+    while (it_ != iend_ && *it_ != toMatch) {
         s.push_back(*it_);
         it_++;
     }
