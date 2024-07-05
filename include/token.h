@@ -9,6 +9,7 @@
 #define DOUBLE_QUOTE '\"'
 #define UNDERSCORE   '_'
 #define COMMA        ','
+#define SEMICOLON    ';'
 
 enum class TokenType {
     COMMAND,
@@ -26,6 +27,9 @@ struct Token {
     TokenType type;
     std::string value;
 
+    Token()
+        : type(TokenType::UNKNOWN)
+        , value("") {};
     Token(TokenType type, std::string value)
         : type(type)
         , value(value) {};

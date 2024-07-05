@@ -7,6 +7,7 @@
 
 class Parser {
 public:
+    Parser();
     std::vector<SyntaxNode> nodes;
     std::vector<SyntaxNode> &parse(std::vector<Token> &);
 
@@ -14,7 +15,7 @@ private:
     std::vector<Token>::iterator tt_;
     std::vector<Token>::iterator tend_;
 
-    SyntaxNode parseCmd_(Token &);
+    SyntaxNode parseCommand_(Token &);
     SyntaxNode parsePrimitive_(Token &);
     SyntaxNode parseList_();
 };

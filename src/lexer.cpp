@@ -21,6 +21,10 @@ std::vector<Token> &Lexer::tokenize(std::string &query) {
                 tokens.push_back(Token(TokenType::DELIMITER, c));
                 it_++;
                 break;
+            case SEMICOLON:
+                tokens.push_back(Token(TokenType::END, c));
+                it_++;
+                break;
             case BACKSLASH: tokens.push_back(lexCommand_()); break;
             case UNDERSCORE: tokens.push_back(lexIdentifier_()); break;
             case SINGLE_QUOTE:
@@ -50,15 +54,15 @@ std::vector<Token> &Lexer::tokenize(std::string &query) {
         }
     }
 
-    tokens.push_back(Token(TokenType::END, ";"));
+    tokens.push_back(Token(TokenType::END, SEMICOLON));
     return tokens;
 }
 
 Token Lexer::lexCommand_() {
     std::string s;
-    while (it_ != iend_ && *it_ != WHITESPACE) {
+    while (it_ != iend_ && *it_ != WHITESPACE && *it_ != SEMICOLON) {
         // Represent as uppercase internally
-        s.push_back(toupper(*it_));
+        if (*it_ != '\\') s.push_back(toupper(*it_));
         it_++;
     }
     return Token(TokenType::COMMAND, s);

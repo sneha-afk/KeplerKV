@@ -2,12 +2,26 @@
 
 #include <list>
 #include <string>
+#include <unordered_map>
 
 enum class CommandType {
     SET,
     GET,
     DELETE,
     UPDATE,
+    UNKNOWN,
+};
+
+static const std::unordered_map<std::string, CommandType> mapToCmd = {
+    { "SET", CommandType::SET },
+    { "S", CommandType::SET },
+    { "GET", CommandType::GET },
+    { "G", CommandType::GET },
+    { "DELETE", CommandType::DELETE },
+    { "DEL", CommandType::DELETE },
+    { "D", CommandType::DELETE },
+    { "UPDATE", CommandType::UPDATE },
+    { "U", CommandType::UPDATE },
 };
 
 enum class ValueType {
@@ -25,13 +39,18 @@ struct SyntaxNode {
     virtual std::string string() const { return "{node_type: default, value: nil}"; };
 
     friend std::ostream &operator<<(std::ostream &os, const SyntaxNode &n) {
-        os << n.string() << std::endl;
+        os << n.string();
+        return os;
     }
 };
 
 struct CommandNode : SyntaxNode {
     CommandType cmd;
     std::list<SyntaxNode> args;
+    CommandNode()
+        : cmd(CommandType::UNKNOWN) {};
+    CommandNode(CommandType c)
+        : cmd(c) {};
 
     std::string string() const override {
         std::string s = "{node_type: Command, args: [";
