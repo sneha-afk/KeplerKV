@@ -5,12 +5,21 @@
 #include <string>
 #include <unordered_map>
 
+enum class NodeType { COMMAND, IDENTIFIER, VALUE, NIL };
+
 enum class CommandType {
     SET,
     GET,
     DELETE,
     UPDATE,
     UNKNOWN,
+};
+
+enum class ValueType {
+    INT,
+    FLOAT,
+    STRING,
+    LIST,
 };
 
 static const std::unordered_map<std::string, CommandType> mapToCmd = {
@@ -25,15 +34,12 @@ static const std::unordered_map<std::string, CommandType> mapToCmd = {
     { "U", CommandType::UPDATE },
 };
 
-enum class ValueType {
-    INT,
-    FLOAT,
-    STRING,
-    LIST,
-};
-
 // https://stackoverflow.com/a/54596
 struct SyntaxNode {
+    NodeType type;
+    SyntaxNode(NodeType t)
+        : type(t) {};
+
     // https://stackoverflow.com/q/461203
     virtual ~SyntaxNode() = default;
 
@@ -45,19 +51,28 @@ struct SyntaxNode {
 };
 
 struct NilNode : SyntaxNode {
+    NilNode()
+        : SyntaxNode(NodeType::NIL) {};
     std::string string() const override { return "{node: nil, value: nil}"; }
 };
 
 struct CommandNode : SyntaxNode {
-    CommandType cmd;
-    std::list<std::shared_ptr<SyntaxNode>> args;
+    CommandType cmdType;
+    std::vector<std::shared_ptr<SyntaxNode>> args;
     CommandNode()
-        : cmd(CommandType::UNKNOWN) {};
+        : cmdType(CommandType::UNKNOWN)
+        , SyntaxNode(NodeType::COMMAND) {
+        args = std::vector<std::shared_ptr<SyntaxNode>>(2);
+    };
     CommandNode(CommandType c)
-        : cmd(c) {};
+        : cmdType(c)
+        , SyntaxNode(NodeType::COMMAND) {
+        args = std::vector<std::shared_ptr<SyntaxNode>>(2);
+    };
 
     std::string string() const override {
-        std::string s = "{node: Command, cmd: " + std::to_string((int) cmd) + ", args: [";
+        std::string s
+            = "{node: Command, cmd: " + std::to_string((int) cmdType) + ", args: [";
         for (const auto &a : args) {
             if (!a) continue;
             s += a->string() + ", ";
@@ -71,48 +86,65 @@ struct CommandNode : SyntaxNode {
     }
 };
 
-struct IntegerNode : SyntaxNode {
-    int value;
-    IntegerNode(int v)
-        : value(v) {};
-
-    std::string string() const override {
-        return "{node: Integer, value: " + std::to_string(value) + "}";
-    }
-};
-
-struct FloatNode : SyntaxNode {
-    float value;
-    FloatNode(float v)
-        : value(v) {};
-
-    std::string string() const override {
-        return "{node: Float, value: " + std::to_string(value) + "}";
-    }
-};
-
-struct StringNode : SyntaxNode {
-    std::string value;
-    StringNode(std::string v)
-        : value(v) {};
-
-    std::string string() const override { return "{node: String, value: " + value + "}"; }
-};
-
 struct IdentifierNode : StringNode {
     IdentifierNode(std::string v)
-        : StringNode(v) {};
+        : StringNode(v) {
+        type = NodeType::IDENTIFIER;
+    };
 
     std::string string() const override {
         return "{node: Identifier, value: " + value + "}";
     }
 };
 
-struct ListNode : SyntaxNode {
-    std::list<std::shared_ptr<SyntaxNode>> value;
-    ListNode() { value = std::list<std::shared_ptr<SyntaxNode>>(2); };
-    ListNode(std::list<std::shared_ptr<SyntaxNode>> &v)
-        : value(v) {};
+// Used to identify all value types
+struct ValueNode : SyntaxNode {
+    ValueType valType;
+    ValueNode(ValueType t)
+        : SyntaxNode(NodeType::VALUE)
+        , valType(t) {};
+};
+
+struct IntegerNode : ValueNode {
+    int value;
+    IntegerNode(int v)
+        : value(v)
+        , ValueNode(ValueType::INT) {};
+
+    std::string string() const override {
+        return "{node: Integer, value: " + std::to_string(value) + "}";
+    }
+};
+
+struct FloatNode : ValueNode {
+    float value;
+    FloatNode(float v)
+        : value(v)
+        , ValueNode(ValueType::FLOAT) {};
+
+    std::string string() const override {
+        return "{node: Float, value: " + std::to_string(value) + "}";
+    }
+};
+
+struct StringNode : ValueNode {
+    std::string value;
+    StringNode(std::string v)
+        : value(v)
+        , ValueNode(ValueType::STRING) {};
+
+    std::string string() const override { return "{node: String, value: " + value + "}"; }
+};
+
+struct ListNode : ValueNode {
+    std::vector<std::shared_ptr<SyntaxNode>> value;
+    ListNode()
+        : ValueNode(ValueType::LIST) {
+        value = std::vector<std::shared_ptr<SyntaxNode>>(2);
+    };
+    ListNode(std::vector<std::shared_ptr<SyntaxNode>> &v)
+        : value(v)
+        , ValueNode(ValueType::LIST) {};
 
     std::string string() const override {
         std::string s = "{node: List, value: [";

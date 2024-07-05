@@ -35,7 +35,7 @@ std::shared_ptr<SyntaxNode> Parser::parseCommand_(std::shared_ptr<Token> &t) {
         throw std::runtime_error("Error: invalid command \'" + tValue + "\'");
 
     std::shared_ptr<CommandNode> cmd = std::make_shared<CommandNode>(cmdType);
-    std::list<std::shared_ptr<SyntaxNode>> &args = cmd->args;
+    std::vector<std::shared_ptr<SyntaxNode>> &args = cmd->args;
     tt_++;
 
     while (tt_ != tend_ && (**tt_).type != TokenType::END) {
@@ -83,7 +83,7 @@ std::shared_ptr<SyntaxNode> Parser::parseList_() {
     tt_++;
 
     std::shared_ptr<ListNode> lstnode = std::make_shared<ListNode>();
-    std::list<std::shared_ptr<SyntaxNode>> &lst = (*lstnode).value;
+    std::vector<std::shared_ptr<SyntaxNode>> &lst = (*lstnode).value;
 
     while (tt_ != tend_ && (**tt_).type != TokenType::LIST_END) {
         std::shared_ptr<Token> &t = *tt_;
