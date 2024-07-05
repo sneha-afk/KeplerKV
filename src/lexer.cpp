@@ -68,7 +68,7 @@ std::shared_ptr<Token> Lexer::lexCommand_() {
 
 std::shared_ptr<Token> Lexer::lexIdentifier_() {
     std::string s;
-    while (it_ != iend_ && (isalpha(*it_) || *it_ == UNDERSCORE)) {
+    while (it_ != iend_ && (isalnum(*it_) || *it_ == UNDERSCORE)) {
         s.push_back(*it_);
         it_++;
     }
@@ -82,7 +82,8 @@ std::shared_ptr<Token> Lexer::lexNumber_() {
     bool signF = false;
     bool decimalF = false;
     while (it_ != iend_ && (isdigit(*it_) || *it_ == '-' || *it_ == '+' || *it_ == '.')) {
-        if ((*it_ == '-' || *it_ == '+') && signF)
+        // Not supporting arithmetic expressions for now
+        if ((*it_ == '-' || *it_ == '+') && (signF || !s.empty()))
             return std::make_shared<Token>(TokenType::UNKNOWN, "");
         else
             signF = true;

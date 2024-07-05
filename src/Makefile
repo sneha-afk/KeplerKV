@@ -1,6 +1,6 @@
-CFORMAT 	= clang-format
+CFORMAT = clang-format
 
-.PHONY = fomrat verify_format
+.PHONY  = format verify_format
 
 all: format
 

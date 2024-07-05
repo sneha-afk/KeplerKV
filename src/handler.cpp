@@ -3,7 +3,9 @@
 #include <iostream>
 
 static const std::runtime_error WRONG_FMT
-    = std::runtime_error("Error: could not read command");
+    = std::runtime_error("Error: incorrect command format");
+static const std::runtime_error NOT_IDENT
+    = std::runtime_error("Error: expected identifier");
 
 void Handler::handleQuery(std::string &query) {
     std::vector<std::shared_ptr<Token>> &tokens = lexer_.tokenize(query);
@@ -17,7 +19,7 @@ void Handler::handleQuery(std::string &query) {
 
         // https://stackoverflow.com/a/14545746
         std::shared_ptr<CommandNode> cmd = std::dynamic_pointer_cast<CommandNode>(n);
-        if (!cmd) throw WRONG_FMT;
+        if (cmd == nullptr) throw WRONG_FMT;
 
         std::vector<std::shared_ptr<SyntaxNode>> &args = cmd->args;
         const std::size_t numArgs = args.size();
@@ -28,13 +30,14 @@ void Handler::handleQuery(std::string &query) {
                         "Error: SET requires at least two arguments (key value)");
 
                 for (int i = 0; i < numArgs; i += 2) {
+                    if (!args[i]) continue;
                     std::shared_ptr<IdentifierNode> ident
                         = std::dynamic_pointer_cast<IdentifierNode>(args[i]);
-                    if (!ident) throw WRONG_FMT;
+                    if (ident == nullptr) throw NOT_IDENT;
 
                     std::shared_ptr<ValueNode> value
                         = std::dynamic_pointer_cast<ValueNode>(args[i + 1]);
-                    if (!value) throw WRONG_FMT;
+                    if (value == nullptr) throw WRONG_FMT;
 
                     // todo: send set() instructions to store
                 }
@@ -47,7 +50,7 @@ void Handler::handleQuery(std::string &query) {
                 for (int i = 0; i < numArgs; i++) {
                     std::shared_ptr<IdentifierNode> ident
                         = std::dynamic_pointer_cast<IdentifierNode>(args[i]);
-                    if (!ident) throw WRONG_FMT;
+                    if (ident == nullptr) throw NOT_IDENT;
 
                     // todo: send get() instructions to store
                 }
@@ -60,7 +63,7 @@ void Handler::handleQuery(std::string &query) {
                 for (int i = 0; i < numArgs; i++) {
                     std::shared_ptr<IdentifierNode> ident
                         = std::dynamic_pointer_cast<IdentifierNode>(args[i]);
-                    if (!ident) throw WRONG_FMT;
+                    if (ident == nullptr) throw NOT_IDENT;
 
                     // todo: send del() instructions to store
                 }
@@ -73,11 +76,11 @@ void Handler::handleQuery(std::string &query) {
                 for (int i = 0; i < numArgs; i += 2) {
                     std::shared_ptr<IdentifierNode> ident
                         = std::dynamic_pointer_cast<IdentifierNode>(args[i]);
-                    if (!ident) throw WRONG_FMT;
+                    if (ident == nullptr) throw NOT_IDENT;
 
                     std::shared_ptr<ValueNode> value
                         = std::dynamic_pointer_cast<ValueNode>(args[i + 1]);
-                    if (!value) throw WRONG_FMT;
+                    if (value == nullptr) throw WRONG_FMT;
 
                     // todo: send update() instructions to store
                 }

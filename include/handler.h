@@ -12,7 +12,7 @@ public:
         parser_ = Parser();
     };
 
-    Handler(Lexer l, Parser p)
+    Handler(Lexer &l, Parser &p)
         : lexer_(l)
         , parser_(p) {};
 

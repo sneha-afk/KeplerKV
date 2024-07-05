@@ -1,9 +1,9 @@
 #pragma once
 
-#include <list>
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 enum class NodeType { COMMAND, IDENTIFIER, VALUE, NIL };
 
@@ -62,12 +62,14 @@ struct CommandNode : SyntaxNode {
     CommandNode()
         : cmdType(CommandType::UNKNOWN)
         , SyntaxNode(NodeType::COMMAND) {
-        args = std::vector<std::shared_ptr<SyntaxNode>>(2);
+        args = std::vector<std::shared_ptr<SyntaxNode>>();
+        args.reserve(2);
     };
     CommandNode(CommandType c)
         : cmdType(c)
         , SyntaxNode(NodeType::COMMAND) {
-        args = std::vector<std::shared_ptr<SyntaxNode>>(2);
+        args = std::vector<std::shared_ptr<SyntaxNode>>();
+        args.reserve(2);
     };
 
     std::string string() const override {
@@ -86,23 +88,14 @@ struct CommandNode : SyntaxNode {
     }
 };
 
-struct IdentifierNode : StringNode {
-    IdentifierNode(std::string v)
-        : StringNode(v) {
-        type = NodeType::IDENTIFIER;
-    };
-
-    std::string string() const override {
-        return "{node: Identifier, value: " + value + "}";
-    }
-};
-
 // Used to identify all value types
 struct ValueNode : SyntaxNode {
     ValueType valType;
     ValueNode(ValueType t)
         : SyntaxNode(NodeType::VALUE)
         , valType(t) {};
+
+    std::string string() const override { return "{node: ValueDefault, value: N/A}"; }
 };
 
 struct IntegerNode : ValueNode {
@@ -136,11 +129,22 @@ struct StringNode : ValueNode {
     std::string string() const override { return "{node: String, value: " + value + "}"; }
 };
 
+struct IdentifierNode : StringNode {
+    IdentifierNode(std::string v)
+        : StringNode(v) {
+        type = NodeType::IDENTIFIER;
+    };
+
+    std::string string() const override {
+        return "{node: Identifier, value: " + value + "}";
+    }
+};
+
 struct ListNode : ValueNode {
     std::vector<std::shared_ptr<SyntaxNode>> value;
     ListNode()
         : ValueNode(ValueType::LIST) {
-        value = std::vector<std::shared_ptr<SyntaxNode>>(2);
+        value = std::vector<std::shared_ptr<SyntaxNode>>();
     };
     ListNode(std::vector<std::shared_ptr<SyntaxNode>> &v)
         : value(v)

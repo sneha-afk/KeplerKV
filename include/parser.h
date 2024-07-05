@@ -3,11 +3,9 @@
 #include "syntax_tree.h"
 #include "token.h"
 
-#include <vector>
-
 class Parser {
 public:
-    Parser() { nodes = std::vector<std::shared_ptr<SyntaxNode>>(2); };
+    Parser() { nodes = std::vector<std::shared_ptr<SyntaxNode>>(); };
 
     std::vector<std::shared_ptr<SyntaxNode>> nodes;
     std::vector<std::shared_ptr<SyntaxNode>> &parse(
