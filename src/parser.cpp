@@ -5,9 +5,10 @@
 
 #include <stdexcept>
 
-Parser::Parser() { nodes = std::vector<SyntaxNode>(2); }
+Parser::Parser() { nodes = std::vector<std::shared_ptr<SyntaxNode>>(2); }
 
-std::vector<SyntaxNode> &Parser::parse(std::vector<Token> &tokens) {
+std::vector<std::shared_ptr<SyntaxNode>> &Parser::parse(
+    std::vector<std::shared_ptr<Token>> &tokens) {
     nodes.clear();
     if (tokens.empty()) return nodes;
 
@@ -15,48 +16,67 @@ std::vector<SyntaxNode> &Parser::parse(std::vector<Token> &tokens) {
     tend_ = tokens.end();
 
     // First token must be a command
-    if ((*tt_).type != TokenType::COMMAND)
-        throw std::runtime_error("Error: invalid command \'" + (*tt_).value + "\'");
+    if ((**tt_).type != TokenType::COMMAND)
+        throw std::runtime_error("Error: invalid command \'" + (**tt_).value + "\'");
 
     while (tt_ != tend_) {
-        Token &t = *tt_;
+        std::shared_ptr<Token> &t = *tt_;
+        if ((*t).type == TokenType::END || (*t).type != TokenType::COMMAND) {
+            break;
+        }
         nodes.push_back(parseCommand_(t));
     }
 
     return nodes;
 }
-
-SyntaxNode Parser::parseCommand_(Token &t) {
-    CommandType cmdType = mapGet(mapToCmd, t.value, CommandType::UNKNOWN);
+#include <iostream>
+std::shared_ptr<SyntaxNode> Parser::parseCommand_(std::shared_ptr<Token> &t) {
+    std::string &tValue = (*t).value;
+    CommandType cmdType = mapGet(mapToCmd, tValue, CommandType::UNKNOWN);
     if (cmdType == CommandType::UNKNOWN)
-        throw std::runtime_error("Error: invalid command \'" + (*tt_).value + "\'");
+        throw std::runtime_error("Error: invalid command \'" + tValue + "\'");
 
-    CommandNode cmd = CommandNode(cmdType);
-    std::list<SyntaxNode> &args = cmd.args;
+    std::shared_ptr<CommandNode> cmd = std::make_shared<CommandNode>(cmdType);
+    std::list<std::shared_ptr<SyntaxNode>> &args = cmd->args;
+    tt_++;
 
-    while (tt_ != tend_ && (*tt_).type != TokenType::END) {
-        Token &t = *tt_;
-
-        switch (t.type) {
-            case TokenType::END: break;
+    while (tt_ != tend_ && (**tt_).type != TokenType::END) {
+        std::shared_ptr<Token> &t = *tt_;
+        switch ((*t).type) {
             case TokenType::COMMAND:
                 throw std::runtime_error("Error: nested commands not supported (yet?)");
             case TokenType::DELIMITER: tt_++; break;
             case TokenType::LIST_START: args.push_back(parseList_()); break;
             case TokenType::NUMBER:
-            case TokenType::STRING: args.push_back(parsePrimitive_(t)); break;
+            case TokenType::STRING:
+                args.push_back(parsePrimitive_(t));
+                tt_++;
+                break;
             case TokenType::UNKNOWN:
-                throw std::runtime_error("Error: unknown token \'" + t.value + "\'");
+                throw std::runtime_error("Error: unknown token \'" + tValue + "\'");
+            case TokenType::END:
             default: tt_++; break;
         }
     }
     return cmd;
 }
 
-SyntaxNode Parser::parsePrimitive_(Token &t) { return SyntaxNode(); };
+std::shared_ptr<SyntaxNode> Parser::parsePrimitive_(std::shared_ptr<Token> &t) {
+    switch ((*t).type) {
+        case TokenType::STRING: return std::make_shared<StringNode>((*t).value); break;
+        case TokenType::NUMBER:
+            if (strContains((*t).value, '.'))
+                return std::make_shared<FloatNode>(std::stof((*t).value));
+            else
+                return std::make_shared<IntegerNode>(std::stoi((*t).value));
+            break;
+        default: break;
+    }
+    return std::make_shared<NilNode>();
+};
 
-SyntaxNode Parser::parseList_() {
+std::shared_ptr<SyntaxNode> Parser::parseList_() {
     // Assuming called this method upon seeing '['
     tt_++;
-    return SyntaxNode();
+    return std::make_shared<NilNode>();
 };

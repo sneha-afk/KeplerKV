@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <ostream>
 #include <string>
 
@@ -37,5 +38,21 @@ struct Token {
         : type(type)
         , value(std::string(1, c)) {};
 
-    friend std::ostream &operator<<(std::ostream &os, const Token &t);
+    friend std::ostream &operator<<(std::ostream &os, const Token &t) {
+        os << "{type: ";
+        switch (t.type) {
+            case TokenType::COMMAND: os << "CMD"; break;
+            case TokenType::IDENTIIFER: os << "IDENTIFIER"; break;
+            case TokenType::NUMBER: os << "NUMBER"; break;
+            case TokenType::STRING: os << "STRING"; break;
+            case TokenType::LIST_START: os << "LIST_START"; break;
+            case TokenType::LIST_END: os << "LIST_END"; break;
+            case TokenType::DELIMITER: os << "DELIMITER"; break;
+            case TokenType::END: os << "END"; break;
+            case TokenType::UNKNOWN:
+            default: os << "UNKNOWN"; break;
+        }
+        os << ", value: `" << t.value << "`}";
+        return os;
+    };
 };

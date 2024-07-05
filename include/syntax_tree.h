@@ -1,6 +1,7 @@
 #pragma once
 
 #include <list>
+#include <memory>
 #include <string>
 #include <unordered_map>
 
@@ -36,17 +37,20 @@ struct SyntaxNode {
     // https://stackoverflow.com/q/461203
     virtual ~SyntaxNode() = default;
 
-    virtual std::string string() const { return "{node_type: default, value: nil}"; };
-
-    friend std::ostream &operator<<(std::ostream &os, const SyntaxNode &n) {
-        os << n.string();
+    virtual std::string string() const = 0;
+    friend std::ostream &operator<<(std::ostream &os, const SyntaxNode &t) {
+        os << t.string();
         return os;
-    }
+    };
+};
+
+struct NilNode : SyntaxNode {
+    std::string string() const override { return "{node_type: nil, value: nil}"; }
 };
 
 struct CommandNode : SyntaxNode {
     CommandType cmd;
-    std::list<SyntaxNode> args;
+    std::list<std::shared_ptr<SyntaxNode>> args;
     CommandNode()
         : cmd(CommandType::UNKNOWN) {};
     CommandNode(CommandType c)
@@ -55,10 +59,12 @@ struct CommandNode : SyntaxNode {
     std::string string() const override {
         std::string s = "{node_type: Command, args: [";
         for (const auto &a : args) {
-            s += a.string() + ", ";
+            s += a->string() + ", ";
         }
-        s.pop_back();
-        s.pop_back();
+        if (!args.empty()) {
+            s.pop_back();
+            s.pop_back();
+        }
         s += "]}";
         return s;
     }
@@ -95,17 +101,19 @@ struct StringNode : SyntaxNode {
 };
 
 struct ListNode : SyntaxNode {
-    std::list<SyntaxNode> value;
-    ListNode(std::list<SyntaxNode> &v)
+    std::list<std::shared_ptr<SyntaxNode>> value;
+    ListNode(std::list<std::shared_ptr<SyntaxNode>> &v)
         : value(v) {};
 
     std::string string() const override {
         std::string s = "{node_type: List, value: [";
         for (const auto &v : value) {
-            s += v.string() + ", ";
+            s += v->string() + ", ";
         }
-        s.pop_back();
-        s.pop_back();
+        if (!value.empty()) {
+            s.pop_back();
+            s.pop_back();
+        }
         s += "]}";
         return s;
     }

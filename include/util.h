@@ -10,4 +10,7 @@ V mapGet(const std::unordered_map<K, V> &map, const K &key, const V &dft) {
     if (found != map.end()) return found->second;
     return dft;
 }
-    
+
+inline bool strContains(const std::string &s, const char &c) {
+    return s.find(c) != std::string::npos;
+}

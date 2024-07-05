@@ -2,22 +2,23 @@
 
 #include "token.h"
 
+#include <memory>
 #include <string>
 #include <vector>
 
 class Lexer {
 public:
     Lexer();
-    std::vector<Token> tokens;
-    std::vector<Token> &tokenize(std::string &);
+    std::vector<std::shared_ptr<Token>> tokens;
+    std::vector<std::shared_ptr<Token>> &tokenize(std::string &);
 
 private:
     std::string input_;
     std::string::iterator it_;
     std::string::iterator iend_;
 
-    Token lexCommand_();
-    Token lexIdentifier_();
-    Token lexNumber_();
-    Token lexString_();
+    std::shared_ptr<Token> lexCommand_();
+    std::shared_ptr<Token> lexIdentifier_();
+    std::shared_ptr<Token> lexNumber_();
+    std::shared_ptr<Token> lexString_();
 };
