@@ -45,7 +45,7 @@ struct SyntaxNode {
 };
 
 struct NilNode : SyntaxNode {
-    std::string string() const override { return "{node_type: nil, value: nil}"; }
+    std::string string() const override { return "{node: nil, value: nil}"; }
 };
 
 struct CommandNode : SyntaxNode {
@@ -57,8 +57,9 @@ struct CommandNode : SyntaxNode {
         : cmd(c) {};
 
     std::string string() const override {
-        std::string s = "{node_type: Command, args: [";
+        std::string s = "{node: Command, cmd: " + std::to_string((int) cmd) + ", args: [";
         for (const auto &a : args) {
+            if (!a) continue;
             s += a->string() + ", ";
         }
         if (!args.empty()) {
@@ -76,7 +77,7 @@ struct IntegerNode : SyntaxNode {
         : value(v) {};
 
     std::string string() const override {
-        return "{node_type: Integer, value: " + std::to_string(value) + "}";
+        return "{node: Integer, value: " + std::to_string(value) + "}";
     }
 };
 
@@ -86,7 +87,7 @@ struct FloatNode : SyntaxNode {
         : value(v) {};
 
     std::string string() const override {
-        return "{node_type: Float, value: " + std::to_string(value) + "}";
+        return "{node: Float, value: " + std::to_string(value) + "}";
     }
 };
 
@@ -95,19 +96,28 @@ struct StringNode : SyntaxNode {
     StringNode(std::string v)
         : value(v) {};
 
+    std::string string() const override { return "{node: String, value: " + value + "}"; }
+};
+
+struct IdentifierNode : StringNode {
+    IdentifierNode(std::string v)
+        : StringNode(v) {};
+
     std::string string() const override {
-        return "{node_type: String, value: " + value + "}";
+        return "{node: Identifier, value: " + value + "}";
     }
 };
 
 struct ListNode : SyntaxNode {
     std::list<std::shared_ptr<SyntaxNode>> value;
+    ListNode() { value = std::list<std::shared_ptr<SyntaxNode>>(2); };
     ListNode(std::list<std::shared_ptr<SyntaxNode>> &v)
         : value(v) {};
 
     std::string string() const override {
-        std::string s = "{node_type: List, value: [";
+        std::string s = "{node: List, value: [";
         for (const auto &v : value) {
+            if (!v) continue;
             s += v->string() + ", ";
         }
         if (!value.empty()) {

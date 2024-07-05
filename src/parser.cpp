@@ -5,8 +5,6 @@
 
 #include <stdexcept>
 
-Parser::Parser() { nodes = std::vector<std::shared_ptr<SyntaxNode>>(2); }
-
 std::vector<std::shared_ptr<SyntaxNode>> &Parser::parse(
     std::vector<std::shared_ptr<Token>> &tokens) {
     nodes.clear();
@@ -29,7 +27,7 @@ std::vector<std::shared_ptr<SyntaxNode>> &Parser::parse(
 
     return nodes;
 }
-#include <iostream>
+
 std::shared_ptr<SyntaxNode> Parser::parseCommand_(std::shared_ptr<Token> &t) {
     std::string &tValue = (*t).value;
     CommandType cmdType = mapGet(mapToCmd, tValue, CommandType::UNKNOWN);
@@ -48,12 +46,13 @@ std::shared_ptr<SyntaxNode> Parser::parseCommand_(std::shared_ptr<Token> &t) {
             case TokenType::DELIMITER: tt_++; break;
             case TokenType::LIST_START: args.push_back(parseList_()); break;
             case TokenType::NUMBER:
+            case TokenType::IDENTIIFER:
             case TokenType::STRING:
                 args.push_back(parsePrimitive_(t));
                 tt_++;
                 break;
             case TokenType::UNKNOWN:
-                throw std::runtime_error("Error: unknown token \'" + tValue + "\'");
+                throw std::runtime_error("Error: unknown token \'" + (*t).value + "\'");
             case TokenType::END:
             default: tt_++; break;
         }
@@ -62,14 +61,18 @@ std::shared_ptr<SyntaxNode> Parser::parseCommand_(std::shared_ptr<Token> &t) {
 }
 
 std::shared_ptr<SyntaxNode> Parser::parsePrimitive_(std::shared_ptr<Token> &t) {
+    std::string &tValue = (*t).value;
     switch ((*t).type) {
-        case TokenType::STRING: return std::make_shared<StringNode>((*t).value); break;
         case TokenType::NUMBER:
-            if (strContains((*t).value, '.'))
-                return std::make_shared<FloatNode>(std::stof((*t).value));
+            if (strContains(tValue, '.'))
+                return std::make_shared<FloatNode>(std::stof(tValue));
             else
-                return std::make_shared<IntegerNode>(std::stoi((*t).value));
+                return std::make_shared<IntegerNode>(std::stoi(tValue));
             break;
+        case TokenType::IDENTIIFER:
+            return std::make_shared<IdentifierNode>(tValue);
+            break;
+        case TokenType::STRING: return std::make_shared<StringNode>(tValue); break;
         default: break;
     }
     return std::make_shared<NilNode>();
@@ -78,5 +81,28 @@ std::shared_ptr<SyntaxNode> Parser::parsePrimitive_(std::shared_ptr<Token> &t) {
 std::shared_ptr<SyntaxNode> Parser::parseList_() {
     // Assuming called this method upon seeing '['
     tt_++;
-    return std::make_shared<NilNode>();
+
+    std::shared_ptr<ListNode> lstnode = std::make_shared<ListNode>();
+    std::list<std::shared_ptr<SyntaxNode>> &lst = (*lstnode).value;
+
+    while (tt_ != tend_ && (**tt_).type != TokenType::LIST_END) {
+        std::shared_ptr<Token> &t = *tt_;
+        switch ((*t).type) {
+            case TokenType::COMMAND:
+                throw std::runtime_error("Error: commands not supported within lists");
+            case TokenType::DELIMITER: tt_++; break;
+            case TokenType::LIST_START: lst.push_back(parseList_()); break;
+            case TokenType::NUMBER:
+            case TokenType::IDENTIIFER:
+            case TokenType::STRING:
+                lst.push_back(parsePrimitive_(t));
+                tt_++;
+                break;
+            case TokenType::UNKNOWN:
+                throw std::runtime_error("Error: unknown token \'" + (*t).value + "\'");
+            case TokenType::END:
+            default: tt_++; break;
+        }
+    }
+    return lstnode;
 };

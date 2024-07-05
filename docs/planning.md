@@ -34,6 +34,16 @@ A NoSQL key-value pair store for quick access.
 ---
 ## dev journal
 
+### July 4, 2024
+
+* Continued work on the parser, which takes in tokens from `Lexer` and outputs `SyntaxNode` structures
+    * Finished primitives (numbers, identifiers, strings), lists, and commands
+    * Mapping the command token to the appropriate `CommandType` to be evaluated
+* Using smart pointers to use dynamic memory safely
+* Next steps:
+    * Evaluator to enforce syntax rules and command specifications
+    * Planning for the store: how to bridge the gap betweent the evaluator and store itself
+
 ### July 1, 2024
 
 * Done with the first iteration of the lexer, moving onto the parser

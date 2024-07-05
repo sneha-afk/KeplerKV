@@ -8,7 +8,8 @@
 
 class Lexer {
 public:
-    Lexer();
+    Lexer() { tokens = std::vector<std::shared_ptr<Token>>(2); };
+
     std::vector<std::shared_ptr<Token>> tokens;
     std::vector<std::shared_ptr<Token>> &tokenize(std::string &);
 

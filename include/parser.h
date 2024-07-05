@@ -7,7 +7,8 @@
 
 class Parser {
 public:
-    Parser();
+    Parser() { nodes = std::vector<std::shared_ptr<SyntaxNode>>(2); };
+
     std::vector<std::shared_ptr<SyntaxNode>> nodes;
     std::vector<std::shared_ptr<SyntaxNode>> &parse(
         std::vector<std::shared_ptr<Token>> &);

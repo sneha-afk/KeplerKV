@@ -4,8 +4,6 @@
 #include <cctype>
 #include <stdexcept>
 
-Lexer::Lexer() { tokens = std::vector<std::shared_ptr<Token>>(2); }
-
 std::vector<std::shared_ptr<Token>> &Lexer::tokenize(std::string &query) {
     tokens.clear();
     if (query.empty()) return tokens;

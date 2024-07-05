@@ -39,7 +39,7 @@ struct Token {
         , value(std::string(1, c)) {};
 
     friend std::ostream &operator<<(std::ostream &os, const Token &t) {
-        os << "{type: ";
+        os << "{token: ";
         switch (t.type) {
             case TokenType::COMMAND: os << "CMD"; break;
             case TokenType::IDENTIIFER: os << "IDENTIFIER"; break;
