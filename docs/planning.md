@@ -34,6 +34,12 @@ A NoSQL key-value pair store for quick access.
 ---
 ## dev journal
 
+### July 5, 2024
+
+* Worked on finishing up the `handleQuery` method
+* Made a barebones header for the store
+* Smaller refactorings for the syntax nodes to identify values more easily
+
 ### July 4, 2024
 
 * Continued work on the parser, which takes in tokens from `Lexer` and outputs `SyntaxNode` structures
