@@ -8,7 +8,10 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 
 add_executable(${PROJECT_NAME}
     src/main.cpp
+    src/syntax_tree.cpp
     src/lexer.cpp
     src/parser.cpp
     src/handler.cpp
+    src/store_value.cpp
+    src/store.cpp
 )
