@@ -5,8 +5,7 @@
 
 #include <stdexcept>
 
-std::vector<std::shared_ptr<SyntaxNode>> &Parser::parse(
-    std::vector<std::shared_ptr<Token>> &tokens) {
+std::vector<SyntaxNodeSP> &Parser::parse(std::vector<TokenSP> &tokens) {
     nodes.clear();
     if (tokens.empty()) return nodes;
 
@@ -18,7 +17,7 @@ std::vector<std::shared_ptr<SyntaxNode>> &Parser::parse(
         throw std::runtime_error("Error: invalid command \'" + (*tt_)->value + "\'");
 
     while (tt_ != tend_) {
-        std::shared_ptr<Token> &t = *tt_;
+        TokenSP &t = *tt_;
         if (t->type == TokenType::END || t->type != TokenType::COMMAND) {
             break;
         }
@@ -28,17 +27,17 @@ std::vector<std::shared_ptr<SyntaxNode>> &Parser::parse(
     return nodes;
 }
 
-std::shared_ptr<SyntaxNode> Parser::parseCommand_(std::shared_ptr<Token> &cmdTok) {
+SyntaxNodeSP Parser::parseCommand_(TokenSP &cmdTok) {
     CommandType cmdType = mapGet(mapToCmd, cmdTok->value, CommandType::UNKNOWN);
     if (cmdType == CommandType::UNKNOWN)
         throw std::runtime_error("Error: invalid command \'" + cmdTok->value + "\'");
 
     std::shared_ptr<CommandNode> cmd = std::make_shared<CommandNode>(cmdType);
-    std::vector<std::shared_ptr<SyntaxNode>> &args = cmd->args;
+    std::vector<SyntaxNodeSP> &args = cmd->args;
     tt_++;
 
     while (tt_ != tend_ && (*tt_)->type != TokenType::END) {
-        std::shared_ptr<Token> &t = *tt_;
+        TokenSP &t = *tt_;
         switch (t->type) {
             case TokenType::COMMAND:
                 throw std::runtime_error("Error: nested commands not supported (yet?)");
@@ -59,7 +58,7 @@ std::shared_ptr<SyntaxNode> Parser::parseCommand_(std::shared_ptr<Token> &cmdTok
     return cmd;
 }
 
-std::shared_ptr<SyntaxNode> Parser::parsePrimitive_(std::shared_ptr<Token> &t) {
+SyntaxNodeSP Parser::parsePrimitive_(TokenSP &t) {
     std::string &tValue = t->value;
     switch (t->type) {
         case TokenType::NUMBER:
@@ -74,15 +73,15 @@ std::shared_ptr<SyntaxNode> Parser::parsePrimitive_(std::shared_ptr<Token> &t) {
     return std::make_shared<NilNode>();
 };
 
-std::shared_ptr<SyntaxNode> Parser::parseList_() {
+SyntaxNodeSP Parser::parseList_() {
     // Assuming called this method upon seeing '['
     tt_++;
 
     std::shared_ptr<ListNode> lstnode = std::make_shared<ListNode>();
-    std::vector<std::shared_ptr<SyntaxNode>> &lst = lstnode->value;
+    std::vector<SyntaxNodeSP> &lst = lstnode->value;
 
     while (tt_ != tend_ && (*tt_)->type != TokenType::LIST_END) {
-        std::shared_ptr<Token> &t = *tt_;
+        TokenSP &t = *tt_;
         switch (t->type) {
             case TokenType::COMMAND:
                 throw std::runtime_error("Error: commands not supported within lists");

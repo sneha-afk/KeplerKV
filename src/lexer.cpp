@@ -4,7 +4,7 @@
 #include <cctype>
 #include <stdexcept>
 
-std::vector<std::shared_ptr<Token>> &Lexer::tokenize(std::string &query) {
+std::vector<TokenSP> &Lexer::tokenize(std::string &query) {
     tokens.clear();
     if (query.empty()) return tokens;
 
@@ -56,7 +56,7 @@ std::vector<std::shared_ptr<Token>> &Lexer::tokenize(std::string &query) {
     return tokens;
 }
 
-std::shared_ptr<Token> Lexer::lexCommand_() {
+TokenSP Lexer::lexCommand_() {
     std::string s;
     while (it_ != iend_ && *it_ != WHITESPACE && *it_ != SEMICOLON) {
         // Represent as uppercase internally
@@ -66,7 +66,7 @@ std::shared_ptr<Token> Lexer::lexCommand_() {
     return std::make_shared<Token>(TokenType::COMMAND, s);
 }
 
-std::shared_ptr<Token> Lexer::lexIdentifier_() {
+TokenSP Lexer::lexIdentifier_() {
     std::string s;
     while (it_ != iend_ && (isalnum(*it_) || *it_ == UNDERSCORE)) {
         s.push_back(*it_);
@@ -75,7 +75,7 @@ std::shared_ptr<Token> Lexer::lexIdentifier_() {
     return std::make_shared<Token>(TokenType::IDENTIIFER, s);
 }
 
-std::shared_ptr<Token> Lexer::lexNumber_() {
+TokenSP Lexer::lexNumber_() {
     std::string s;
 
     // Flags for symbols that can only appear once
@@ -99,7 +99,7 @@ std::shared_ptr<Token> Lexer::lexNumber_() {
     return std::make_shared<Token>(TokenType::NUMBER, s);
 }
 
-std::shared_ptr<Token> Lexer::lexString_() {
+TokenSP Lexer::lexString_() {
     std::string s;
 
     const char &quote = *it_;

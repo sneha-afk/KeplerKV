@@ -5,17 +5,16 @@
 
 class Parser {
 public:
-    Parser() { nodes = std::vector<std::shared_ptr<SyntaxNode>>(); };
+    Parser() { nodes = std::vector<SyntaxNodeSP>(); };
 
-    std::vector<std::shared_ptr<SyntaxNode>> nodes;
-    std::vector<std::shared_ptr<SyntaxNode>> &parse(
-        std::vector<std::shared_ptr<Token>> &);
+    std::vector<SyntaxNodeSP> nodes;
+    std::vector<SyntaxNodeSP> &parse(std::vector<TokenSP> &);
 
 private:
-    std::vector<std::shared_ptr<Token>>::iterator tt_;
-    std::vector<std::shared_ptr<Token>>::iterator tend_;
+    std::vector<TokenSP>::iterator tt_;
+    std::vector<TokenSP>::iterator tend_;
 
-    std::shared_ptr<SyntaxNode> parseCommand_(std::shared_ptr<Token> &);
-    std::shared_ptr<SyntaxNode> parsePrimitive_(std::shared_ptr<Token> &);
-    std::shared_ptr<SyntaxNode> parseList_();
+    SyntaxNodeSP parseCommand_(TokenSP &);
+    SyntaxNodeSP parsePrimitive_(TokenSP &);
+    SyntaxNodeSP parseList_();
 };

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <ostream>
 #include <string>
 
@@ -55,3 +56,5 @@ struct Token {
         return os;
     };
 };
+
+using TokenSP = std::shared_ptr<Token>;
