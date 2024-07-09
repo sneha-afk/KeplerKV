@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <variant>
 #include <vector>
 
 enum class NodeType { COMMAND, IDENTIFIER, VALUE, NIL };
@@ -15,7 +16,7 @@ enum class CommandType {
     UNKNOWN,
 };
 
-enum class ValueType {
+enum class ValueNodeType {
     INT,
     FLOAT,
     STRING,
@@ -38,8 +39,13 @@ static const std::unordered_map<std::string, CommandType> mapToCmd = {
 struct SyntaxNode;
 using SyntaxNodeSP = std::shared_ptr<SyntaxNode>;
 
+struct ValueNode;
+using ValueNodeSP = std::shared_ptr<ValueNode>;
+using ValueType = std::variant<int, float, std::string, std::vector<ValueNodeSP>>;
+
 // https://stackoverflow.com/a/54596
-struct SyntaxNode {
+class SyntaxNode {
+public:
     NodeType type;
     SyntaxNode(NodeType t)
         : type(t) {};
@@ -60,7 +66,8 @@ struct NilNode : SyntaxNode {
     std::string string() const override;
 };
 
-struct CommandNode : SyntaxNode {
+class CommandNode : SyntaxNode {
+public:
     CommandType cmdType;
     std::vector<SyntaxNodeSP> args;
 
@@ -81,65 +88,76 @@ struct CommandNode : SyntaxNode {
 };
 
 // Used to identify all value types
-struct ValueNode : SyntaxNode {
-    ValueType valType;
+class ValueNode : SyntaxNode {
+public:
+    ValueNodeType valType;
+    ValueType value;
 
-    ValueNode(ValueType t)
+    ValueNode(ValueNodeType t, ValueType v)
         : SyntaxNode(NodeType::VALUE)
-        , valType(t) {};
+        , valType(t)
+        , value(v) {};
+    ValueNode(NodeType n, ValueNodeType t, ValueType v)
+        : SyntaxNode(n)
+        , valType(t)
+        , value(v) {};
 
     std::string string() const override;
 };
 
-struct IntegerNode : ValueNode {
-    int value;
-
+class IntegerNode : ValueNode {
+public:
     IntegerNode(int v)
-        : value(v)
-        , ValueNode(ValueType::INT) {};
+        : ValueNode(ValueNodeType::INT, v) {};
 
+    const int &getValue() const { return std::get<int>(value); }
     std::string string() const override;
 };
 
-struct FloatNode : ValueNode {
-    float value;
-
+class FloatNode : ValueNode {
+public:
     FloatNode(float v)
-        : value(v)
-        , ValueNode(ValueType::FLOAT) {};
+        : ValueNode(ValueNodeType::FLOAT, v) {};
 
+    const float &getValue() const { return std::get<float>(value); }
     std::string string() const override;
 };
 
-struct StringNode : ValueNode {
-    std::string value;
-
+class StringNode : ValueNode {
+public:
     StringNode(std::string v)
-        : value(v)
-        , ValueNode(ValueType::STRING) {};
+        : ValueNode(ValueNodeType::STRING, v) {};
 
+    const std::string &getValue() const { return std::get<std::string>(value); }
     std::string string() const override;
 };
 
-struct IdentifierNode : StringNode {
+class IdentifierNode : ValueNode {
+public:
     IdentifierNode(std::string v)
-        : StringNode(v) {
-        type = NodeType::IDENTIFIER;
-    };
+        : ValueNode(NodeType::IDENTIFIER, ValueNodeType::STRING, v) {};
 
+    const std::string &getIdent() const { return std::get<std::string>(value); }
+    const std::string &getValue() const { return getValue(); }
     std::string string() const override;
 };
 
-struct ListNode : ValueNode {
-    std::vector<SyntaxNodeSP> value;
-
+class ListNode : ValueNode {
+public:
     ListNode()
-        : ValueNode(ValueType::LIST) {
-        value = std::vector<SyntaxNodeSP>();
-    };
-    ListNode(std::vector<SyntaxNodeSP> &v)
-        : value(v)
-        , ValueNode(ValueType::LIST) {};
+        : ValueNode(ValueNodeType::LIST, std::vector<ValueNodeSP>()) {};
+    ListNode(std::vector<ValueNodeSP> &v)
+        : ValueNode(ValueNodeType::LIST, v) {};
 
+    const std::vector<ValueNodeSP> &getValue() const {
+        return std::get<std::vector<ValueNodeSP>>(value);
+    }
     std::string string() const override;
 };
+
+using CommandNodeSP = std::shared_ptr<CommandNode>;
+using IntegerNodeSP = std::shared_ptr<IntegerNode>;
+using FloatNodeSP = std::shared_ptr<FloatNode>;
+using StringNodeSP = std::shared_ptr<StringNode>;
+using IdentifierNodeSP = std::shared_ptr<IdentifierNode>;
+using ListNodeSP = std::shared_ptr<ListNode>;

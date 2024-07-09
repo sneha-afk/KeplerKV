@@ -1,5 +1,7 @@
 #pragma once
 
+#include "syntax_tree.h"
+
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -10,7 +12,7 @@ static constexpr unsigned int STORE_MIN_SIZE = 256;
 
 struct StoreValue;
 using StoreValueSP = std::shared_ptr<StoreValue>;
-using StoreValueType = std::variant<int, std::string, std::vector<StoreValueSP>>;
+using StoreValueType = std::variant<int, float, std::string, std::vector<StoreValueSP>>;
 
 class StoreValue {
 private:
@@ -20,10 +22,13 @@ private:
 public:
     StoreValue(int v)
         : value_(v) {};
+    StoreValue(float v)
+        : value_(v) {};
     StoreValue(const std::string &v)
         : value_(v) {};
     StoreValue(const std::vector<StoreValueSP> &v)
         : value_(v) {};
+    StoreValue(const ValueNodeSP &v);
 
     std::string string() const;
     friend std::ostream &operator<<(std::ostream &os, const StoreValue &sv) {

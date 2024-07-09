@@ -78,7 +78,7 @@ SyntaxNodeSP Parser::parseList_() {
     tt_++;
 
     std::shared_ptr<ListNode> lstnode = std::make_shared<ListNode>();
-    std::vector<SyntaxNodeSP> &lst = lstnode->value;
+    std::vector<SyntaxNodeSP> &lst = std::get<std::vector<SyntaxNodeSP>>(lstnode->value);
 
     while (tt_ != tend_ && (*tt_)->type != TokenType::LIST_END) {
         TokenSP &t = *tt_;

@@ -19,26 +19,30 @@ std::string CommandNode::string() const {
 }
 
 std::string IntegerNode::string() const {
-    return "{node: Integer, value: " + std::to_string(value) + "}";
+    return "{node: Integer, value: " + std::to_string(getValue()) + "}";
 }
 
 std::string FloatNode::string() const {
-    return "{node: Float, value: " + std::to_string(value) + "}";
+    return "{node: Float, value: " + std::to_string(getValue()) + "}";
 }
 
-std::string StringNode::string() const { return "{node: String, value: " + value + "}"; }
+std::string StringNode::string() const {
+    return "{node: String, value: " + getValue() + "}";
+}
 
 std::string IdentifierNode::string() const {
-    return "{node: Identifier, value: " + value + "}";
+    return "{node: Identifier, value: " + getIdent() + "}";
 }
 
 std::string ListNode::string() const {
     std::string s = "{node: List, value: [";
-    for (const auto &v : value) {
+
+    const std::vector<ValueNodeSP> &values = getValue();
+    for (const auto &v : values) {
         if (!v) continue;
         s += v->string() + ", ";
     }
-    if (!value.empty()) {
+    if (!values.empty()) {
         s.pop_back();
         s.pop_back();
     }

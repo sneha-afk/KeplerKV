@@ -18,7 +18,7 @@ void Handler::handleQuery(std::string &query) {
         std::cout << "\t" << *n << std::endl;
 
         // https://stackoverflow.com/a/14545746
-        std::shared_ptr<CommandNode> cmd = std::dynamic_pointer_cast<CommandNode>(n);
+        CommandNodeSP cmd = std::dynamic_pointer_cast<CommandNode>(n);
         if (cmd == nullptr) throw WRONG_FMT;
 
         std::vector<std::shared_ptr<SyntaxNode>> &args = cmd->args;
@@ -31,15 +31,17 @@ void Handler::handleQuery(std::string &query) {
 
                 for (int i = 0; i < numArgs; i += 2) {
                     if (!args[i]) continue;
-                    std::shared_ptr<IdentifierNode> ident
+                    IdentifierNodeSP identNode
                         = std::dynamic_pointer_cast<IdentifierNode>(args[i]);
-                    if (ident == nullptr) throw NOT_IDENT;
+                    if (identNode == nullptr) throw NOT_IDENT;
+                    std::string ident = identNode->getIdent();
 
-                    std::shared_ptr<ValueNode> value
-                        = std::dynamic_pointer_cast<ValueNode>(args[i + 1]);
+                    ValueNodeSP value = std::dynamic_pointer_cast<ValueNode>(args[i + 1]);
                     if (value == nullptr) throw WRONG_FMT;
 
                     // todo: send set() instructions to store
+                    StoreValueSP toValue = std::make_shared<StoreValue>(value);
+                    store_.set(ident, toValue);
                 }
                 break;
             case CommandType::GET:
@@ -48,7 +50,7 @@ void Handler::handleQuery(std::string &query) {
                         "Error: GET requires at least one argument (key)");
 
                 for (int i = 0; i < numArgs; i++) {
-                    std::shared_ptr<IdentifierNode> ident
+                    IdentifierNodeSP ident
                         = std::dynamic_pointer_cast<IdentifierNode>(args[i]);
                     if (ident == nullptr) throw NOT_IDENT;
 
@@ -61,7 +63,7 @@ void Handler::handleQuery(std::string &query) {
                         "Error: DELETE requires at least one argument (key)");
 
                 for (int i = 0; i < numArgs; i++) {
-                    std::shared_ptr<IdentifierNode> ident
+                    IdentifierNodeSP ident
                         = std::dynamic_pointer_cast<IdentifierNode>(args[i]);
                     if (ident == nullptr) throw NOT_IDENT;
 
@@ -74,12 +76,11 @@ void Handler::handleQuery(std::string &query) {
                         "Error: UPDATE requires at least two arguments (key value)");
 
                 for (int i = 0; i < numArgs; i += 2) {
-                    std::shared_ptr<IdentifierNode> ident
+                    IdentifierNodeSP ident
                         = std::dynamic_pointer_cast<IdentifierNode>(args[i]);
                     if (ident == nullptr) throw NOT_IDENT;
 
-                    std::shared_ptr<ValueNode> value
-                        = std::dynamic_pointer_cast<ValueNode>(args[i + 1]);
+                    ValueNodeSP value = std::dynamic_pointer_cast<ValueNode>(args[i + 1]);
                     if (value == nullptr) throw WRONG_FMT;
 
                     // todo: send update() instructions to store
