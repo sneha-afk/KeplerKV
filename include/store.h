@@ -1,21 +1,45 @@
 #pragma once
 
+#include <memory>
 #include <string>
-#include <unordered_map>
 #include <variant>
 #include <vector>
 
-using StoreValue = std::variant<int, float, std::string, std::vector<StoreValue>>;
+static constexpr unsigned int STORE_MIN_SIZE = 256;
+
+struct StoreValue;
+using StoreValueSP = std::shared_ptr<StoreValue>;
+using StoreValueType = std::variant<int, std::string, std::vector<StoreValueSP>>;
+
+class StoreValue {
+private:
+    StoreValueType value_;
+    std::string stringRecur_() const;
+
+public:
+    StoreValue(int v)
+        : value_(v) {};
+    StoreValue(const std::string &v)
+        : value_(v) {};
+    StoreValue(const std::vector<StoreValueSP> &v)
+        : value_(v) {};
+
+    std::string string() const;
+    friend std::ostream &operator<<(std::ostream &os, const StoreValue &sv) {
+        os << sv.string();
+        return os;
+    };
+};
 
 class Store {
 private:
-    std::unordered_map<std::string, StoreValue> store_;
+    std::vector<std::string, StoreValueSP> map_;
 
 public:
     Store();
 
-    void set(std::string &, StoreValue);
-    StoreValue get(std::string &);
-    bool del(std::string &);
-    bool update(std::string &, StoreValue);
+    bool set(const std::string &, StoreValueSP);
+    StoreValueSP get(const std::string &);
+    bool del(const std::string &);
+    bool update(const std::string &, StoreValueSP);
 };
