@@ -1,25 +1,36 @@
-#include "store.h"
+#include "store_value.h"
 
 #include <stdexcept>
 
-static const std::runtime_error VALUE_ERR
-    = std::runtime_error("Error: could not parse value");
+static const std::runtime_error WRONG_TYPE_ERR
+    = std::runtime_error("Error: wrong getter used with StoreValue");
 
-StoreValue::StoreValue(const ValueNodeSP &v) {
-    std::vector<StoreValueSP> asValues;
-    switch (v->valType) {
-        case ValueNodeType::INT: value_ = std::get<int>(v->value); break;
-        case ValueNodeType::FLOAT: value_ = std::get<float>(v->value); break;
-        case ValueNodeType::STRING: value_ = std::get<std::string>(v->value); break;
-        case ValueNodeType::LIST:
-            auto &list = std::get<std::vector<ValueNodeSP>>(v->value);
-            asValues = std::vector<StoreValueSP>();
-            for (const auto &node : list)
-                asValues.push_back(std::make_shared<StoreValue>(node));
-            value_ = asValues;
-            break;
-        default: throw VALUE_ERR;
-    }
+int StoreValue::getInt() const {
+    if (isInt())
+        return std::get<int>(value_);
+    else
+        throw WRONG_TYPE_ERR;
+}
+
+float StoreValue::getFloat() const {
+    if (isFloat())
+        return std::get<float>(value_);
+    else
+        throw WRONG_TYPE_ERR;
+}
+
+const std::string &StoreValue::getString() const {
+    if (isString())
+        return std::get<std::string>(value_);
+    else
+        throw WRONG_TYPE_ERR;
+}
+
+const std::vector<StoreValueSP> &StoreValue::getList() const {
+    if (isList())
+        return std::get<std::vector<StoreValueSP>>(value_);
+    else
+        throw WRONG_TYPE_ERR;
 }
 
 std::string stringList_(const std::vector<StoreValueSP> &arg) {

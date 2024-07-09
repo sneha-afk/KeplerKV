@@ -1,5 +1,6 @@
 #pragma once
 
+#include "store_value.h"
 #include "syntax_tree.h"
 
 #include <memory>
@@ -9,33 +10,6 @@
 #include <vector>
 
 static constexpr unsigned int STORE_MIN_SIZE = 256;
-
-struct StoreValue;
-using StoreValueSP = std::shared_ptr<StoreValue>;
-using StoreValueType = std::variant<int, float, std::string, std::vector<StoreValueSP>>;
-
-class StoreValue {
-private:
-    StoreValueType value_;
-    std::string stringRecur_() const;
-
-public:
-    StoreValue(int v)
-        : value_(v) {};
-    StoreValue(float v)
-        : value_(v) {};
-    StoreValue(const std::string &v)
-        : value_(v) {};
-    StoreValue(const std::vector<StoreValueSP> &v)
-        : value_(v) {};
-    StoreValue(const ValueNodeSP &v);
-
-    std::string string() const;
-    friend std::ostream &operator<<(std::ostream &os, const StoreValue &sv) {
-        os << sv.string();
-        return os;
-    };
-};
 
 class Store {
 private:
