@@ -10,9 +10,6 @@ class StoreValue;
 using StoreValueSP = std::shared_ptr<StoreValue>;
 using StoreValueType = std::variant<int, float, std::string, std::vector<StoreValueSP>>;
 
-static const std::runtime_error WRONG_TYPE_ERR
-    = std::runtime_error("Error: wrong getter used with StoreValue");
-
 class StoreValue {
 private:
     StoreValueType value_;

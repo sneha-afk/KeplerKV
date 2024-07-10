@@ -13,7 +13,7 @@ void Handler::handleQuery(std::string &query) {
         std::cout << "\t" << *t << std::endl;
     }
 
-    std::vector<std::shared_ptr<SyntaxNode>> &nodes = parser_.parse(tokens);
+    std::vector<ASTNodeSP> &nodes = parser_.parse(tokens);
     for (const auto &n : nodes) {
         std::cout << "\t" << *n << std::endl;
 
@@ -21,9 +21,9 @@ void Handler::handleQuery(std::string &query) {
         CommandNodeSP cmd = std::dynamic_pointer_cast<CommandNode>(n);
         if (cmd == nullptr) throw WRONG_FMT;
 
-        std::vector<std::shared_ptr<SyntaxNode>> &args = cmd->args;
+        std::vector<ValueNodeSP> &args = cmd->getArgs();
         const std::size_t numArgs = args.size();
-        switch (cmd->cmdType) {
+        switch (cmd->getCmdType()) {
             case CommandType::SET:
                 if (numArgs < 2)
                     throw std::runtime_error(
@@ -31,17 +31,19 @@ void Handler::handleQuery(std::string &query) {
 
                 for (int i = 0; i < numArgs; i += 2) {
                     if (!args[i]) continue;
-                    IdentifierNodeSP identNode
-                        = std::dynamic_pointer_cast<IdentifierNode>(args[i]);
-                    if (identNode == nullptr) throw NOT_IDENT;
-                    std::string ident = identNode->getIdent();
 
-                    ValueNodeSP value = std::dynamic_pointer_cast<ValueNode>(args[i + 1]);
-                    if (value == nullptr) throw WRONG_FMT;
+                    ValueNodeSP identNode = args[i];
+                    if (identNode->getValueType() != ValueType::IDENTIFIER)
+                        throw NOT_IDENT;
+                    std::string ident = identNode->value->getString();
+
+                    if (!(i + 1 < numArgs) || !args[i + 1])
+                        throw std::runtime_error(
+                            "Error: expected value after identifier");
+
+                    ValueNodeSP value = args[i + 1];
 
                     // todo: send set() instructions to store
-                    StoreValueSP toValue = std::make_shared<StoreValue>(value);
-                    store_.set(ident, toValue);
                 }
                 break;
             case CommandType::GET:
@@ -50,9 +52,12 @@ void Handler::handleQuery(std::string &query) {
                         "Error: GET requires at least one argument (key)");
 
                 for (int i = 0; i < numArgs; i++) {
-                    IdentifierNodeSP ident
-                        = std::dynamic_pointer_cast<IdentifierNode>(args[i]);
-                    if (ident == nullptr) throw NOT_IDENT;
+                    if (!args[i]) continue;
+
+                    ValueNodeSP identNode = args[i];
+                    if (identNode->getValueType() != ValueType::IDENTIFIER)
+                        throw NOT_IDENT;
+                    std::string ident = identNode->value->getString();
 
                     // todo: send get() instructions to store
                 }
@@ -63,9 +68,12 @@ void Handler::handleQuery(std::string &query) {
                         "Error: DELETE requires at least one argument (key)");
 
                 for (int i = 0; i < numArgs; i++) {
-                    IdentifierNodeSP ident
-                        = std::dynamic_pointer_cast<IdentifierNode>(args[i]);
-                    if (ident == nullptr) throw NOT_IDENT;
+                    if (!args[i]) continue;
+
+                    ValueNodeSP identNode = args[i];
+                    if (identNode->getValueType() != ValueType::IDENTIFIER)
+                        throw NOT_IDENT;
+                    std::string ident = identNode->value->getString();
 
                     // todo: send del() instructions to store
                 }
@@ -76,12 +84,18 @@ void Handler::handleQuery(std::string &query) {
                         "Error: UPDATE requires at least two arguments (key value)");
 
                 for (int i = 0; i < numArgs; i += 2) {
-                    IdentifierNodeSP ident
-                        = std::dynamic_pointer_cast<IdentifierNode>(args[i]);
-                    if (ident == nullptr) throw NOT_IDENT;
+                    if (!args[i]) continue;
 
-                    ValueNodeSP value = std::dynamic_pointer_cast<ValueNode>(args[i + 1]);
-                    if (value == nullptr) throw WRONG_FMT;
+                    ValueNodeSP identNode = args[i];
+                    if (identNode->getValueType() != ValueType::IDENTIFIER)
+                        throw NOT_IDENT;
+                    std::string ident = identNode->value->getString();
+
+                    if (!(i + 1 < numArgs) || !args[i + 1])
+                        throw std::runtime_error(
+                            "Error: expected value after identifier");
+
+                    ValueNodeSP value = args[i + 1];
 
                     // todo: send update() instructions to store
                 }

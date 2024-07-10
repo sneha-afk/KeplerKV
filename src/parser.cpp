@@ -18,9 +18,7 @@ std::vector<ASTNodeSP> &Parser::parse(std::vector<TokenSP> &tokens) {
 
     while (tt_ != tend_) {
         TokenSP &t = *tt_;
-        if (t->type == TokenType::END || t->type != TokenType::COMMAND) {
-            break;
-        }
+        if (t->type == TokenType::END || t->type != TokenType::COMMAND) break;
         nodes.push_back(parseCommand_(t));
     }
 
@@ -31,11 +29,9 @@ ASTNodeSP Parser::parseCommand_(TokenSP &cmdTok) {
     CommandType cmdType = mapGet(mapToCmd, cmdTok->value, CommandType::UNKNOWN);
     if (cmdType == CommandType::UNKNOWN)
         throw std::runtime_error("Error: invalid command \'" + cmdTok->value + "\'");
-
-    CommandNodeSP cmd = std::make_shared<CommandNode>(cmdType);
-    std::vector<ValueNodeSP> &args = cmd->args;
     tt_++;
 
+    CommandNodeSP cmd = std::make_shared<CommandNode>(cmdType);
     while (tt_ != tend_ && (*tt_)->type != TokenType::END) {
         TokenSP &t = *tt_;
         switch (t->type) {
@@ -47,11 +43,12 @@ ASTNodeSP Parser::parseCommand_(TokenSP &cmdTok) {
                 throw std::runtime_error("Error: unknown token \'" + t->value + "\'");
             case TokenType::NUMBER:
             case TokenType::STRING:
+            case TokenType::IDENTIIFER:
             case TokenType::LIST_START:
             default:
                 ValueNodeSP a = std::make_shared<ValueNode>(parseValue_(t));
                 if (t->type == TokenType::IDENTIIFER) a->setAsIdentifier();
-                args.push_back(a);
+                cmd->addArg(a);
                 tt_++;
                 break;
         }

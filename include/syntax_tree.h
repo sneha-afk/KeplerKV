@@ -46,7 +46,7 @@ public:
     // https://stackoverflow.com/q/461203
     virtual ~ASTNode() = default;
 
-    virtual NodeType getType() const = 0;
+    virtual NodeType getNodeType() const = 0;
 
     virtual std::string string() const = 0;
     friend std::ostream &operator<<(std::ostream &os, const ASTNode &t) {
@@ -56,79 +56,51 @@ public:
 };
 
 class NilNode : public ASTNode {
-    NodeType getType() const { return NodeType::NIL; };
+    NodeType getNodeType() const { return NodeType::NIL; };
     std::string string() { return "{node: nil, value: nil}"; }
 };
 
 class ValueNode : public ASTNode {
+private:
+    ValueType valType_;
+
 public:
-    ValueType valType;
-    StoreValue storeValue;
+    StoreValueSP value;
 
-    NodeType getType() const { return NodeType::VALUE; };
-
-    ValueNode(int v)
-        : valType(ValueType::INT)
-        , storeValue(v) {};
-    ValueNode(float v)
-        : valType(ValueType::FLOAT)
-        , storeValue(v) {};
-    ValueNode(const std::string &v)
-        : valType(ValueType::STRING)
-        , storeValue(v) {};
-    ValueNode(const std::vector<StoreValueSP> &v)
-        : valType(ValueType::LIST)
-        , storeValue(v) {};
     ValueNode(StoreValueSP);
 
-    // Uses default values for each type
-    ValueNode(ValueType t)
-        : valType(t) {
-        switch (t) {
-            case ValueType::INT: storeValue = 0; break;
-            case ValueType::FLOAT: storeValue = float(0); break;
-            case ValueType::STRING: storeValue = std::string(); break;
-            case ValueType::LIST: storeValue = std::vector<StoreValueSP>();
-            default: break;
-        }
-    };
+    NodeType getNodeType() const { return NodeType::VALUE; };
+    std::string string() const;
 
     // Identifiers are also considered strings internally, call this to mark it as such.
-    void setAsIdentifier() { valType = ValueType::IDENTIFIER; }
-
-    // Constructor for identifiers
-    ValueNode(const std::string &v, bool isIdent)
-        : storeValue(v) {
-        if (isIdent)
-            valType = ValueType::IDENTIFIER;
-        else
-            valType = ValueType::STRING;
-    }
-
-    std::string string() const;
+    void setAsIdentifier() { valType_ = ValueType::IDENTIFIER; }
+    ValueType getValueType() const { return valType_; }
 };
 
 using ValueNodeSP = std::shared_ptr<ValueNode>;
 
 class CommandNode : public ASTNode {
+private:
+    CommandType cmdType_;
+    std::vector<ValueNodeSP> args_;
+
 public:
-    CommandType cmdType;
-    std::vector<ValueNodeSP> args;
-
     CommandNode()
-        : cmdType(CommandType::UNKNOWN)
-        , args(std::vector<ValueNodeSP>()) {};
+        : cmdType_(CommandType::UNKNOWN)
+        , args_(std::vector<ValueNodeSP>()) {};
     CommandNode(const std::string &c)
-        : cmdType(mapGet(mapToCmd, c, CommandType::UNKNOWN))
-        , args(std::vector<ValueNodeSP>()) {};
+        : cmdType_(mapGet(mapToCmd, c, CommandType::UNKNOWN))
+        , args_(std::vector<ValueNodeSP>()) {};
     CommandNode(CommandType c)
-        : cmdType(c)
-        , args(std::vector<ValueNodeSP>()) {};
+        : cmdType_(c)
+        , args_(std::vector<ValueNodeSP>()) {};
 
-    NodeType getType() const { return NodeType::COMMAND; };
+    NodeType getNodeType() const { return NodeType::COMMAND; };
     std::string string() const;
 
-    void addArg(ValueNodeSP &a) { args.push_back(a); };
+    CommandType getCmdType() const { return cmdType_; }
+    void addArg(ValueNodeSP &a) { args_.push_back(a); };
+    std::vector<ValueNodeSP> &getArgs() { return args_; };
 };
 
 using ASTNodeSP = std::shared_ptr<ASTNode>;
