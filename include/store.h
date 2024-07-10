@@ -20,7 +20,7 @@ public:
 
     void set(const std::string &, StoreValueSP);
     StoreValueSP get(const std::string &);
-    void del(const std::string &);
+    bool del(const std::string &);
     bool update(const std::string &, StoreValueSP);
 
     inline bool contains(const std::string &);

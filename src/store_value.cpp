@@ -51,10 +51,11 @@ std::string stringList_(const std::vector<StoreValueSP> &arg) {
 }
 
 /**
+ * Returns a string representation with the datatype and value of this StoreValue.
  * https://en.cppreference.com/w/cpp/utility/variant/visit
  * https://dzone.com/articles/how-to-use-stdvisit-with-multiple-variants
  */
-std::string StoreValue::stringRecur_() const {
+std::string StoreValue::string() const {
     return std::visit(
         [](auto &&arg) {
             using T = std::decay_t<decltype(arg)>;
@@ -70,5 +71,3 @@ std::string StoreValue::stringRecur_() const {
         },
         value_);
 }
-
-std::string StoreValue::string() const { return stringRecur_(); }

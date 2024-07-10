@@ -8,39 +8,46 @@
 
 class StoreValue;
 using StoreValueSP = std::shared_ptr<StoreValue>;
-using StoreValueType = std::variant<int, float, std::string, std::vector<StoreValueSP>>;
+using StoreValueVar = std::variant<int, float, std::string, std::vector<StoreValueSP>>;
+
+enum class StoreValueType { INT, FLOAT, STRING, LIST };
 
 class StoreValue {
 private:
-    StoreValueType value_;
-    std::string stringRecur_() const;
+    StoreValueVar value_;
+    StoreValueType type_;
 
 public:
     StoreValue()
-        : value_(0) {};
+        : value_(0)
+        , type_(StoreValueType::INT) {};
     StoreValue(int v)
-        : value_(v) {};
+        : value_(v)
+        , type_(StoreValueType::INT) {};
     StoreValue(float v)
-        : value_(v) {};
+        : value_(v)
+        , type_(StoreValueType::FLOAT) {};
     StoreValue(const std::string &v)
-        : value_(v) {};
+        : value_(v)
+        , type_(StoreValueType::STRING) {};
     StoreValue(const std::vector<StoreValueSP> &v)
-        : value_(v) {};
+        : value_(v)
+        , type_(StoreValueType::LIST) {};
 
     // What type of value is this?
-    bool isInt() const { return std::holds_alternative<int>(value_); }
-    bool isFloat() const { return std::holds_alternative<float>(value_); }
-    bool isString() const { return std::holds_alternative<std::string>(value_); }
-    bool isList() const {
-        return std::holds_alternative<std::vector<StoreValueSP>>(value_);
-    }
+    bool isInt() const { return type_ == StoreValueType::INT; }
+    bool isFloat() const { return type_ == StoreValueType::FLOAT; }
+    bool isString() const { return type_ == StoreValueType::STRING; }
+    bool isList() const { return type_ == StoreValueType::LIST; }
 
-    // Retrieve value, should be wrapped around isType() to avoid errors
+    // Retrieve value, use in conjunction wtih getType()
     int getInt() const;
     float getFloat() const;
     const std::string &getString() const;
     const std::vector<StoreValueSP> &getList() const;
     std::vector<StoreValueSP> &getModifiableList();
+
+    StoreValueType getType() const { return type_; }
 
     std::string string() const;
     friend std::ostream &operator<<(std::ostream &os, const StoreValue &sv) {

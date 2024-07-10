@@ -2,20 +2,24 @@
 
 #include <iostream>
 
+static constexpr bool DEBUG = false;
+
 static const std::runtime_error WRONG_FMT
     = std::runtime_error("Error: incorrect command format");
 static const std::runtime_error NOT_IDENT
     = std::runtime_error("Error: expected identifier");
+static const std::runtime_error NOT_FOUND
+    = std::runtime_error("Error: not found in store");
 
 void Handler::handleQuery(std::string &query) {
     std::vector<std::shared_ptr<Token>> &tokens = lexer_.tokenize(query);
-    for (const auto &t : tokens) {
-        std::cout << "\t" << *t << std::endl;
-    }
+    if (DEBUG)
+        for (const auto &t : tokens)
+            std::cout << "\t" << *t << std::endl;
 
     std::vector<ASTNodeSP> &nodes = parser_.parse(tokens);
     for (const auto &n : nodes) {
-        std::cout << "\t" << *n << std::endl;
+        if (DEBUG) std::cout << "\t" << *n << std::endl;
 
         // https://stackoverflow.com/a/14545746
         CommandNodeSP cmd = std::dynamic_pointer_cast<CommandNode>(n);
@@ -43,9 +47,7 @@ void Handler::handleQuery(std::string &query) {
 
                     ValueNodeSP valueNode = args[i + 1];
 
-                    // todo: send set() instructions to store
                     store_.set(ident, valueNode->value);
-                    std::cout << *(store_.get(ident)) << std::endl;
                 }
                 break;
             case CommandType::GET:
@@ -61,7 +63,11 @@ void Handler::handleQuery(std::string &query) {
                         throw NOT_IDENT;
                     std::string ident = identNode->value->getString();
 
-                    // todo: send get() instructions to store
+                    StoreValueSP value = store_.get(ident);
+                    if (value)
+                        std::cout << ident << " > " << *value << std::endl;
+                    else
+                        throw NOT_FOUND;
                 }
                 break;
             case CommandType::DELETE:
@@ -77,7 +83,11 @@ void Handler::handleQuery(std::string &query) {
                         throw NOT_IDENT;
                     std::string ident = identNode->value->getString();
 
-                    // todo: send del() instructions to store
+                    bool deleted = store_.del(ident);
+                    if (deleted)
+                        std::cout << "OK" << std::endl;
+                    else
+                        std::cout << "NO SUCH KEY EXISTS" << std::endl;
                 }
                 break;
             case CommandType::UPDATE:
@@ -97,9 +107,13 @@ void Handler::handleQuery(std::string &query) {
                         throw std::runtime_error(
                             "Error: expected value after identifier");
 
-                    ValueNodeSP value = args[i + 1];
+                    ValueNodeSP valueNode = args[i + 1];
 
-                    // todo: send update() instructions to store
+                    bool updated = store_.update(ident, valueNode->value);
+                    if (updated)
+                        std::cout << "OK" << std::endl;
+                    else
+                        std::cout << "NO SUCH KEY EXISTS" << std::endl;
                 }
                 break;
             default: break;

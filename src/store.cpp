@@ -15,8 +15,8 @@ StoreValueSP Store::get(const std::string &key) {
     return found->second;
 }
 
-// Erases a key from the map, no effect if it is not present.
-void Store::del(const std::string &key) { map_.erase(key); }
+// Erases a key from the map, no effect if it is not present. Returns indication whether any deletion occured.
+bool Store::del(const std::string &key) { return map_.erase(key); }
 
 // Updates a key's value. Returns true if updated, false if the key does not exist.
 bool Store::update(const std::string &key, StoreValueSP value) {
