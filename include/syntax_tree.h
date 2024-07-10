@@ -77,8 +77,24 @@ public:
         : valType(ValueType::STRING)
         , storeValue(v) {};
     ValueNode(const std::vector<StoreValueSP> &v)
-        : valType(ValueType::STRING)
+        : valType(ValueType::LIST)
         , storeValue(v) {};
+    ValueNode(StoreValueSP);
+
+    // Uses default values for each type
+    ValueNode(ValueType t)
+        : valType(t) {
+        switch (t) {
+            case ValueType::INT: storeValue = 0; break;
+            case ValueType::FLOAT: storeValue = float(0); break;
+            case ValueType::STRING: storeValue = std::string(); break;
+            case ValueType::LIST: storeValue = std::vector<StoreValueSP>();
+            default: break;
+        }
+    };
+
+    // Identifiers are also considered strings internally, call this to mark it as such.
+    void setAsIdentifier() { valType = ValueType::IDENTIFIER; }
 
     // Constructor for identifiers
     ValueNode(const std::string &v, bool isIdent)

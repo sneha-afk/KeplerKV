@@ -19,6 +19,8 @@ private:
     std::string stringRecur_() const;
 
 public:
+    StoreValue()
+        : value_(0) {};
     StoreValue(int v)
         : value_(v) {};
     StoreValue(float v)
@@ -41,6 +43,7 @@ public:
     float getFloat() const;
     const std::string &getString() const;
     const std::vector<StoreValueSP> &getList() const;
+    std::vector<StoreValueSP> &getModifiableList();
 
     std::string string() const;
     friend std::ostream &operator<<(std::ostream &os, const StoreValue &sv) {

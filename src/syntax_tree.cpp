@@ -1,5 +1,17 @@
 #include "syntax_tree.h"
 
+ValueNode::ValueNode(StoreValueSP s)
+    : storeValue(*s) {
+    if (s->isInt())
+        valType = ValueType::INT;
+    else if (s->isFloat())
+        valType = ValueType::FLOAT;
+    else if (s->isString())
+        valType = ValueType::STRING;
+    else if (s->isList())
+        valType = ValueType::LIST;
+}
+
 std::string ValueNode::string() const {
     std::string s = "{node: Value";
     switch (valType) {

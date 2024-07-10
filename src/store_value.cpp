@@ -33,6 +33,13 @@ const std::vector<StoreValueSP> &StoreValue::getList() const {
         throw WRONG_TYPE_ERR;
 }
 
+std::vector<StoreValueSP> &StoreValue::getModifiableList() {
+    if (isList())
+        return std::get<std::vector<StoreValueSP>>(value_);
+    else
+        throw WRONG_TYPE_ERR;
+}
+
 std::string stringList_(const std::vector<StoreValueSP> &arg) {
     std::string res = "list: [";
     for (size_t i = 0; i < arg.size(); i++) {
