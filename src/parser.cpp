@@ -71,23 +71,23 @@ StoreValueSP Parser::parseValue_(TokenSP &t) {
     }
     return nullptr;
 };
-
 StoreValueSP Parser::parseList_() {
     // Assuming called this method upon seeing '['
     tt_++;
 
     std::vector<StoreValueSP> lst = std::vector<StoreValueSP>();
 
-    while (tt_ != tend_ && (*tt_)->type != TokenType::LIST_END) {
+    while (tt_ != tend_ && (*tt_)->type != TokenType::END
+           && (*tt_)->type != TokenType::LIST_END) {
         TokenSP &t = *tt_;
         switch (t->type) {
+            case TokenType::END:
             case TokenType::LIST_END: break;
             case TokenType::COMMAND:
                 throw std::runtime_error("Error: commands not supported within lists");
             case TokenType::DELIMITER: tt_++; break;
             case TokenType::UNKNOWN:
                 throw std::runtime_error("Error: unknown token \'" + t->value + "\'");
-            case TokenType::END: break;
             case TokenType::LIST_START:
             case TokenType::NUMBER:
             case TokenType::IDENTIIFER:

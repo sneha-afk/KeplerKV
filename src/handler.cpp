@@ -41,9 +41,11 @@ void Handler::handleQuery(std::string &query) {
                         throw std::runtime_error(
                             "Error: expected value after identifier");
 
-                    ValueNodeSP value = args[i + 1];
+                    ValueNodeSP valueNode = args[i + 1];
 
                     // todo: send set() instructions to store
+                    store_.set(ident, valueNode->value);
+                    std::cout << *(store_.get(ident)) << std::endl;
                 }
                 break;
             case CommandType::GET:
