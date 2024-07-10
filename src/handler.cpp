@@ -30,6 +30,10 @@ void Handler::handleQuery(std::string &query) {
         std::vector<ValueNodeSP> &args = cmd->getArgs();
         const std::size_t numArgs = args.size();
         switch (cmd->getCmdType()) {
+            case CommandType::QUIT:
+                std::cout << T_BBLUE << "Farewell!" << T_RESET << std::endl;
+                exit(EXIT_SUCCESS);
+                break;
             case CommandType::SET:
                 if (numArgs < 2)
                     throw std::runtime_error(

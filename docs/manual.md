@@ -1,14 +1,13 @@
 # keplerKV manual
 
-
-
 ## contents
 
 1. [General syntax](#general-syntax)
-2. [SET](#set): setting a key
-3. [GET](#get): retrieving a key
-4. [DEL](#del): deleting a key
-5. [UPDATE](#update): updating a key
+2. [QUIT](#QUIT): quitting the program.
+3. [SET](#set): setting a key
+4. [GET](#get): retrieving a key
+5. [DEL](#del): deleting a key
+6. [UPDATE](#update): updating a key
 
 ## General syntax
 
@@ -26,9 +25,15 @@ Optional comma delimiters can be used for clarity, be sure to separate distinct 
 \get apple, banana
 ```
 
+## QUIT
+
+**`{\q, \quit}`**
+
+Quit the KeplerKV program.
+
 ## SET
 
-**{\set, \s} key value [k2 v2 k3 v3 ...]**
+**`{\set, \s} key value [k2 v2 k3 v3 ...]`**
 
 Set a key-value pair to the store.
 
@@ -64,7 +69,7 @@ Set a key-value pair to the store.
 
 ## GET
 
-**{\get, \g} key [k2 k3 ...]**
+**`{\get, \g} key [k2 k3 ...]`**
 
 Get the value of a key in the store.
 
@@ -78,7 +83,7 @@ If the key is not present in the store, `NOT FOUND` is returned.
 
 ## DEL
 
-**{\del, \delete \d} key [k2 k3 ...]**
+**`{\del, \delete \d} key [k2 k3 ...]`**
 
 Delete a key from the store.
 ```bash
@@ -92,7 +97,7 @@ If the key is not present in the store, `NOT FOUND` is returned and no effect is
 
 ## UPDATE
 
-**{\update, \u} key value [k2 v2 k3 v3 ...]**
+**`{\update, \u} key value [k2 v2 k3 v3 ...]`**
 
 Update the value of a key that is **present** in the store.
 
