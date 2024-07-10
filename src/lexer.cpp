@@ -41,7 +41,7 @@ std::vector<TokenSP> &Lexer::tokenize(std::string &query) {
                     break;
                 }
 
-                if (isdigit(c) || c == '-' || c == '+') {
+                if (isdigit(c) || c == '-' || c == '+' || c == '.') {
                     tokens.push_back(lexNumber_());
                     break;
                 }
@@ -74,7 +74,6 @@ TokenSP Lexer::lexIdentifier_() {
     }
     return std::make_shared<Token>(TokenType::IDENTIIFER, s);
 }
-
 TokenSP Lexer::lexNumber_() {
     std::string s;
 
@@ -82,18 +81,23 @@ TokenSP Lexer::lexNumber_() {
     bool signF = false;
     bool decimalF = false;
     while (it_ != iend_ && (isdigit(*it_) || *it_ == '-' || *it_ == '+' || *it_ == '.')) {
-        // Not supporting arithmetic expressions for now
-        if ((*it_ == '-' || *it_ == '+') && (signF || !s.empty()))
-            return std::make_shared<Token>(TokenType::UNKNOWN, "");
-        else
-            signF = true;
+        const char &c = *it_;
+        if (c == '-' || c == '+') {
+            // Not supporting arithmetic expressions for now
+            if (signF || !s.empty())
+                return std::make_shared<Token>(TokenType::UNKNOWN, s);
+            else
+                signF = true;
+        }
 
-        if (*it_ == '.' && decimalF)
-            return std::make_shared<Token>(TokenType::UNKNOWN, "");
-        else
-            decimalF = true;
+        if (c == '.') {
+            if (decimalF)
+                return std::make_shared<Token>(TokenType::UNKNOWN, s);
+            else
+                decimalF = true;
+        }
 
-        s.push_back(*it_);
+        s.push_back(c);
         it_++;
     }
     return std::make_shared<Token>(TokenType::NUMBER, s);

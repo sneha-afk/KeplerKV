@@ -17,7 +17,7 @@ A NoSQL key-value pair store for quick access.
 ## goals
 
 ### overall
-- [ ] Build a parser system to implement a user CLI
+- [X] Build a parser system to implement a user CLI
 - [ ] Manage key-values in efficent data structures
 - [ ] Serialization/deserialization from file
 - [ ] Allow for data manipulation to supported types
@@ -28,18 +28,28 @@ A NoSQL key-value pair store for quick access.
 - [ ] Concurrency
 
 ### baseline
-- [ ] Inserting and deleting key-values
-- [ ] Validate user input and operations
+- [X] Inserting and deleting key-values
+- [X] Validate user input and operations
 
 ---
 ## dev journal
+
+### July 10, 2024
+
+* Finished `Handler` on the four basic command types
+* Fixed the parsing issues mentioned yesterday
+* Next steps:
+    * Work on recursive identifier handling
+        * Thinking about using lazy evaluation for these
+        * Can set a currently unbinded identifier, but must be specified before doing a `GET`
+    * Start plannning serialization to file
 
 ### July 9, 2024
 
 I had been working on this incrementally and continously getting stuck on how to effectively parse so many types of `ValueNodes`. I took a step back and read more about abstract syntax trees and decided a more "flat" approach to parsing since I am only handling very primiive types. After doing so, I had to delve into `std::variant` to make operations easier on the store. This coupling between a `StoreValue` type and its containing `ValueNode` type is hopefully as seamless as I can make it for now.
 * Next steps:
     * Debug parsing issues:
-        * Segmentation fault on improperly formed lists, should instead throw an error
+        * Segmentation fault on improperly formed lists, should instead throw an error (or infer end of list scope)
         * Floating type values are not being parsed correctly
     * Complete the implemenation of `Handler` which interacts with the store
 

@@ -46,10 +46,18 @@ ASTNodeSP Parser::parseCommand_(TokenSP &cmdTok) {
             case TokenType::IDENTIIFER:
             case TokenType::LIST_START:
             default:
-                ValueNodeSP a = std::make_shared<ValueNode>(parseValue_(t));
+                StoreValueSP val = parseValue_(t);
+                if (!val) {
+                    tt_++;
+                    break;
+                }
+
+                ValueNodeSP a = std::make_shared<ValueNode>(val);
                 if (t->type == TokenType::IDENTIIFER) a->setAsIdentifier();
                 cmd->addArg(a);
-                tt_++;
+
+                // Malformed lists could cause errors if not checking end
+                if (tt_ != tend_) tt_++;
                 break;
         }
     }
