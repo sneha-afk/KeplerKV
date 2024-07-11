@@ -72,8 +72,7 @@ void Handler::handleQuery(std::string &query) {
 
                     StoreValueSP value = store_.get(ident);
                     if (value)
-                        std::cout << T_BBLUE << ident << T_RESET << " | " << *value
-                                  << std::endl;
+                        print_item_(ident, value);
                     else
                         std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
                 }
@@ -124,7 +123,15 @@ void Handler::handleQuery(std::string &query) {
                         std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
                 }
                 break;
+            case CommandType::LIST:
+                for (const auto &item : store_)
+                    print_item_(item.first, item.second);
+                break;
             default: break;
         }
     }
+}
+
+void Handler::print_item_(const std::string &id, StoreValueSP val) {
+    std::cout << T_BBLUE << id << T_RESET << " | " << *val << std::endl;
 }

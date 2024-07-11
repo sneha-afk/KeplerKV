@@ -25,4 +25,6 @@ private:
     Lexer lexer_;
     Parser parser_;
     Store store_;
+
+    void print_item_(const std::string &, StoreValueSP);
 };

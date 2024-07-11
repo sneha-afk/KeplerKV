@@ -1,6 +1,10 @@
 # keplerKV manual
 
-## contents
+The full manual for KeplerKV including syntax and command specifics.
+
+Last updated: 2024-07-11
+
+## Contents
 
 1. [General syntax](#general-syntax)
 2. [QUIT](#QUIT): quitting the program.
@@ -8,10 +12,15 @@
 4. [GET](#get): retrieving a key
 5. [DEL](#del): deleting a key
 6. [UPDATE](#update): updating a key
+7. [LIST](#list): lists out all values in the store currently
 
 ## General syntax
 
-Commands are **case-insentive** and may have alternate syntax.
+Commands are **case-insentive** and may have alternate syntax, see the specific command for shorthands.
+
+All tokens are assumed space-delimited and whitespace is ignored.
+
+---
 
 Optional comma delimiters can be used for clarity, be sure to separate distinct tokens by **spaces** when required. For example, the following examples show equivalent commands:
 ```bash
@@ -23,6 +32,14 @@ Optional comma delimiters can be used for clarity, be sure to separate distinct 
 ```bash
 \get apple banana
 \get apple, banana
+```
+---
+
+Multiple commands can be completed at once by separating them with semicolons:
+```bash
+\set a 1 ; \get a
+    OK              # confirmation of \set
+    a | int: 1      # output of \get
 ```
 
 ## QUIT
@@ -106,4 +123,18 @@ Keys must be set in the store to some initial value before they can be updated. 
 ```bash
 \set id 123
 \update id "an actual name!"
+```
+
+## LIST
+
+**`{\list, \ls, \l}`**
+
+List out all items that are currently in the store.
+
+```bash
+\set a 1, b "abc", c [1, 2, 3]
+\list
+    c | list: [int: 1, int: 2, int: 3]
+    b | str: "abc"
+    a | int: 1
 ```

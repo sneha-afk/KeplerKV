@@ -18,6 +18,7 @@ enum class CommandType {
     UPDATE,
     UNKNOWN,
     QUIT,
+    LIST,
 };
 
 enum class ValueType {
@@ -28,19 +29,14 @@ enum class ValueType {
     IDENTIFIER,
 };
 
-static const std::unordered_map<std::string, CommandType> mapToCmd = {
-    { "SET", CommandType::SET },
-    { "S", CommandType::SET },
-    { "GET", CommandType::GET },
-    { "G", CommandType::GET },
-    { "DELETE", CommandType::DELETE },
-    { "DEL", CommandType::DELETE },
-    { "D", CommandType::DELETE },
-    { "UPDATE", CommandType::UPDATE },
-    { "U", CommandType::UPDATE },
-    { "Q", CommandType::QUIT },
-    { "QUIT", CommandType::QUIT },
-};
+static const std::unordered_map<std::string, CommandType> mapToCmd
+    = { { "SET", CommandType::SET }, { "S", CommandType::SET },
+          { "GET", CommandType::GET }, { "G", CommandType::GET },
+          { "DELETE", CommandType::DELETE }, { "DEL", CommandType::DELETE },
+          { "D", CommandType::DELETE }, { "UPDATE", CommandType::UPDATE },
+          { "U", CommandType::UPDATE }, { "Q", CommandType::QUIT },
+          { "QUIT", CommandType::QUIT }, { "L", CommandType::LIST },
+          { "LS", CommandType::LIST }, { "LIST", CommandType::LIST } };
 
 // https://en.wikipedia.org/wiki/Abstract_syntax_tree
 // https://stackoverflow.com/a/54596
