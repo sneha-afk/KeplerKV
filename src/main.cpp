@@ -8,7 +8,8 @@ int main(int argc, char const *argv[]) {
     std::string input;
     Handler handler;
 
-    std::cout << T_BBLUE << "Welcome to KeplerKV! Type \\q to quit!" << T_RESET << std::endl;
+    std::cout << T_BBLUE << "Welcome to KeplerKV! Type \\q to quit!" << T_RESET
+              << std::endl;
     while (true) {
         std::cout << "> ";
         std::getline(std::cin, input);

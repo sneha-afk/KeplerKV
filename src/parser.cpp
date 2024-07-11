@@ -18,7 +18,10 @@ std::vector<ASTNodeSP> &Parser::parse(std::vector<TokenSP> &tokens) {
 
     while (tt_ != tend_) {
         TokenSP &t = *tt_;
-        if (t->type == TokenType::END || t->type != TokenType::COMMAND) break;
+        if (t->type == TokenType::END || t->type != TokenType::COMMAND) {
+            tt_++;
+            continue;
+        }
         nodes.push_back(parseCommand_(t));
     }
 
@@ -35,28 +38,22 @@ ASTNodeSP Parser::parseCommand_(TokenSP &cmdTok) {
     while (tt_ != tend_ && (*tt_)->type != TokenType::END) {
         TokenSP &t = *tt_;
         switch (t->type) {
-            case TokenType::END: break;
+            case TokenType::END:
+            case TokenType::LIST_END: break;
+            case TokenType::DELIMITER: tt_++; break;
             case TokenType::COMMAND:
                 throw std::runtime_error("Error: nested commands not supported (yet?)");
-            case TokenType::DELIMITER: tt_++; break;
             case TokenType::UNKNOWN:
                 throw std::runtime_error("Error: unknown token \'" + t->value + "\'");
-            case TokenType::NUMBER:
-            case TokenType::STRING:
-            case TokenType::IDENTIIFER:
-            case TokenType::LIST_START:
             default:
                 StoreValueSP val = parseValue_(t);
-                if (!val) {
-                    tt_++;
-                    break;
-                }
+                if (val != nullptr) {
+                    ValueNodeSP a = std::make_shared<ValueNode>(val);
+                    if (t->type == TokenType::IDENTIIFER) a->setAsIdentifier();
+                    cmd->addArg(a);
+                };
 
-                ValueNodeSP a = std::make_shared<ValueNode>(val);
-                if (t->type == TokenType::IDENTIIFER) a->setAsIdentifier();
-                cmd->addArg(a);
-
-                // Malformed lists could cause errors if not checking end
+                // Wary of where parseValue() ended up
                 if (tt_ != tend_) tt_++;
                 break;
         }
@@ -79,9 +76,11 @@ StoreValueSP Parser::parseValue_(TokenSP &t) {
     }
     return nullptr;
 };
+
 StoreValueSP Parser::parseList_() {
     // Assuming called this method upon seeing '['
-    tt_++;
+    while (tt_ != tend_ && (*tt_)->type == TokenType::LIST_START)
+        tt_++;
 
     std::vector<StoreValueSP> lst = std::vector<StoreValueSP>();
 
@@ -91,18 +90,16 @@ StoreValueSP Parser::parseList_() {
         switch (t->type) {
             case TokenType::END:
             case TokenType::LIST_END: break;
+            case TokenType::DELIMITER: tt_++; break;
             case TokenType::COMMAND:
                 throw std::runtime_error("Error: commands not supported within lists");
-            case TokenType::DELIMITER: tt_++; break;
             case TokenType::UNKNOWN:
                 throw std::runtime_error("Error: unknown token \'" + t->value + "\'");
-            case TokenType::LIST_START:
-            case TokenType::NUMBER:
-            case TokenType::IDENTIIFER:
-            case TokenType::STRING:
             default:
-                lst.push_back(parseValue_(t));
-                tt_++;
+                StoreValueSP val = parseValue_(t);
+                if (val != nullptr) lst.push_back(val);
+
+                if (tt_ != tend_) tt_++;
                 break;
         }
     }
