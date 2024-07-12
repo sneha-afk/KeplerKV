@@ -19,7 +19,13 @@ public:
         , parser_(p)
         , store_(s) {};
 
-    void handleQuery(std::string &);
+    Handler(Store &s)
+        : store_(s) {
+        lexer_ = Lexer();
+        parser_ = Parser();
+    };
+
+    bool handleQuery(std::string &);
 
 private:
     Lexer lexer_;

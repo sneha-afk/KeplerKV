@@ -13,7 +13,11 @@ static const std::runtime_error NOT_IDENT
 static const std::runtime_error NOT_FOUND
     = std::runtime_error("Error: not found in store");
 
-void Handler::handleQuery(std::string &query) {
+/**
+ * Proccesses a query and hands it off to the store to execute.
+ * Returns whether to keep running the program.
+ */
+bool Handler::handleQuery(std::string &query) {
     std::vector<std::shared_ptr<Token>> &tokens = lexer_.tokenize(query);
     if (DEBUG)
         for (const auto &t : tokens)
@@ -32,8 +36,7 @@ void Handler::handleQuery(std::string &query) {
         switch (cmd->getCmdType()) {
             case CommandType::QUIT:
                 std::cout << T_BBLUE << "Farewell!" << T_RESET << std::endl;
-                exit(EXIT_SUCCESS);
-                break;
+                return false;
             case CommandType::SET:
                 if (numArgs < 2)
                     throw std::runtime_error(
@@ -130,6 +133,7 @@ void Handler::handleQuery(std::string &query) {
             default: break;
         }
     }
+    return true;
 }
 
 void Handler::print_item_(const std::string &id, StoreValueSP val) {
