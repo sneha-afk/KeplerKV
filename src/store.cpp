@@ -1,5 +1,7 @@
 #include "store.h"
 
+#include "error_msgs.h"
+
 Store::Store() {
     map_ = std::unordered_map<std::string, StoreValueSP>();
     map_.reserve(STORE_MIN_SIZE);
@@ -28,4 +30,23 @@ bool Store::update(const std::string &key, StoreValueSP value) {
 // Indicates whether the store conatains the key.
 inline bool Store::contains(const std::string &key) {
     return map_.find(key) != map_.end();
+}
+
+// Resolves recursive references (keys storing other keys) until a base value is reached.
+StoreValueSP Store::resolve(const std::string &key) {
+    // Set of keys that have been explored to prevent circular references
+    std::unordered_set<std::string> seen;
+    return resolveRecur_(key, seen);
+}
+
+StoreValueSP Store::resolveRecur_(
+    const std::string &key, std::unordered_set<std::string> &seen) {
+    if (seen.count(key)) throw CIRCULAR_REF;
+    seen.insert(key);
+
+    StoreValueSP found = get(key);
+    if (!found) return nullptr;
+
+    if (found->isIdent()) return resolveRecur_(found->getString(), seen);
+    return found;
 }

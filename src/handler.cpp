@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-static constexpr bool DEBUG = true;
+static constexpr bool DEBUG = false;
 
 /**
  * Proccesses a query and hands it off to the store to execute.
@@ -32,7 +32,7 @@ bool Handler::handleQuery(std::string &query) {
                 std::cout << T_BBLUE << "Farewell!" << T_RESET << std::endl;
                 return false;
             case CommandType::SET:
-                if (numArgs < 2) throw SET_NUM_ARGS;
+                if (numArgs < 2) throw MIN_TWO_ARG("SET");
 
                 for (std::size_t i = 0; i < numArgs; i += 2) {
                     if (!args[i]) continue;
@@ -51,7 +51,7 @@ bool Handler::handleQuery(std::string &query) {
                 }
                 break;
             case CommandType::GET:
-                if (numArgs < 1) throw GET_NUM_ARGS;
+                if (numArgs < 1) throw MIN_ONE_ARG("GET");
 
                 for (std::size_t i = 0; i < numArgs; i++) {
                     if (!args[i]) continue;
@@ -69,7 +69,7 @@ bool Handler::handleQuery(std::string &query) {
                 }
                 break;
             case CommandType::DELETE:
-                if (numArgs < 1) throw DEL_NUM_ARGS;
+                if (numArgs < 1) throw MIN_ONE_ARG("DELETE");
 
                 for (std::size_t i = 0; i < numArgs; i++) {
                     if (!args[i]) continue;
@@ -87,7 +87,7 @@ bool Handler::handleQuery(std::string &query) {
                 }
                 break;
             case CommandType::UPDATE:
-                if (numArgs < 2) throw UPD_NUM_ARGS;
+                if (numArgs < 2) throw MIN_TWO_ARG("UPDATE");
 
                 for (std::size_t i = 0; i < numArgs; i += 2) {
                     if (!args[i]) continue;
@@ -111,6 +111,9 @@ bool Handler::handleQuery(std::string &query) {
             case CommandType::LIST:
                 for (const auto &item : store_)
                     print_item_(item.first, item.second);
+                break;
+            case CommandType::RESOLVE:
+                if (numArgs < 1) throw MIN_ONE_ARG("RESOLVE");
                 break;
             default: break;
         }
