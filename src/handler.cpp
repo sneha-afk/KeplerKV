@@ -1,17 +1,11 @@
 #include "handler.h"
 
+#include "error_msgs.h"
 #include "terminal_colors.h"
 
 #include <iostream>
 
-static constexpr bool DEBUG = false;
-
-static const std::runtime_error WRONG_FMT
-    = std::runtime_error("Error: incorrect command format");
-static const std::runtime_error NOT_IDENT
-    = std::runtime_error("Error: expected identifier");
-static const std::runtime_error NOT_FOUND
-    = std::runtime_error("Error: not found in store");
+static constexpr bool DEBUG = true;
 
 /**
  * Proccesses a query and hands it off to the store to execute.
@@ -38,9 +32,7 @@ bool Handler::handleQuery(std::string &query) {
                 std::cout << T_BBLUE << "Farewell!" << T_RESET << std::endl;
                 return false;
             case CommandType::SET:
-                if (numArgs < 2)
-                    throw std::runtime_error(
-                        "Error: SET requires at least two arguments (key value)");
+                if (numArgs < 2) throw SET_NUM_ARGS;
 
                 for (std::size_t i = 0; i < numArgs; i += 2) {
                     if (!args[i]) continue;
@@ -50,9 +42,7 @@ bool Handler::handleQuery(std::string &query) {
                         throw NOT_IDENT;
                     std::string ident = identNode->value->getString();
 
-                    if (!(i + 1 < numArgs) || !args[i + 1])
-                        throw std::runtime_error(
-                            "Error: expected value after identifier");
+                    if (!(i + 1 < numArgs) || !args[i + 1]) throw VAL_AFTER_IDENT;
 
                     ValueNodeSP valueNode = args[i + 1];
 
@@ -61,9 +51,7 @@ bool Handler::handleQuery(std::string &query) {
                 }
                 break;
             case CommandType::GET:
-                if (numArgs < 1)
-                    throw std::runtime_error(
-                        "Error: GET requires at least one argument (key)");
+                if (numArgs < 1) throw GET_NUM_ARGS;
 
                 for (std::size_t i = 0; i < numArgs; i++) {
                     if (!args[i]) continue;
@@ -81,9 +69,7 @@ bool Handler::handleQuery(std::string &query) {
                 }
                 break;
             case CommandType::DELETE:
-                if (numArgs < 1)
-                    throw std::runtime_error(
-                        "Error: DELETE requires at least one argument (key)");
+                if (numArgs < 1) throw DEL_NUM_ARGS;
 
                 for (std::size_t i = 0; i < numArgs; i++) {
                     if (!args[i]) continue;
@@ -101,9 +87,7 @@ bool Handler::handleQuery(std::string &query) {
                 }
                 break;
             case CommandType::UPDATE:
-                if (numArgs < 2)
-                    throw std::runtime_error(
-                        "Error: UPDATE requires at least two arguments (key value)");
+                if (numArgs < 2) throw UPD_NUM_ARGS;
 
                 for (std::size_t i = 0; i < numArgs; i += 2) {
                     if (!args[i]) continue;
@@ -113,9 +97,7 @@ bool Handler::handleQuery(std::string &query) {
                         throw NOT_IDENT;
                     std::string ident = identNode->value->getString();
 
-                    if (!(i + 1 < numArgs) || !args[i + 1])
-                        throw std::runtime_error(
-                            "Error: expected value after identifier");
+                    if (!(i + 1 < numArgs) || !args[i + 1]) throw VAL_AFTER_IDENT;
 
                     ValueNodeSP valueNode = args[i + 1];
 
