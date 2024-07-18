@@ -67,6 +67,9 @@ public:
     StoreValueSP value;
 
     ValueNode(StoreValueSP);
+    ValueNode(StoreValueSP v, ValueType t)
+        : value(v)
+        , valType_(t) {};
 
     NodeType getNodeType() const { return NodeType::VALUE; };
     std::string string() const;

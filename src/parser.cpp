@@ -69,7 +69,7 @@ StoreValueSP Parser::parseValue_(TokenSP &t) {
                 return std::make_shared<StoreValue>(std::stof(tValue));
             else
                 return std::make_shared<StoreValue>(std::stoi(tValue));
-        case TokenType::IDENTIIFER:;
+        case TokenType::IDENTIIFER: return std::make_shared<StoreValue>(tValue, true);
         case TokenType::STRING: return std::make_shared<StoreValue>(tValue);
         case TokenType::LIST_START: return parseList_();
         default: break;

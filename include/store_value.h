@@ -10,7 +10,7 @@ class StoreValue;
 using StoreValueSP = std::shared_ptr<StoreValue>;
 using StoreValueVar = std::variant<int, float, std::string, std::vector<StoreValueSP>>;
 
-enum class StoreValueType { INT, FLOAT, STRING, LIST };
+enum class StoreValueType { INT, FLOAT, STRING, LIST, IDENTIIFER };
 
 class StoreValue {
 private:
@@ -30,6 +30,13 @@ public:
     StoreValue(const std::string &v)
         : value_(v)
         , type_(StoreValueType::STRING) {};
+    StoreValue(const std::string &v, bool is_ident)
+        : value_(v) {
+        if (is_ident)
+            type_ = StoreValueType::IDENTIIFER;
+        else
+            type_ = StoreValueType::STRING;
+    };
     StoreValue(const std::vector<StoreValueSP> &v)
         : value_(v)
         , type_(StoreValueType::LIST) {};
@@ -38,6 +45,7 @@ public:
     bool isInt() const { return type_ == StoreValueType::INT; }
     bool isFloat() const { return type_ == StoreValueType::FLOAT; }
     bool isString() const { return type_ == StoreValueType::STRING; }
+    bool isIdent() const { return type_ == StoreValueType::IDENTIIFER; }
     bool isList() const { return type_ == StoreValueType::LIST; }
 
     // Retrieve value, use in conjunction wtih getType()

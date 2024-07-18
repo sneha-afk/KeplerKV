@@ -20,7 +20,7 @@ float StoreValue::getFloat() const {
 }
 
 const std::string &StoreValue::getString() const {
-    if (isString())
+    if (isString() || isIdent())
         return std::get<std::string>(value_);
     else
         throw WRONG_TYPE_ERR;
@@ -56,6 +56,8 @@ std::string stringList_(const std::vector<StoreValueSP> &arg) {
  * https://dzone.com/articles/how-to-use-stdvisit-with-multiple-variants
  */
 std::string StoreValue::string() const {
+    if (isIdent()) return "id: " + std::get<std::string>(value_);
+
     return std::visit(
         [](auto &&arg) {
             using T = std::decay_t<decltype(arg)>;
