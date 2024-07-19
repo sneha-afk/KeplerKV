@@ -33,6 +33,7 @@ inline bool Store::contains(const std::string &key) {
 }
 
 // Resolves recursive references (keys storing other keys) until a base value is reached.
+// Essentially, a recursive GET command for when the user wants to unpack a key-chain.
 StoreValueSP Store::resolve(const std::string &key) {
     // Set of keys that have been explored to prevent circular references
     std::unordered_set<std::string> seen;
@@ -41,12 +42,15 @@ StoreValueSP Store::resolve(const std::string &key) {
 
 StoreValueSP Store::resolveRecur_(
     const std::string &key, std::unordered_set<std::string> &seen) {
+    // If a key is being searched for again, there is a circluar ref
     if (seen.count(key)) throw CIRCULAR_REF;
     seen.insert(key);
 
     StoreValueSP found = get(key);
     if (!found) return nullptr;
 
+    // If another identiifer is found, continue down the chain
     if (found->isIdent()) return resolveRecur_(found->getString(), seen);
+
     return found;
 }

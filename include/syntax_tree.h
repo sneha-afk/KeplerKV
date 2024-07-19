@@ -19,6 +19,7 @@ enum class CommandType {
     UNKNOWN,
     QUIT,
     LIST,
+    RESOLVE,
 };
 
 enum class ValueType {
@@ -36,7 +37,9 @@ static const std::unordered_map<std::string, CommandType> mapToCmd
           { "D", CommandType::DELETE }, { "UPDATE", CommandType::UPDATE },
           { "U", CommandType::UPDATE }, { "Q", CommandType::QUIT },
           { "QUIT", CommandType::QUIT }, { "L", CommandType::LIST },
-          { "LS", CommandType::LIST }, { "LIST", CommandType::LIST } };
+          { "LS", CommandType::LIST }, { "LIST", CommandType::LIST },
+          { "R", CommandType::RESOLVE }, { "RES", CommandType::RESOLVE },
+          { "RESOLVE", CommandType::RESOLVE } };
 
 // https://en.wikipedia.org/wiki/Abstract_syntax_tree
 // https://stackoverflow.com/a/54596

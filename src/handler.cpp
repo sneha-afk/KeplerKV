@@ -114,6 +114,21 @@ bool Handler::handleQuery(std::string &query) {
                 break;
             case CommandType::RESOLVE:
                 if (numArgs < 1) throw MIN_ONE_ARG("RESOLVE");
+
+                for (std::size_t i = 0; i < numArgs; i++) {
+                    if (!args[i]) continue;
+
+                    ValueNodeSP identNode = args[i];
+                    if (identNode->getValueType() != ValueType::IDENTIFIER)
+                        throw NOT_IDENT;
+                    std::string ident = identNode->value->getString();
+
+                    StoreValueSP value = store_.resolve(ident);
+                    if (value)
+                        print_item_(ident, value);
+                    else
+                        std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
+                }
                 break;
             default: break;
         }
