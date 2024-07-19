@@ -23,7 +23,7 @@ bool Handler::handleQuery(std::string &query) {
 
         // https://stackoverflow.com/a/14545746
         CommandNodeSP cmd = std::dynamic_pointer_cast<CommandNode>(n);
-        if (cmd == nullptr) throw WRONG_FMT;
+        if (cmd == nullptr) throw RuntimeErr(WRONG_FMT);
 
         std::vector<ValueNodeSP> &args = cmd->getArgs();
         const std::size_t numArgs = args.size();
@@ -39,10 +39,11 @@ bool Handler::handleQuery(std::string &query) {
 
                     ValueNodeSP identNode = args[i];
                     if (identNode->getValueType() != ValueType::IDENTIFIER)
-                        throw NOT_IDENT;
+                        throw RuntimeErr(NOT_IDENT);
                     std::string ident = identNode->value->getString();
 
-                    if (!(i + 1 < numArgs) || !args[i + 1]) throw VAL_AFTER_IDENT;
+                    if (!(i + 1 < numArgs) || !args[i + 1])
+                        throw RuntimeErr(VAL_AFTER_IDENT);
 
                     ValueNodeSP valueNode = args[i + 1];
 
@@ -58,7 +59,7 @@ bool Handler::handleQuery(std::string &query) {
 
                     ValueNodeSP identNode = args[i];
                     if (identNode->getValueType() != ValueType::IDENTIFIER)
-                        throw NOT_IDENT;
+                        throw RuntimeErr(NOT_IDENT);
                     std::string ident = identNode->value->getString();
 
                     StoreValueSP value = store_.get(ident);
@@ -76,7 +77,7 @@ bool Handler::handleQuery(std::string &query) {
 
                     ValueNodeSP identNode = args[i];
                     if (identNode->getValueType() != ValueType::IDENTIFIER)
-                        throw NOT_IDENT;
+                        throw RuntimeErr(NOT_IDENT);
                     std::string ident = identNode->value->getString();
 
                     bool deleted = store_.del(ident);
@@ -94,10 +95,11 @@ bool Handler::handleQuery(std::string &query) {
 
                     ValueNodeSP identNode = args[i];
                     if (identNode->getValueType() != ValueType::IDENTIFIER)
-                        throw NOT_IDENT;
+                        throw RuntimeErr(NOT_IDENT);
                     std::string ident = identNode->value->getString();
 
-                    if (!(i + 1 < numArgs) || !args[i + 1]) throw VAL_AFTER_IDENT;
+                    if (!(i + 1 < numArgs) || !args[i + 1])
+                        throw RuntimeErr(VAL_AFTER_IDENT);
 
                     ValueNodeSP valueNode = args[i + 1];
 
@@ -120,7 +122,7 @@ bool Handler::handleQuery(std::string &query) {
 
                     ValueNodeSP identNode = args[i];
                     if (identNode->getValueType() != ValueType::IDENTIFIER)
-                        throw NOT_IDENT;
+                        throw RuntimeErr(NOT_IDENT);
                     std::string ident = identNode->value->getString();
 
                     StoreValueSP value = store_.resolve(ident);

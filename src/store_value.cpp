@@ -1,43 +1,40 @@
 #include "store_value.h"
 
-#include <stdexcept>
-
-static const std::runtime_error WRONG_TYPE_ERR
-    = std::runtime_error("Error: wrong getter used with StoreValue");
+#include "error_msgs.h"
 
 int StoreValue::getInt() const {
     if (isInt())
         return std::get<int>(value_);
     else
-        throw WRONG_TYPE_ERR;
+        throw RuntimeErr(SV_WRONG_TYPE);
 }
 
 float StoreValue::getFloat() const {
     if (isFloat())
         return std::get<float>(value_);
     else
-        throw WRONG_TYPE_ERR;
+        throw RuntimeErr(SV_WRONG_TYPE);
 }
 
 const std::string &StoreValue::getString() const {
     if (isString() || isIdent())
         return std::get<std::string>(value_);
     else
-        throw WRONG_TYPE_ERR;
+        throw RuntimeErr(SV_WRONG_TYPE);
 }
 
 const std::vector<StoreValueSP> &StoreValue::getList() const {
     if (isList())
         return std::get<std::vector<StoreValueSP>>(value_);
     else
-        throw WRONG_TYPE_ERR;
+        throw RuntimeErr(SV_WRONG_TYPE);
 }
 
 std::vector<StoreValueSP> &StoreValue::getModifiableList() {
     if (isList())
         return std::get<std::vector<StoreValueSP>>(value_);
     else
-        throw WRONG_TYPE_ERR;
+        throw RuntimeErr(SV_WRONG_TYPE);
 }
 
 std::string stringList_(const std::vector<StoreValueSP> &arg) {

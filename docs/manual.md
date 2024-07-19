@@ -2,7 +2,7 @@
 
 The full manual for KeplerKV including syntax and command specifics.
 
-Last updated: 2024-07-11
+Last updated: 2024-07-18
 
 ## Contents
 

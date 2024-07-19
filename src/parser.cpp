@@ -1,9 +1,8 @@
 #include "parser.h"
 
+#include "error_msgs.h"
 #include "syntax_tree.h"
 #include "util.h"
-
-#include <stdexcept>
 
 std::vector<ASTNodeSP> &Parser::parse(std::vector<TokenSP> &tokens) {
     nodes.clear();
@@ -13,8 +12,7 @@ std::vector<ASTNodeSP> &Parser::parse(std::vector<TokenSP> &tokens) {
     tend_ = tokens.end();
 
     // First token must be a command
-    if ((*tt_)->type != TokenType::COMMAND)
-        throw std::runtime_error("Error: invalid command \'" + (*tt_)->value + "\'");
+    if ((*tt_)->type != TokenType::COMMAND) throw INVALID_CMD((*tt_)->value);
 
     while (tt_ != tend_) {
         TokenSP &t = *tt_;
@@ -30,8 +28,7 @@ std::vector<ASTNodeSP> &Parser::parse(std::vector<TokenSP> &tokens) {
 
 ASTNodeSP Parser::parseCommand_(TokenSP &cmdTok) {
     CommandType cmdType = mapGet(mapToCmd, cmdTok->value, CommandType::UNKNOWN);
-    if (cmdType == CommandType::UNKNOWN)
-        throw std::runtime_error("Error: invalid command \'" + cmdTok->value + "\'");
+    if (cmdType == CommandType::UNKNOWN) throw INVALID_CMD(cmdTok->value);
     tt_++;
 
     CommandNodeSP cmd = std::make_shared<CommandNode>(cmdType);
@@ -41,10 +38,8 @@ ASTNodeSP Parser::parseCommand_(TokenSP &cmdTok) {
             case TokenType::END:
             case TokenType::LIST_END: break;
             case TokenType::DELIMITER: tt_++; break;
-            case TokenType::COMMAND:
-                throw std::runtime_error("Error: nested commands not supported (yet?)");
-            case TokenType::UNKNOWN:
-                throw std::runtime_error("Error: unknown token \'" + t->value + "\'");
+            case TokenType::COMMAND: throw RuntimeErr(NESTED_CMD);
+            case TokenType::UNKNOWN: throw UNKNOWN_TOKEN(t->value);
             default:
                 StoreValueSP val = parseValue_(t);
                 if (val != nullptr) {
@@ -91,10 +86,8 @@ StoreValueSP Parser::parseList_() {
             case TokenType::END:
             case TokenType::LIST_END: break;
             case TokenType::DELIMITER: tt_++; break;
-            case TokenType::COMMAND:
-                throw std::runtime_error("Error: commands not supported within lists");
-            case TokenType::UNKNOWN:
-                throw std::runtime_error("Error: unknown token \'" + t->value + "\'");
+            case TokenType::COMMAND: throw RuntimeErr(CMD_IN_LIST);
+            case TokenType::UNKNOWN: throw UNKNOWN_TOKEN(t->value);
             default:
                 StoreValueSP val = parseValue_(t);
                 if (val != nullptr) lst.push_back(val);

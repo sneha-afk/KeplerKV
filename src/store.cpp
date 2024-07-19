@@ -12,9 +12,7 @@ void Store::set(const std::string &key, StoreValueSP value) { map_[key] = value;
 
 // Returns the key's value, or nullptr if it is not present.
 StoreValueSP Store::get(const std::string &key) {
-    auto found = map_.find(key);
-    if (found == map_.end()) return nullptr;
-    return found->second;
+    return mapGet(map_, key, (StoreValueSP) nullptr);
 }
 
 // Erases a key from the map, no effect if it is not present. Returns indication whether any deletion occured.
