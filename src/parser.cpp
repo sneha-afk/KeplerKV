@@ -36,7 +36,7 @@ ASTNodeSP Parser::parseCommand_(TokenSP &cmdTok) {
         TokenSP &t = *tt_;
         switch (t->type) {
             case TokenType::END:
-            case TokenType::LIST_END: break;
+            case TokenType::LIST_END:
             case TokenType::DELIMITER: tt_++; break;
             case TokenType::COMMAND: throw RuntimeErr(NESTED_CMD);
             case TokenType::UNKNOWN: throw UNKNOWN_TOKEN(t->value);
@@ -46,7 +46,7 @@ ASTNodeSP Parser::parseCommand_(TokenSP &cmdTok) {
                     ValueNodeSP a = std::make_shared<ValueNode>(val);
                     if (t->type == TokenType::IDENTIIFER) a->setAsIdentifier();
                     cmd->addArg(a);
-                };
+                }
 
                 // Wary of where parseValue() ended up
                 if (tt_ != tend_) tt_++;
@@ -66,17 +66,13 @@ StoreValueSP Parser::parseValue_(TokenSP &t) {
                 return std::make_shared<StoreValue>(std::stoi(tValue));
         case TokenType::IDENTIIFER: return std::make_shared<StoreValue>(tValue, true);
         case TokenType::STRING: return std::make_shared<StoreValue>(tValue);
-        case TokenType::LIST_START: return parseList_();
+        case TokenType::LIST_START: tt_++; return parseList_();
         default: break;
     }
     return nullptr;
-};
+}
 
 StoreValueSP Parser::parseList_() {
-    // Assuming called this method upon seeing '['
-    while (tt_ != tend_ && (*tt_)->type == TokenType::LIST_START)
-        tt_++;
-
     std::vector<StoreValueSP> lst = std::vector<StoreValueSP>();
 
     while (tt_ != tend_ && (*tt_)->type != TokenType::END
@@ -97,4 +93,4 @@ StoreValueSP Parser::parseList_() {
         }
     }
     return std::make_shared<StoreValue>(lst);
-};
+}
