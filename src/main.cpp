@@ -5,7 +5,7 @@
 #include <iostream>
 #include <stdexcept>
 
-int main(int argc, char const *argv[]) {
+int main() {
     std::string input;
     bool running = true;
     Store store;

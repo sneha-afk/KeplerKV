@@ -63,9 +63,6 @@ class NilNode : public ASTNode {
 };
 
 class ValueNode : public ASTNode {
-private:
-    ValueType valType_;
-
 public:
     StoreValueSP value;
 
@@ -80,6 +77,9 @@ public:
     // Identifiers are also considered strings internally, call this to mark it as such.
     void setAsIdentifier() { valType_ = ValueType::IDENTIFIER; }
     ValueType getValueType() const { return valType_; }
+
+private:
+    ValueType valType_;
 };
 
 using ValueNodeSP = std::shared_ptr<ValueNode>;

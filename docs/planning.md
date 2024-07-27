@@ -34,6 +34,17 @@ A NoSQL key-value pair store for quick access.
 ---
 ## dev journal
 
+### July 26, 2024
+
+* Added a manual `Makefile`, for the few out there who would appreciate an easier manual build process :)
+
+### July 18, 2024
+
+* `LIST` for listing out all values that are currently in the store
+* Added a new command called `RESOLVE` which allows for keys to be references to other keys
+    * `RESOLVE` is a recursive `GET` call until a primitive is found
+    * Reach: should `RESOLVE` handle references that are in list primitives?
+
 ### July 10, 2024
 
 * Finished `Handler` on the four basic command types
