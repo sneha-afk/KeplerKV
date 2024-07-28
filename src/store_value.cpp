@@ -85,31 +85,47 @@ void StoreValue::toFile(std::ofstream &fp) const {
     if (std::holds_alternative<int>(value_)) {
         type = 'i';
         fp.WRITE_CHAR(type);
+        fp.WRITE_DELIM;
 
         const int &i = std::get<int>(value_);
         fp.write(reinterpret_cast<const char *>(&i), sizeof(int));
     } else if (std::holds_alternative<float>(value_)) {
         type = 'f';
         fp.WRITE_CHAR(type);
+        fp.WRITE_DELIM;
 
         const float &f = std::get<float>(value_);
         fp.write(reinterpret_cast<const char *>(&f), sizeof(float));
     } else if (std::holds_alternative<std::string>(value_)) {
+        // s|size|string
         type = 's';
         fp.WRITE_CHAR(type);
+        fp.WRITE_DELIM;
 
         const std::string &str = std::get<std::string>(value_);
-        size_t strSize = str.size();
+        const size_t &strSize = str.size();
         fp.write(reinterpret_cast<const char *>(&strSize), sizeof(strSize));
+        fp.WRITE_DELIM;
         fp.write(str.data(), strSize);
     } else if (std::holds_alternative<std::vector<StoreValueSP>>(value_)) {
+        static const char DENOTE_L_START = '<';
+        static const char DENOTE_L_END = '>';
+
+        // l|numElem|e1|e2|...|en|
         type = 'l';
         fp.WRITE_CHAR(type);
+        fp.WRITE_DELIM;
 
-        // TODO
-        // const std::vector<StoreValueSP> &list = std::get<std::vector<StoreValueSP>>(value_);
-        // for (const auto &item : list) {
-        //     item->toFile(fp);
-        // }
+        const std::vector<StoreValueSP> &list
+            = std::get<std::vector<StoreValueSP>>(value_);
+        const size_t &numElem = list.size();
+        fp.write(reinterpret_cast<const char *>(&numElem), sizeof(numElem));
+
+        fp.WRITE_CHAR(DENOTE_L_START);
+        for (const auto &item : list) {
+            item->toFile(fp);
+            fp.WRITE_DELIM;
+        }
+        fp.WRITE_CHAR(DENOTE_L_END);
     }
 }
