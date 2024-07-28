@@ -1,6 +1,9 @@
 #include "store_value.h"
 
 #include "error_msgs.h"
+#include "util.h"
+
+#include <fstream>
 
 int StoreValue::getInt() const {
     if (isInt())
@@ -69,4 +72,44 @@ std::string StoreValue::string() const {
                 return stringList_(arg);
         },
         value_);
+}
+
+/**
+ * Serializes this StoreValue in binary format with a type identifier, size of the value,
+ * then the value itself.
+ * ex. a string "abc" may be stored as s|4|abc
+ */
+void StoreValue::toFile(std::ofstream &fp) const {
+    char type;
+    size_t size;
+    if (std::holds_alternative<int>(value_)) {
+        type = 'i';
+        fp.WRITE_CHAR(type);
+
+        const int &i = std::get<int>(value_);
+        fp.write(reinterpret_cast<const char *>(&i), sizeof(int));
+    } else if (std::holds_alternative<float>(value_)) {
+        type = 'f';
+        fp.WRITE_CHAR(type);
+
+        const float &f = std::get<float>(value_);
+        fp.write(reinterpret_cast<const char *>(&f), sizeof(float));
+    } else if (std::holds_alternative<std::string>(value_)) {
+        type = 's';
+        fp.WRITE_CHAR(type);
+
+        const std::string &str = std::get<std::string>(value_);
+        size_t strSize = str.size();
+        fp.write(reinterpret_cast<const char *>(&strSize), sizeof(strSize));
+        fp.write(str.data(), strSize);
+    } else if (std::holds_alternative<std::vector<StoreValueSP>>(value_)) {
+        type = 'l';
+        fp.WRITE_CHAR(type);
+
+        // TODO
+        // const std::vector<StoreValueSP> &list = std::get<std::vector<StoreValueSP>>(value_);
+        // for (const auto &item : list) {
+        //     item->toFile(fp);
+        // }
+    }
 }

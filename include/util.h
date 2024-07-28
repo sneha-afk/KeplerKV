@@ -1,7 +1,15 @@
 #pragma once
 
+#include <fstream>
 #include <string>
 #include <unordered_map>
+
+static const std::string FILE_HEADER = "KEPLERKV-SAVE\n";
+static int FILE_HEADER_SIZE = (int) FILE_HEADER.size();
+
+static const char DELIMITER = '|';
+#define WRITE_DELIM   write(&DELIMITER, sizeof(char))
+#define WRITE_CHAR(c) write(&c, sizeof(char))
 
 // Returns the vlaue of the key in the map if it exists, else returns the provided default
 template <typename K, typename V>

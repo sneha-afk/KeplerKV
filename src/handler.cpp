@@ -7,6 +7,8 @@
 
 static constexpr bool DEBUG = false;
 
+static std::string DEFAULT_SAVE_FILE = "kep-save.dat";
+
 /**
  * Proccesses a query and hands it off to the store to execute.
  * Returns whether to keep running the program.
@@ -131,6 +133,10 @@ bool Handler::handleQuery(std::string &query) {
                     else
                         std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
                 }
+                break;
+            case CommandType::SAVE:
+                store_.saveToFile(DEFAULT_SAVE_FILE);
+                std::cout << T_BGREEN << "SAVED" << T_RESET << std::endl;
                 break;
             default: break;
         }

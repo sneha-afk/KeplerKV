@@ -58,6 +58,7 @@ public:
     StoreValueType getType() const { return type_; }
 
     std::string string() const;
+    void toFile(std::ofstream &) const;
     friend std::ostream &operator<<(std::ostream &os, const StoreValue &sv) {
         os << sv.string();
         return os;

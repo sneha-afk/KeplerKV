@@ -1,6 +1,11 @@
 #include "store.h"
 
 #include "error_msgs.h"
+#include "util.h"
+
+#include <fstream>
+#include <iostream>
+#include <ostream>
 
 Store::Store() {
     map_ = std::unordered_map<std::string, StoreValueSP>();
@@ -51,4 +56,28 @@ StoreValueSP Store::resolveRecur_(
     if (found->isIdent()) return resolveRecur_(found->getString(), seen);
 
     return found;
+}
+
+// https://www.eecs.umich.edu/courses/eecs380/HANDOUTS/cppBinaryFileIO-2.html
+// https://gist.github.com/molpopgen/9123133
+void Store::saveToFile(const std::string &filename) {
+    std::ofstream fp;
+    fp.open(filename, std::ios::out | std::ios::binary);
+    if (!fp.is_open()) throw RuntimeErr("Error: failed to open file to save");
+
+    fp.write(FILE_HEADER.data(), FILE_HEADER_SIZE);
+
+    for (const auto &item : map_) {
+        const std::string &key = item.first;
+        StoreValueSP val = item.second;
+
+        size_t keySize = key.size();
+        fp.write(reinterpret_cast<const char *>(&keySize), sizeof(keySize));
+        fp.WRITE_DELIM;
+        fp.write(key.data(), keySize);
+        fp.WRITE_DELIM;
+        val->toFile(fp);
+    }
+
+    fp.close();
 }
