@@ -31,6 +31,7 @@ bool Handler::handleQuery(std::string &query) {
             case CommandType::QUIT:
                 std::cout << T_BBLUE << "Farewell!" << T_RESET << std::endl;
                 return false;
+            case CommandType::CLEAR: std::cout << "\033[H\033[2J" << std::endl; break;
             case CommandType::SET:
                 if (numArgs < 2) throw MIN_TWO_ARG("SET");
 

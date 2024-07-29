@@ -6,14 +6,21 @@ Last updated: 2024-07-18
 
 ## Contents
 
-1. [General syntax](#general-syntax)
-2. [QUIT](#QUIT): quitting the program.
-3. [SET](#set): setting a key
-4. [GET](#get): retrieving a key
-5. [DEL](#del): deleting a key
-6. [UPDATE](#update): updating a key
-7. [LIST](#list): lists out all values in the store currently
-8. [RESOLVE](#resolve): resolve nested/recursive references
+- [General syntax](#general-syntax)
+    - [Tokenization](#tokenization)
+    - [Command syntax](#command-syntax)
+    - [Identifiers](#identifiers)
+- Commands
+    - [QUIT](#quit): quitting the program.
+    - [CLEAR](#clear): clearing the screen
+    - [SET](#set): setting a key
+        - [Supported datatypes](#supported-types)
+    - [GET](#get): retrieving a key
+    - [DEL](#del): deleting a key
+    - [UPDATE](#update): updating a key
+    - [LIST](#list): lists out all values in the store currently
+    - [RESOLVE](#resolve): resolve nested/recursive references
+        - [Explanation of lazy evaluation](#lazy-evaluation)
 
 ## General syntax
 
@@ -42,22 +49,25 @@ Multiple commands can be completed at once by separating them with semicolons:
 
 ---
 
-### Commands
+### Command syntax
 
-Commands are **case-insentive** and may have alternate syntax, see the specific command for shorthands.
+Commands are **case-insentive** and may have alternate syntax. This documentation denotes commands and their arguments as:
+```
+{set of equivalent invocations} required-argument [optional-arguments]
+```
 
 ### Identifiers
 
 Identifiers are **case-sensitive** and must begin with an alphabetical character or an underscore, with any alphanumeric or underscore characters permitted afterwards.
 
-#### Examples of allowed
+#### Examples of allowed identifiers
 |              |            |
 |:------------:|:----------:|
 | `_name`      |   |
 | `Age`        | `age` (different from `Age`!)  |
 | `_patient0`  |   |
 
-#### Examples of disallowed
+#### Examples of disallowed identifiers
 |            |                                                          |
 |:----------:|----------------------------------------------------------|
 | `0patient` | Cannot start with a number                               |
@@ -68,6 +78,12 @@ Identifiers are **case-sensitive** and must begin with an alphabetical character
 **`{\q, \quit}`**
 
 Quit the KeplerKV program.
+
+## CLEAR
+
+**`\clear`**
+
+Clear the terminal screen, returning to the `>` prompt.
 
 ## SET
 
@@ -166,6 +182,7 @@ List out all items that are currently in the store.
 
 Resolve the values of keys that reference another key (or form a key-chain!). **`RESOLVE` works identically to `GET` when keys are not recursive.**
 
+### Lazy evaluation
 Recursive keys are **lazily evaluated**, which means the value of the key being referenced need not be defined until resolution is required.
 ```bash
 \set a b        # a -> b
