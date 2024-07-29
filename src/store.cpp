@@ -58,8 +58,12 @@ StoreValueSP Store::resolveRecur_(
     return found;
 }
 
-// https://www.eecs.umich.edu/courses/eecs380/HANDOUTS/cppBinaryFileIO-2.html
-// https://gist.github.com/molpopgen/9123133
+/**
+ * Serializes the Store into binary at the filename specified.
+ * 
+ * https://www.eecs.umich.edu/courses/eecs380/HANDOUTS/cppBinaryFileIO-2.html
+ * https://gist.github.com/molpopgen/9123133
+ */
 void Store::saveToFile(const std::string &filename) {
     std::ofstream fp;
     fp.open(filename, std::ios::out | std::ios::binary);
@@ -81,6 +85,7 @@ void Store::saveToFile(const std::string &filename) {
     fp.close();
 }
 
+// Deserializes a binary KEPLER-SAVE file into a Store with all its data.
 void Store::loadFromFile(const std::string &filename) {
     std::ifstream fp;
     fp.open(filename, std::ios::in | std::ios::binary);

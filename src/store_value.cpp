@@ -111,9 +111,6 @@ void StoreValue::toFile(std::ofstream &fp) const {
         fp.WRITE_DELIM;
         fp.write(str.data(), strSize);
     } else if (std::holds_alternative<std::vector<StoreValueSP>>(value_)) {
-        static const char DENOTE_L_START = '<';
-        static const char DENOTE_L_END = '>';
-
         // l|numElem|e1|e2|...|en|
         type = 'l';
         fp.WRITE_CHAR(type);
@@ -124,15 +121,14 @@ void StoreValue::toFile(std::ofstream &fp) const {
         const size_t &numElem = list.size();
         fp.write(reinterpret_cast<const char *>(&numElem), sizeof(numElem));
 
-        fp.WRITE_CHAR(DENOTE_L_START);
         for (const auto &item : list) {
             item->toFile(fp);
             fp.WRITE_DELIM;
         }
-        fp.WRITE_CHAR(DENOTE_L_END);
     }
 }
-#include <iostream>
+
+// Reads a StoreValue from the file, assuming the file is a valid KEPLER-SAVE.
 StoreValue StoreValue::fromFile(std::ifstream &fp) {
     char type;
     fp.read(&type, sizeof(char));
@@ -162,7 +158,18 @@ StoreValue StoreValue::fromFile(std::ifstream &fp) {
             if (strType == 'i') return StoreValue(sval, true);
             return StoreValue(sval);
         }
-        case 'l': break;
+        case 'l': {
+            size_t numVals;
+            fp.read(reinterpret_cast<char *>(&numVals), sizeof(size_t));
+
+            std::vector<StoreValueSP> lst = std::vector<StoreValueSP>();
+            for (size_t i = 0; i < numVals; i++) {
+                StoreValueSP valsp = std::make_shared<StoreValue>(fromFile(fp));
+                lst.push_back(valsp);
+                fp.MV_FP_FORWARD;
+            }
+            return StoreValue(lst);
+        }
         default: throw RuntimeErr("Error: unknown type found in save file"); break;
     }
 

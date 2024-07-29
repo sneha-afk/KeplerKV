@@ -7,7 +7,7 @@
 
 static constexpr bool DEBUG = false;
 
-static std::string DEFAULT_SAVE_FILE = "kep-save.dat";
+static std::string DEFAULT_SAVE_FILE = "default_kep_save";
 
 /**
  * Proccesses a query and hands it off to the store to execute.
@@ -135,11 +135,11 @@ bool Handler::handleQuery(std::string &query) {
                 }
                 break;
             case CommandType::SAVE:
-                store_.saveToFile(DEFAULT_SAVE_FILE);
+                store_.saveToFile(DEFAULT_SAVE_FILE + ".kep");
                 std::cout << T_BGREEN << "SAVED" << T_RESET << std::endl;
                 break;
             case CommandType::LOAD:
-                store_.loadFromFile(DEFAULT_SAVE_FILE);
+                store_.loadFromFile(DEFAULT_SAVE_FILE + ".kep");
                 std::cout << T_BGREEN << "LOADED" << T_RESET << std::endl;
                 break;
             default: break;

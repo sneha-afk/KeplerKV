@@ -23,7 +23,7 @@ A NoSQL key-value pair store for quick access.
 ### overall
 - [X] Build a parser system to implement a user CLI
 - [ ] Manage key-values in efficent data structures
-- [ ] Serialization/deserialization from file
+- [X] Serialization/deserialization from file
 - [ ] Allow for data manipulation to supported types
 
 ### reach
@@ -47,16 +47,16 @@ A NoSQL key-value pair store for quick access.
 
 ### July 28, 2024
 
-* Working on deserialization
-    * Reducing the delimiters would be more helpful (and less space)
-    * Only a few instances are of variable type
+* Worked on deserialization, currently working for basic types, lists not fully tested
+* Considering reducing the number of delimiters to be more space-efficient
+* More extensive testing mechanisms would be beneficial
+* `.kep` file extension to mark which files are Kepler saves
 
 ### July 27, 2024
 
-* Binary I/O to save into a file
-    * Type of the data is written first to know if any size considerations need to be made
-    * Lists start with a < and end with a >, might not need this later
-* 
+* Designed a preliminary serialization scheme for saving
+* Encoding into bytes to be more efficient
+* Datatype indicator is written first, followed by the data or other information (such as size)
 
 ### July 26, 2024
 
