@@ -4,7 +4,7 @@
 #include <string>
 #include <unordered_map>
 
-static const std::string FILE_HEADER = "KEPLERKV-SAVE\n";
+static const std::string FILE_HEADER = "KEPLERKV-SAVE|";
 static int FILE_HEADER_SIZE = (int) FILE_HEADER.size();
 
 static const char DELIMITER = '|';

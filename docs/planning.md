@@ -45,6 +45,15 @@ A NoSQL key-value pair store for quick access.
 ---
 ## dev journal
 
+### July 29, 2024
+
+* Introduced the `CLEAR` method similar to Linux's `clear`
+* Reduced the number of delimiters in the save files to save some bytes
+* Next steps:
+    * Formal testing (most likely through bash scripts)
+    * Review codebase and improve on some redundancy
+    * Plan on the data manipulation goal
+
 ### July 28, 2024
 
 * Worked on deserialization, currently working for basic types, lists not fully tested

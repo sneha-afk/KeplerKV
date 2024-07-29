@@ -11,6 +11,11 @@ using RuntimeErr = std::runtime_error;
 #define SV_WRONG_TYPE   "Error: wrong type getter used with this value"
 #define NESTED_CMD      "Error: nested commands not supported (yet?)"
 #define CMD_IN_LIST     "Error: commands not supported within lists"
+#define FAIL_OPEN_WRITE "Error: failed to open file to write"
+#define FAIL_OPEN_READ  "Error: failed to open file to read (check if it exists!)"
+#define NOT_VALID_SAVE  "Error: not a valid KEPLER-SAVE file"
+#define UNK_SAVE_ITEM   "Error: unknown item type found in save file"
+#define INVALID_FNAME   "Error: invalid filename, must be valid string or identifier"
 
 inline RuntimeErr MIN_ONE_ARG(const std::string &c) {
     return RuntimeErr("Error: " + c + " requires at least one argument (key)");

@@ -2,7 +2,7 @@
 
 The full manual for KeplerKV including syntax and command specifics.
 
-Last updated: 2024-07-18
+Last updated: 2024-07-29
 
 ## Contents
 
@@ -21,6 +21,9 @@ Last updated: 2024-07-18
     - [LIST](#list): lists out all values in the store currently
     - [RESOLVE](#resolve): resolve nested/recursive references
         - [Explanation of lazy evaluation](#lazy-evaluation)
+    - [SAVE](#save): save the store into file
+        - [Valid filenames](#valid-filenames)
+    - [LOAD](#load): load a store from file
 
 ## General syntax
 
@@ -206,4 +209,31 @@ Similar to C++ references, affecting `b` also affects `a` since `a` is an alias 
     b | int: 2
 \resolve a
     a | int: 2
+```
+
+## SAVE
+
+**`\save [filename]`**
+
+Save the current state of the store into a save file of **`.kep`** extension.
+
+```bash
+\set a 1
+\save manual
+    SAVED
+```
+
+### Valid filenames
+
+Filenames follow the same rules as strings (surrounded by quotes) and [identifiers](#identifiers). If you have spaces or special characters within a filename, it is safer to put quotes around the name.
+
+## LOAD
+
+**`\load [filename]`**
+
+Load in a store state from a valid save file produced from [`SAVE`](#save), denoted by the **`.kep`** extension.
+
+```bash
+\load manual
+    LOADED
 ```

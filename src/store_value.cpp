@@ -84,46 +84,39 @@ void StoreValue::toFile(std::ofstream &fp) const {
     if (std::holds_alternative<int>(value_)) {
         type = 'i';
         fp.WRITE_CHAR(type);
-        fp.WRITE_DELIM;
 
         const int &i = std::get<int>(value_);
         fp.write(reinterpret_cast<const char *>(&i), sizeof(int));
     } else if (std::holds_alternative<float>(value_)) {
         type = 'f';
         fp.WRITE_CHAR(type);
-        fp.WRITE_DELIM;
 
         const float &f = std::get<float>(value_);
         fp.write(reinterpret_cast<const char *>(&f), sizeof(float));
     } else if (std::holds_alternative<std::string>(value_)) {
-        // s i or another s|size|string
+        // [s][i or s][size][string]
         type = 's';
         fp.WRITE_CHAR(type);
 
         char strType = isIdent() ? 'i' : 's';
         fp.WRITE_CHAR(strType);
-        fp.WRITE_DELIM;
 
         const std::string &str = std::get<std::string>(value_);
         const size_t &strSize = str.size();
         fp.write(reinterpret_cast<const char *>(&strSize), sizeof(strSize));
-        fp.WRITE_DELIM;
         fp.write(str.data(), strSize);
     } else if (std::holds_alternative<std::vector<StoreValueSP>>(value_)) {
-        // l|numElem|e1|e2|...|en|
+        // [l][num elements][e1|e2|...|en|]
         type = 'l';
         fp.WRITE_CHAR(type);
-        fp.WRITE_DELIM;
 
         const std::vector<StoreValueSP> &list
             = std::get<std::vector<StoreValueSP>>(value_);
         const size_t &numElem = list.size();
         fp.write(reinterpret_cast<const char *>(&numElem), sizeof(numElem));
 
-        for (const auto &item : list) {
+        for (const auto &item : list)
             item->toFile(fp);
-            fp.WRITE_DELIM;
-        }
     }
 }
 
@@ -131,7 +124,6 @@ void StoreValue::toFile(std::ofstream &fp) const {
 StoreValue StoreValue::fromFile(std::ifstream &fp) {
     char type;
     fp.read(&type, sizeof(char));
-    fp.MV_FP_FORWARD;
 
     switch (type) {
         case 'i':
@@ -143,15 +135,12 @@ StoreValue StoreValue::fromFile(std::ifstream &fp) {
             fp.read(reinterpret_cast<char *>(&fval), sizeof(float));
             return StoreValue(fval);
         case 's': {
-            fp.MV_FP_BACKWARD;
             char strType;
             fp.read(&strType, sizeof(char));
-            fp.MV_FP_FORWARD;
 
             size_t strSize;
             fp.read(reinterpret_cast<char *>(&strSize), sizeof(strSize));
             std::string sval(strSize, '\0');
-            fp.MV_FP_FORWARD;
 
             fp.read(&sval[0], strSize);
             if (strType == 'i') return StoreValue(sval, true);
@@ -165,11 +154,10 @@ StoreValue StoreValue::fromFile(std::ifstream &fp) {
             for (size_t i = 0; i < numVals; i++) {
                 StoreValueSP valsp = std::make_shared<StoreValue>(fromFile(fp));
                 lst.push_back(valsp);
-                fp.MV_FP_FORWARD;
             }
             return StoreValue(lst);
         }
-        default: throw RuntimeErr("Error: unknown type found in save file"); break;
+        default: throw RuntimeErr(UNK_SAVE_ITEM); break;
     }
 
     return StoreValue();

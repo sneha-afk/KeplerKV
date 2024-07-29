@@ -67,17 +67,17 @@ StoreValueSP Store::resolveRecur_(
 void Store::saveToFile(const std::string &filename) {
     std::ofstream fp;
     fp.open(filename, std::ios::out | std::ios::binary);
-    if (!fp.is_open()) throw RuntimeErr("Error: failed to open file to save");
+    if (!fp.is_open()) throw RuntimeErr(FAIL_OPEN_WRITE);
 
     fp.write(FILE_HEADER.data(), FILE_HEADER_SIZE);
 
     for (const auto &item : map_) {
+        // [key size][key][value]
         const std::string &key = item.first;
         StoreValueSP val = item.second;
 
         size_t keySize = key.size();
         fp.write(reinterpret_cast<const char *>(&keySize), sizeof(keySize));
-        fp.WRITE_DELIM;
         fp.write(key.data(), keySize);
         fp.WRITE_DELIM;
         val->toFile(fp);
@@ -89,18 +89,16 @@ void Store::saveToFile(const std::string &filename) {
 void Store::loadFromFile(const std::string &filename) {
     std::ifstream fp;
     fp.open(filename, std::ios::in | std::ios::binary);
-    if (!fp.is_open()) throw RuntimeErr("Error: failed to open file to read");
+    if (!fp.is_open()) throw RuntimeErr(FAIL_OPEN_READ);
 
     // Confirm file header tag by filling empty buffer
     std::string expectHeader(FILE_HEADER_SIZE, '\0');
     fp.read(&expectHeader[0], FILE_HEADER_SIZE);
-    if (expectHeader != FILE_HEADER)
-        throw RuntimeErr("Error: not a valid KEPLER-SAVE file");
+    if (expectHeader != FILE_HEADER) throw RuntimeErr(NOT_VALID_SAVE);
 
     while (fp.peek() != EOF) {
         size_t keySize;
         fp.read(reinterpret_cast<char *>(&keySize), sizeof(keySize));
-        fp.MV_FP_FORWARD;
         std::string key(keySize, '\0');
         fp.read(&key[0], keySize);
         fp.MV_FP_FORWARD;

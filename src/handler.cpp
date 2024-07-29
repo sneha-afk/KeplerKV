@@ -134,13 +134,37 @@ bool Handler::handleQuery(std::string &query) {
                 }
                 break;
             case CommandType::SAVE:
-                store_.saveToFile(DEFAULT_SAVE_FILE + ".kep");
-                std::cout << T_BGREEN << "SAVED" << T_RESET << std::endl;
+            case CommandType::LOAD: {
+                std::string &filename = DEFAULT_SAVE_FILE;
+                if (numArgs) {
+                    ValueNodeSP fnameNode = args[0];
+                    if (fnameNode->getValueType() == ValueType::IDENTIFIER)
+                        filename = fnameNode->value->getString();
+                    else if (fnameNode->getValueType() == ValueType::STRING) {
+                        filename = fnameNode->value->getString();
+
+                        // Remove the quotation marks
+                        size_t first_quote = filename.find_first_of('"');
+                        if (first_quote != std::string::npos) {
+                            filename.erase(filename.find_last_of('"'), 1);
+                        } else {
+                            first_quote = filename.find_first_of('\'');
+                            filename.erase(filename.find_last_of('\''), 1);
+                        }
+                        filename.erase(first_quote, 1);
+                    } else
+                        throw RuntimeErr(INVALID_FNAME);
+                }
+
+                if (cmd->getCmdType() == CommandType::SAVE) {
+                    store_.saveToFile(filename + ".kep");
+                    std::cout << T_BGREEN << "SAVED" << T_RESET << std::endl;
+                } else {
+                    store_.loadFromFile(filename + ".kep");
+                    std::cout << T_BGREEN << "LOADED" << T_RESET << std::endl;
+                }
                 break;
-            case CommandType::LOAD:
-                store_.loadFromFile(DEFAULT_SAVE_FILE + ".kep");
-                std::cout << T_BGREEN << "LOADED" << T_RESET << std::endl;
-                break;
+            }
             default: break;
         }
     }
