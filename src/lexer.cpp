@@ -1,8 +1,6 @@
 #include "lexer.h"
 
-#include <algorithm>
 #include <cctype>
-#include <stdexcept>
 
 std::vector<TokenSP> &Lexer::tokenize(std::string &query) {
     tokens.clear();
@@ -74,6 +72,8 @@ TokenSP Lexer::lexIdentifier_() {
     }
     return std::make_shared<Token>(TokenType::IDENTIIFER, s);
 }
+
+// Numbers have digits, at most one sign, and at most one decimal
 TokenSP Lexer::lexNumber_() {
     std::string s;
 
@@ -103,6 +103,7 @@ TokenSP Lexer::lexNumber_() {
     return std::make_shared<Token>(TokenType::NUMBER, s);
 }
 
+// Valid strings should be denoted with quotations around the string
 TokenSP Lexer::lexString_() {
     std::string s;
 

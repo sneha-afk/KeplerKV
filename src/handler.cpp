@@ -7,8 +7,6 @@
 
 static constexpr bool DEBUG = false;
 
-static std::string DEFAULT_SAVE_FILE = "default_kep_save";
-
 /**
  * Proccesses a query and hands it off to the store to execute.
  * Returns whether to keep running the program.

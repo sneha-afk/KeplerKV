@@ -5,9 +5,10 @@
 
 class Parser {
 public:
+    std::vector<ASTNodeSP> nodes;
+
     Parser() { nodes = std::vector<ASTNodeSP>(); };
 
-    std::vector<ASTNodeSP> nodes;
     std::vector<ASTNodeSP> &parse(std::vector<TokenSP> &);
 
 private:

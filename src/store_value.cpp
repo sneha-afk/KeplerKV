@@ -100,8 +100,7 @@ void StoreValue::toFile(std::ofstream &fp) const {
         type = 's';
         fp.WRITE_CHAR(type);
 
-        char strType = 's';
-        if (isIdent()) strType = 'i';
+        char strType = isIdent() ? 'i' : 's';
         fp.WRITE_CHAR(strType);
         fp.WRITE_DELIM;
 

@@ -31,12 +31,8 @@ public:
         : value_(v)
         , type_(StoreValueType::STRING) {};
     StoreValue(const std::string &v, bool is_ident)
-        : value_(v) {
-        if (is_ident)
-            type_ = StoreValueType::IDENTIIFER;
-        else
-            type_ = StoreValueType::STRING;
-    };
+        : value_(v)
+        , type_(is_ident ? StoreValueType::IDENTIIFER : StoreValueType::STRING) {};
     StoreValue(const std::vector<StoreValueSP> &v)
         : value_(v)
         , type_(StoreValueType::LIST) {};

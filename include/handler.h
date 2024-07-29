@@ -6,6 +6,8 @@
 
 #include <string>
 
+static std::string DEFAULT_SAVE_FILE = "default_kep_save";
+
 class Handler {
 public:
     Handler() {

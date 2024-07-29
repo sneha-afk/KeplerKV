@@ -88,10 +88,6 @@ private:
 using ValueNodeSP = std::shared_ptr<ValueNode>;
 
 class CommandNode : public ASTNode {
-private:
-    CommandType cmdType_;
-    std::vector<ValueNodeSP> args_;
-
 public:
     CommandNode()
         : cmdType_(CommandType::UNKNOWN)
@@ -109,6 +105,10 @@ public:
     CommandType getCmdType() const { return cmdType_; }
     void addArg(ValueNodeSP &a) { args_.push_back(a); };
     std::vector<ValueNodeSP> &getArgs() { return args_; };
+
+private:
+    CommandType cmdType_;
+    std::vector<ValueNodeSP> args_;
 };
 
 using ASTNodeSP = std::shared_ptr<ASTNode>;
