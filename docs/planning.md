@@ -11,8 +11,12 @@ A NoSQL key-value pair store for quick access.
 
 * `class Handler`: processes and executes commands to the store
     * `class Lexer`: lexical analyzer for commands
+        * `class Token`: container of a string token read and its inferred type (i.e command, value, unknown)
     * `class Parser`: parses semantic meaning out of the tokens generated from the lexer
+        * `class ASTNode`: represents a `Token`'s meaning and any contained data
     * Execution and validation done within `Handler`: may consider exporting this to a class if too unwiedly
+* `class Store`: in-memory representation of the store
+    * `class StoreValue`: variant type to hold different types of data
 
 ## goals
 
@@ -32,7 +36,27 @@ A NoSQL key-value pair store for quick access.
 - [X] Validate user input and operations
 
 ---
+
+## resources used
+
+1. [How to Write a Programming Language](https://accu.org/journals/overload/26/145/balaam_2510/) series by Andy Balaam
+2. [TosLang](https://faouellet.github.io/categories/toslang/) series by Félix-Antoine Ouellet
+
+---
 ## dev journal
+
+### July 28, 2024
+
+* Working on deserialization
+    * Reducing the delimiters would be more helpful (and less space)
+    * Only a few instances are of variable type
+
+### July 27, 2024
+
+* Binary I/O to save into a file
+    * Type of the data is written first to know if any size considerations need to be made
+    * Lists start with a < and end with a >, might not need this later
+* 
 
 ### July 26, 2024
 
@@ -113,8 +137,3 @@ I had been working on this incrementally and continously getting stuck on how to
 ### June 28, 2024
 
 A key-value store is far less coupled than a relational database and I intend to focus my efforts in learning how to make an effective CLI that is easy to expand and interpret.
-
-## resources used
-
-1. [How to Write a Programming Language](https://accu.org/journals/overload/26/145/balaam_2510/) series by Andy Balaam
-2. [TosLang](https://faouellet.github.io/categories/toslang/) series by Félix-Antoine Ouellet

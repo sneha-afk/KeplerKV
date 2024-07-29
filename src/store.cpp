@@ -78,6 +78,30 @@ void Store::saveToFile(const std::string &filename) {
         fp.WRITE_DELIM;
         val->toFile(fp);
     }
+    fp.close();
+}
 
+void Store::loadFromFile(const std::string &filename) {
+    std::ifstream fp;
+    fp.open(filename, std::ios::in | std::ios::binary);
+    if (!fp.is_open()) throw RuntimeErr("Error: failed to open file to read");
+
+    // Confirm file header tag by filling empty buffer
+    std::string expectHeader(FILE_HEADER_SIZE, '\0');
+    fp.read(&expectHeader[0], FILE_HEADER_SIZE);
+    if (expectHeader != FILE_HEADER)
+        throw RuntimeErr("Error: not a valid KEPLER-SAVE file");
+
+    while (fp.peek() != EOF) {
+        size_t keySize;
+        fp.read(reinterpret_cast<char *>(&keySize), sizeof(keySize));
+        fp.MV_FP_FORWARD;
+        std::string key(keySize, '\0');
+        fp.read(&key[0], keySize);
+        fp.MV_FP_FORWARD;
+
+        StoreValueSP val = std::make_shared<StoreValue>(StoreValue::fromFile(fp));
+        map_[key] = val;
+    }
     fp.close();
 }

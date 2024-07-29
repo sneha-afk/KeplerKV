@@ -59,6 +59,8 @@ public:
 
     std::string string() const;
     void toFile(std::ofstream &) const;
+    static StoreValue fromFile(std::ifstream &);
+
     friend std::ostream &operator<<(std::ostream &os, const StoreValue &sv) {
         os << sv.string();
         return os;

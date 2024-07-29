@@ -138,6 +138,10 @@ bool Handler::handleQuery(std::string &query) {
                 store_.saveToFile(DEFAULT_SAVE_FILE);
                 std::cout << T_BGREEN << "SAVED" << T_RESET << std::endl;
                 break;
+            case CommandType::LOAD:
+                store_.loadFromFile(DEFAULT_SAVE_FILE);
+                std::cout << T_BGREEN << "LOADED" << T_RESET << std::endl;
+                break;
             default: break;
         }
     }

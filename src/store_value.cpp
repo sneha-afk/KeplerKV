@@ -81,7 +81,6 @@ std::string StoreValue::string() const {
  */
 void StoreValue::toFile(std::ofstream &fp) const {
     char type;
-    size_t size;
     if (std::holds_alternative<int>(value_)) {
         type = 'i';
         fp.WRITE_CHAR(type);
@@ -97,9 +96,13 @@ void StoreValue::toFile(std::ofstream &fp) const {
         const float &f = std::get<float>(value_);
         fp.write(reinterpret_cast<const char *>(&f), sizeof(float));
     } else if (std::holds_alternative<std::string>(value_)) {
-        // s|size|string
+        // s i or another s|size|string
         type = 's';
         fp.WRITE_CHAR(type);
+
+        char strType = 's';
+        if (isIdent()) strType = 'i';
+        fp.WRITE_CHAR(strType);
         fp.WRITE_DELIM;
 
         const std::string &str = std::get<std::string>(value_);
@@ -128,4 +131,40 @@ void StoreValue::toFile(std::ofstream &fp) const {
         }
         fp.WRITE_CHAR(DENOTE_L_END);
     }
+}
+#include <iostream>
+StoreValue StoreValue::fromFile(std::ifstream &fp) {
+    char type;
+    fp.read(&type, sizeof(char));
+    fp.MV_FP_FORWARD;
+
+    switch (type) {
+        case 'i':
+            int ival;
+            fp.read(reinterpret_cast<char *>(&ival), sizeof(int));
+            return StoreValue(ival);
+        case 'f':
+            float fval;
+            fp.read(reinterpret_cast<char *>(&fval), sizeof(float));
+            return StoreValue(fval);
+        case 's': {
+            fp.MV_FP_BACKWARD;
+            char strType;
+            fp.read(&strType, sizeof(char));
+            fp.MV_FP_FORWARD;
+
+            size_t strSize;
+            fp.read(reinterpret_cast<char *>(&strSize), sizeof(strSize));
+            std::string sval(strSize, '\0');
+            fp.MV_FP_FORWARD;
+
+            fp.read(&sval[0], strSize);
+            if (strType == 'i') return StoreValue(sval, true);
+            return StoreValue(sval);
+        }
+        case 'l': break;
+        default: throw RuntimeErr("Error: unknown type found in save file"); break;
+    }
+
+    return StoreValue();
 }
