@@ -46,7 +46,7 @@ StoreValueSP Store::resolve(const std::string &key) {
 StoreValueSP Store::resolveRecur_(
     const std::string &key, std::unordered_set<std::string> &seen) {
     // If a key is being searched for again, there is a circluar ref
-    if (seen.count(key)) throw CIRCULAR_REF;
+    if (seen.count(key)) throw RuntimeErr(CIRCULAR_REF);
     seen.insert(key);
 
     StoreValueSP found = get(key);

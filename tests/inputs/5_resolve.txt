@@ -1,0 +1,14 @@
+\set a b
+\set b c
+\set c d
+\set d 1
+\get a
+\resolve a
+\resolve b
+\resolve c
+\resolve d
+\set one two
+\set two three
+\set three one
+\resolve one
+\q

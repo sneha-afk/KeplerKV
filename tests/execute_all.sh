@@ -34,14 +34,25 @@ do
     res_file="${RESULTS_DIR}${name_base}_result.txt"
     diff_file="${RESULTS_DIR}${name_base}_diff.txt"
 
-    # sed to remove ANSI escape sequences: https://superuser.com/a/380778
-    $KEPLER < "$input_file" | sed -e 's/\x1b\[[0-9;]*m//g' > "$res_file"
-    diff $out_file "$res_file" > "$diff_file"
-
     echo -en "File: $name_base"
+
+    # sed to remove ANSI escape sequences: https://superuser.com/a/380778
+    $KEPLER < "$input_file" 2>&1| sed -e 's/\x1b\[[0-9;]*m//g' &> "$res_file"
+    
+    # Find any error messages
+    grep -qE "Segmentation fault|Aborted|Assertion failed|\
+    Illegal instruction|Floating point exception|Bus error|Memory error|\
+    File not found|Permission denied|Command not found|Invalid argument|terminate called" "$res_file"
+    if [ $? -eq 0 ]; then
+        echo -e "\t\t${T_BRED}FAILED: program crash${T_RESET}"
+        continue
+    fi
+
+    diff $out_file "$res_file" > "$diff_file"
     if [ $? -eq 0 ]; then
         echo -e "\t\t${T_BGREEN}PASSED${T_RESET}"
     else
-        echo -e "\t\t${T_BRED}FAILED${T_RESET}"
+        echo -e "\t\t${T_BRED}FAILED: wrong output${T_RESET}"
     fi
+    
 done
