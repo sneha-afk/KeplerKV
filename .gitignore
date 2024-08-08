@@ -37,3 +37,6 @@
 build/
 
 .vscode/
+
+# Results directory of tests
+tests/results

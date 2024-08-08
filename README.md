@@ -2,10 +2,6 @@
 
 > A key-value store.
 
-## Prerequisites
-
-A C++ compiler that is compatible with the C++17 standard.
-
 ## Download
 
 Each release comes with the compiled KeplerKV binary to download.
@@ -16,11 +12,25 @@ See the [latest release](https://github.com/sneha-afk/KeplerKV/releases)!
 
 See the [manual](docs/manual.md) for a comprehensive list of commands and see the [examples](docs/examples.md) page for example usage.
 
-## Building
+## Developers
+
+Working on KeplerKV requires a C++ compiler that is compatible with the C++17 standard.
+
+### Testing
+
+A testing script is located in `tests/` that takes an input and corresponding output files located in `inputs/` and `outputs/` respectively. To run all tests:
+```bash
+cd tests
+bash execute_all.sh
+```
+
+**Note: end any input file with `\q` as the program runs infinitely until this command is entered.**
+
+### Building
 
 Currently the project has two methods of building from scratch.
 
-### GNU Make
+#### GNU Make
 
 A `Makefile` is located at the root of the repository and is a quick way to build locally.
 
@@ -39,7 +49,7 @@ To clean your directory of object files and the binary:
 make clean
 ```
 
-### CMake
+#### CMake
 
 A `CMakeLists.txt` is located at the root of the repository and is the preferred way to build locally.
 

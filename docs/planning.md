@@ -45,6 +45,14 @@ A NoSQL key-value pair store for quick access.
 ---
 ## dev journal
 
+### August 8, 2024
+
+* Created `tests/execute_all.sh` which takes input and expected output files as test cases
+* Next steps:
+    * Aforementioned code review
+    * Add some small utility commands: `RENAME`, `STATS`
+    * Data manipulation: perhaps starting with incrementing decrementing integers
+
 ### July 29, 2024
 
 * Introduced the `CLEAR` method similar to Linux's `clear`
