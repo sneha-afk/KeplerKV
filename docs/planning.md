@@ -37,6 +37,12 @@ A NoSQL key-value pair store for quick access.
 
 ---
 
+## current limitations
+* No nested commands allowed, i.e `\SET a \GET b + 1`
+* No commands allowed within a list definition, i.e `\SET l [\GET a]
+* `RESOLVE` will not resolve identifiers within lists
+* Arithmetic expressions are not allowed when setting numbers
+
 ## resources used
 
 1. [How to Write a Programming Language](https://accu.org/journals/overload/26/145/balaam_2510/) series by Andy Balaam
@@ -48,6 +54,7 @@ A NoSQL key-value pair store for quick access.
 ### August 8, 2024
 
 * Created `tests/execute_all.sh` which takes input and expected output files as test cases
+* Refactored `handler.cpp` to use a function map instead of an unweidly `switch` statement for longer command processes
 * Next steps:
     * Aforementioned code review
     * Add some small utility commands: `RENAME`, `STATS`

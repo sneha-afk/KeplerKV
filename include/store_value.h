@@ -13,10 +13,6 @@ using StoreValueVar = std::variant<int, float, std::string, std::vector<StoreVal
 enum class StoreValueType { INT, FLOAT, STRING, LIST, IDENTIIFER };
 
 class StoreValue {
-private:
-    StoreValueVar value_;
-    StoreValueType type_;
-
 public:
     StoreValue()
         : value_(0)
@@ -61,4 +57,8 @@ public:
         os << sv.string();
         return os;
     };
+
+private:
+    StoreValueVar value_;
+    StoreValueType type_;
 };

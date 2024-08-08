@@ -4,9 +4,12 @@
 #include "parser.h"
 #include "store.h"
 
+#include <functional>
 #include <string>
 
-static std::string DEFAULT_SAVE_FILE = "default_kep_save";
+class Handler;
+using HandlerFunctionPtr
+    = std::function<void(Handler *, std::vector<ValueNodeSP> &, const std::size_t)>;
 
 class Handler {
 public:
@@ -34,5 +37,17 @@ private:
     Parser parser_;
     Store store_;
 
+    static std::unordered_map<CommandType, HandlerFunctionPtr> CommandToFunction;
+
     void print_item_(const std::string &, StoreValueSP);
+
+    std::string &getFilename_(ValueNodeSP);
+
+    void handleSet_(std::vector<ValueNodeSP> &, const std::size_t);
+    void handleGet_(std::vector<ValueNodeSP> &, const std::size_t);
+    void handleDelete_(std::vector<ValueNodeSP> &, const std::size_t);
+    void handleUpdate_(std::vector<ValueNodeSP> &, const std::size_t);
+    void handleResolve_(std::vector<ValueNodeSP> &, const std::size_t);
+    void handleSave_(std::vector<ValueNodeSP> &, const std::size_t);
+    void handleLoad_(std::vector<ValueNodeSP> &, const std::size_t);
 };

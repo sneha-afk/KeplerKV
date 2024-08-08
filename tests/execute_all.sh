@@ -24,6 +24,7 @@ KEPLER="../build/KeplerKV"
 mkdir -p results
 RESULTS_DIR="./results/"
 
+echo -e "Test case\t\tResult\n-----------------------------"
 for input_file in $INPUT_FILES
 do
     no_path=$(basename "$input_file")
@@ -33,15 +34,14 @@ do
     res_file="${RESULTS_DIR}${name_base}_result.txt"
     diff_file="${RESULTS_DIR}${name_base}_diff.txt"
 
-    echo -e "NOW TESTING:\t$name_base"
-
     # sed to remove ANSI escape sequences: https://superuser.com/a/380778
     $KEPLER < "$input_file" | sed -e 's/\x1b\[[0-9;]*m//g' > "$res_file"
     diff $out_file "$res_file" > "$diff_file"
 
+    echo -en "File: $name_base"
     if [ $? -eq 0 ]; then
-        echo -e "\t${T_BGREEN}PASSED${T_RESET}"
+        echo -e "\t\t${T_BGREEN}PASSED${T_RESET}"
     else
-        echo -e "\t${T_BRED}FAILED${T_RESET}"
+        echo -e "\t\t${T_BRED}FAILED${T_RESET}"
     fi
 done

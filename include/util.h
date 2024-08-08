@@ -6,6 +6,7 @@
 
 static const std::string FILE_HEADER = "KEPLERKV-SAVE|";
 static int FILE_HEADER_SIZE = (int) FILE_HEADER.size();
+static std::string DEFAULT_SAVE_FILE = "default_kep_save";
 
 static const char DELIMITER = '|';
 #define WRITE_DELIM    write(&DELIMITER, sizeof(char))
