@@ -30,11 +30,6 @@ bool Store::update(const std::string &key, StoreValueSP value) {
     return true;
 }
 
-// Indicates whether the store conatains the key.
-inline bool Store::contains(const std::string &key) {
-    return map_.find(key) != map_.end();
-}
-
 // Resolves recursive references (keys storing other keys) until a base value is reached.
 // Essentially, a recursive GET command for when the user wants to unpack a key-chain.
 StoreValueSP Store::resolve(const std::string &key) {
@@ -56,6 +51,16 @@ StoreValueSP Store::resolveRecur_(
     if (found->isIdent()) return resolveRecur_(found->getString(), seen);
 
     return found;
+}
+
+// Renames a value's key. WARNING: if `newName` was already present in the store, its value will be overwritten.
+void Store::rename(const std::string &oldName, const std::string &newName) {
+    StoreValueSP val = get(oldName);
+    if (!val) return;
+
+    // Delete old key, insert again
+    map_.erase(oldName);
+    map_[newName] = val;
 }
 
 /**

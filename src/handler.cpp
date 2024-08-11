@@ -14,7 +14,8 @@ std::unordered_map<CommandType, HandlerFunctionPtr> Handler::CommandToFunction
           { CommandType::UPDATE, &Handler::handleUpdate_ },
           { CommandType::RESOLVE, &Handler::handleResolve_ },
           { CommandType::SAVE, &Handler::handleSave_ },
-          { CommandType::LOAD, &Handler::handleLoad_ } };
+          { CommandType::LOAD, &Handler::handleLoad_ },
+          { CommandType::RENAME, &Handler::handleRename_ } };
 
 /**
  * Proccesses a query and hands it off to the store to execute.
@@ -64,7 +65,7 @@ void Handler::print_item_(const std::string &id, StoreValueSP val) {
 }
 
 void Handler::handleSet_(std::vector<ValueNodeSP> &args, const std::size_t numArgs) {
-    if (numArgs < 2) throw MIN_TWO_ARG("SET");
+    if (numArgs < 2) throw MIN_TWO_ARG_KV("SET");
 
     for (std::size_t i = 0; i < numArgs; i += 2) {
         if (!args[i]) continue;
@@ -84,7 +85,7 @@ void Handler::handleSet_(std::vector<ValueNodeSP> &args, const std::size_t numAr
 }
 
 void Handler::handleGet_(std::vector<ValueNodeSP> &args, const std::size_t numArgs) {
-    if (numArgs < 1) throw MIN_ONE_ARG("GET");
+    if (numArgs < 1) throw MIN_ONE_ARG_K("GET");
 
     for (std::size_t i = 0; i < numArgs; i++) {
         if (!args[i]) continue;
@@ -103,7 +104,7 @@ void Handler::handleGet_(std::vector<ValueNodeSP> &args, const std::size_t numAr
 }
 
 void Handler::handleDelete_(std::vector<ValueNodeSP> &args, const std::size_t numArgs) {
-    if (numArgs < 1) throw MIN_ONE_ARG("DELETE");
+    if (numArgs < 1) throw MIN_ONE_ARG_K("DELETE");
 
     for (std::size_t i = 0; i < numArgs; i++) {
         if (!args[i]) continue;
@@ -122,7 +123,7 @@ void Handler::handleDelete_(std::vector<ValueNodeSP> &args, const std::size_t nu
 }
 
 void Handler::handleUpdate_(std::vector<ValueNodeSP> &args, const std::size_t numArgs) {
-    if (numArgs < 2) throw MIN_TWO_ARG("UPDATE");
+    if (numArgs < 2) throw MIN_TWO_ARG_KV("UPDATE");
 
     for (std::size_t i = 0; i < numArgs; i += 2) {
         if (!args[i]) continue;
@@ -145,7 +146,7 @@ void Handler::handleUpdate_(std::vector<ValueNodeSP> &args, const std::size_t nu
 }
 
 void Handler::handleResolve_(std::vector<ValueNodeSP> &args, const std::size_t numArgs) {
-    if (numArgs < 1) throw MIN_ONE_ARG("RESOLVE");
+    if (numArgs < 1) throw MIN_ONE_ARG_K("RESOLVE");
 
     for (std::size_t i = 0; i < numArgs; i++) {
         if (!args[i]) continue;
@@ -199,4 +200,37 @@ void Handler::handleLoad_(std::vector<ValueNodeSP> &args, const std::size_t numA
 
     store_.loadFromFile(filename + ".kep");
     std::cout << T_BGREEN << "LOADED" << T_RESET << std::endl;
+}
+
+void Handler::handleRename_(std::vector<ValueNodeSP> &args, const std::size_t numArgs) {
+    if (numArgs < 2) throw MIN_TWO_ARG_KK("RENAME");
+
+    for (std::size_t i = 0; i < numArgs; i += 2) {
+        ValueNodeSP oldNameNode = args[i];
+        ValueNodeSP newNameNode = args[i + 1];
+
+        if (oldNameNode->getValueType() != ValueType::IDENTIFIER
+            || newNameNode->getValueType() != ValueType::IDENTIFIER)
+            throw RuntimeErr(NOT_IDENT);
+
+        const std::string &oldName = oldNameNode->value->getString();
+        const std::string &newName = newNameNode->value->getString();
+
+        // Make the user confirm overwrites
+        if (store_.contains(newName)) {
+            std::cout << T_BYLLW << "Warning: key \'" << newName
+                      << "\' already exists. Do you want to overwrite it? (y/n)"
+                      << T_RESET << "\n> ";
+            std::string confirm;
+            std::getline(std::cin, confirm);
+            if (0 < confirm.size() && (confirm[0]) != 'y') {
+                std::cout << T_BYLLW << "No changes made to the store." << T_RESET
+                          << std::endl;
+                return;
+            }
+        }
+
+        store_.rename(oldName, newName);
+        std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
+    }
 }

@@ -17,16 +17,20 @@ using RuntimeErr = std::runtime_error;
 #define UNK_SAVE_ITEM   "Error: unknown item type found in save file"
 #define INVALID_FNAME   "Error: invalid filename, must be valid string or identifier"
 
-inline RuntimeErr MIN_ONE_ARG(const std::string &c) {
+inline RuntimeErr MIN_ONE_ARG_K(const std::string &c) {
     return RuntimeErr("Error: " + c + " requires at least one argument (key)");
 }
 
-inline RuntimeErr MIN_TWO_ARG(const std::string &c) {
+inline RuntimeErr MIN_TWO_ARG_KV(const std::string &c) {
     return RuntimeErr("Error: " + c + " requires at least two arguments (key value)");
 }
 
+inline RuntimeErr MIN_TWO_ARG_KK(const std::string &c) {
+    return RuntimeErr("Error: " + c + " requires at least two arguments (key key)");
+}
+
 inline RuntimeErr INVALID_CMD(const std::string &c) {
-    return RuntimeErr("Error: invalid command \'" + c + "\'");
+    return RuntimeErr("Error: invalid command \'" + c + "\' (did you forget an '\'?)");
 }
 
 inline RuntimeErr UNKNOWN_TOKEN(const std::string &t) {

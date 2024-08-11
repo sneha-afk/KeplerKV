@@ -23,6 +23,7 @@ enum class CommandType {
     SAVE,
     LOAD,
     CLEAR,
+    RENAME
 };
 
 enum class ValueType {
@@ -43,7 +44,8 @@ static const std::unordered_map<std::string, CommandType> mapToCmd
           { "LS", CommandType::LIST }, { "LIST", CommandType::LIST },
           { "R", CommandType::RESOLVE }, { "RES", CommandType::RESOLVE },
           { "RESOLVE", CommandType::RESOLVE }, { "SAVE", CommandType::SAVE },
-          { "LOAD", CommandType::LOAD }, { "CLEAR", CommandType::CLEAR } };
+          { "LOAD", CommandType::LOAD }, { "CLEAR", CommandType::CLEAR },
+          { "RENAME", CommandType::RENAME }, { "RN", CommandType::RENAME } };
 
 // https://en.wikipedia.org/wiki/Abstract_syntax_tree
 // https://stackoverflow.com/a/54596

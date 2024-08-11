@@ -18,8 +18,10 @@ public:
     bool del(const std::string &);
     bool update(const std::string &, StoreValueSP);
     StoreValueSP resolve(const std::string &);
+    void rename(const std::string &, const std::string &);
 
-    inline bool contains(const std::string &);
+    // Indicates whether the store conatains the key.
+    inline bool contains(const std::string &key) { return map_.find(key) != map_.end(); }
 
     void saveToFile(const std::string &);
     void loadFromFile(const std::string &);

@@ -24,6 +24,7 @@ Last updated: 2024-07-29
     - [SAVE](#save): save the store into file
         - [Valid filenames](#valid-filenames)
     - [LOAD](#load): load a store from file
+    - [RENAME](#rename): rename a key
 
 ## General syntax
 
@@ -237,3 +238,18 @@ Load in a store state from a valid save file produced from [`SAVE`](#save), deno
 \load manual
     LOADED
 ```
+
+## RENAME
+
+**`{\rename, \rn} oldKeyName newKeyName [o2 k2 ...]`**
+
+Renames a value's key.
+
+```bash
+\set a 1
+    a | int: 1
+\rename a b
+    b | int: 1
+```
+
+**Note: if the new key name already exists in the store, you will be asked to confirm if that key should be overwritten with the data from the old key name.**

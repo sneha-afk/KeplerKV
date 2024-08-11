@@ -18,6 +18,12 @@ A NoSQL key-value pair store for quick access.
 * `class Store`: in-memory representation of the store
     * `class StoreValue`: variant type to hold different types of data
 
+### procedure for adding new commands
+1. Register a new value in the `CommandType` enum in `syntax_tree.h`
+2. Add the corresponding tokens mapped to the enum in `mapToCmd` in that file
+3. Add to the `CommandToFunction` map in `handler.cpp` if the new command will need a larger handler function, else it can be added to the `switch` statement in the main `handleQuery()` function
+4. Implement the necessary functionality within `Store` if applicable
+
 ## goals
 
 ### overall
@@ -50,6 +56,11 @@ A NoSQL key-value pair store for quick access.
 
 ---
 ## dev journal
+
+### August 10, 2024
+
+* Added a new command `RENAME` to renae keys to new names
+* Added documentation and a test file
 
 ### August 8, 2024
 

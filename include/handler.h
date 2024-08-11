@@ -50,4 +50,5 @@ private:
     void handleResolve_(std::vector<ValueNodeSP> &, const std::size_t);
     void handleSave_(std::vector<ValueNodeSP> &, const std::size_t);
     void handleLoad_(std::vector<ValueNodeSP> &, const std::size_t);
+    void handleRename_(std::vector<ValueNodeSP> &, const std::size_t);
 };
