@@ -2,7 +2,7 @@
 
 The full manual for KeplerKV including syntax and command specifics.
 
-Last updated: 2024-07-29
+Last updated: 2024-08-15
 
 ## Contents
 
@@ -10,9 +10,13 @@ Last updated: 2024-07-29
     - [Tokenization](#tokenization)
     - [Command syntax](#command-syntax)
     - [Identifiers](#identifiers)
-- Commands
+- Commands: [System](#commands-system)
     - [QUIT](#quit): quitting the program.
     - [CLEAR](#clear): clearing the screen
+    - [SAVE](#save): save the store into file
+        - [Valid filenames](#valid-filenames)
+    - [LOAD](#load): load a store from file
+- Commands: [Data](#commands-data)
     - [SET](#set): setting a key
         - [Supported datatypes](#supported-types)
     - [GET](#get): retrieving a key
@@ -21,10 +25,8 @@ Last updated: 2024-07-29
     - [LIST](#list): lists out all values in the store currently
     - [RESOLVE](#resolve): resolve nested/recursive references
         - [Explanation of lazy evaluation](#lazy-evaluation)
-    - [SAVE](#save): save the store into file
-        - [Valid filenames](#valid-filenames)
-    - [LOAD](#load): load a store from file
     - [RENAME](#rename): rename a key
+- Commands: [Data Manipulation](#commands-data-manipulation)
     - [INCR](#incr): increment a numeric key
     - [DECR](#decr): decrement a numeric key
 
@@ -79,25 +81,58 @@ Identifiers are **case-sensitive** and must begin with an alphabetical character
 | `0patient` | Cannot start with a number                               |
 | `hash#`    | Only alphanumeric characters and underscores are allowed |
 
-## QUIT
+## Commands: System 
+### QUIT
 
 **`{\q, \quit}`**
 
 Quit the KeplerKV program.
 
-## CLEAR
+### CLEAR
 
 **`\clear`**
 
 Clear the terminal screen, returning to the `>` prompt.
 
-## SET
+### SAVE
+
+**`\save [filename]`**
+
+Save the current state of the store into a save file of **`.kep`** extension.
+
+```bash
+\set a 1
+\save manual
+    SAVED
+```
+
+#### Valid filenames
+
+Filenames follow the same rules as strings (surrounded by quotes) and [identifiers](#identifiers). If you have spaces or special characters within a filename, it is safer to put quotes around the name.
+
+> Verify what special characters are permitted in your file system.
+
+### LOAD
+
+**`\load [filename]`**
+
+Load in a store state from a valid save file produced from [`SAVE`](#save), denoted by the **`.kep`** extension.
+
+```bash
+\load manual
+    LOADED
+```
+
+
+## Commands: Data
+
+### SET
 
 **`{\set, \s} key value [k2 v2 k3 v3 ...]`**
 
 Set a key-value pair to the store.
 
-### Supported types
+#### Supported types
 1. Integers
     ```bash
     \set num 1
@@ -113,7 +148,7 @@ Set a key-value pair to the store.
 
     **Strings must be denoted with starting and closing quotation single or double quotation marks.**
 
-    To have a quotation mark inside of a string, it must be of the opposite kind.
+    To have a quotation mark inside of a string, the inner must be of the opposite kind of the outer.
     ```bash
     \set str 'look its a "string", nice'
     ```
@@ -127,7 +162,7 @@ Set a key-value pair to the store.
     \set matrix [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
     ```
 
-## GET
+### GET
 
 **`{\get, \g} key [k2 k3 ...]`**
 
@@ -141,7 +176,7 @@ Get the value of a key in the store.
 
 If the key is not present in the store, `NOT FOUND` is returned.
 
-## DEL
+### DEL
 
 **`{\del, \delete \d} key [k2 k3 ...]`**
 
@@ -155,7 +190,7 @@ Delete a key from the store if it is present.
 If the key is not present in the store, `NOT FOUND` is returned and no effect is done to the store.
 
 
-## UPDATE
+### UPDATE
 
 **`{\update, \u} key value [k2 v2 k3 v3 ...]`**
 
@@ -168,7 +203,7 @@ Keys must be set in the store to some initial value before they can be updated. 
 \update id "an actual name!"
 ```
 
-## LIST
+### LIST
 
 **`{\list, \ls, \l}`**
 
@@ -182,13 +217,13 @@ List out all items that are currently in the store.
     a | int: 1
 ```
 
-## RESOLVE
+### RESOLVE
 
 **`{\resolve, \res, \r} key [k2 k3 ...]`**
 
 Resolve the values of keys that reference another key (or form a key-chain!). **`RESOLVE` works identically to `GET` when keys are not recursive.**
 
-### Lazy evaluation
+#### Lazy evaluation
 Recursive keys are **lazily evaluated**, which means the value of the key being referenced need not be defined until resolution is required.
 ```bash
 \set a b        # a -> b
@@ -214,34 +249,21 @@ Similar to C++ references, affecting `b` also affects `a` since `a` is an alias 
     a | int: 2
 ```
 
-## SAVE
+#### Data manipulation
 
-**`\save [filename]`**
+If manipulation commands such as `[INCR](#incr)` are used upon an alias, the action will affect **the alias and the referenced keys**.
 
-Save the current state of the store into a save file of **`.kep`** extension.
-
-```bash
+```
 \set a 1
-\save manual
-    SAVED
+\set b a        # b -> a
+\incr b
+\get a
+    a | int: 2
+\resolve b
+    b | int: 2
 ```
 
-### Valid filenames
-
-Filenames follow the same rules as strings (surrounded by quotes) and [identifiers](#identifiers). If you have spaces or special characters within a filename, it is safer to put quotes around the name.
-
-## LOAD
-
-**`\load [filename]`**
-
-Load in a store state from a valid save file produced from [`SAVE`](#save), denoted by the **`.kep`** extension.
-
-```bash
-\load manual
-    LOADED
-```
-
-## RENAME
+### RENAME
 
 **`{\rename, \rn} oldKeyName newKeyName [o2 k2 ...]`**
 
@@ -256,7 +278,8 @@ Renames a value's key.
 
 **Note: if the new key name already exists in the store, you will be asked to confirm if that key should be overwritten with the data from the old key name.**
 
-## INCR
+## Commands: Data Manipulation
+### INCR
 
 **`\incr key [k2 k3 ...]`**
 
@@ -269,7 +292,7 @@ Increment a numeric (integer or float) key. Throws an error if invoked on other 
     a | int: 2
 ```
 
-## DECR
+### DECR
 
 **`\decr key [k2 k3 ...]`**
 
