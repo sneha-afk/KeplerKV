@@ -29,6 +29,8 @@ Last updated: 2024-08-15
 - Commands: [Data Manipulation](#commands-data-manipulation)
     - [INCR](#incr): increment a numeric key
     - [DECR](#decr): decrement a numeric key
+    - [APPEND](#append): append to a list
+    - [PREPEND](#prepend): prepend to a list
 
 ## General syntax
 
@@ -303,4 +305,30 @@ Decrement a numeric (integer or float) key. Throws an error if invoked on other 
     a | int: 1
 \decr a
     a | int: 0
+```
+
+### APPEND
+
+**`\append key value [v2 v3 ...]`**
+
+Append elements to a list. Throws an error if invoked on other types
+
+```bash
+\set a [1]
+    a | list: [int: 1]
+\append a 2
+    a | list: [int: 1, int: 2]
+```
+
+### APPEND
+
+**`\append key value [v2 v3 ...]`**
+
+Prepend elements to a list. Throws an error if invoked on other types
+
+```bash
+\set a [1]
+    a | list: [int: 1]
+\prepend a 2
+    a | list: [int: 2, int: 1]
 ```

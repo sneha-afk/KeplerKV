@@ -63,6 +63,20 @@ bool StoreValue::decr() {
     return false;
 }
 
+bool StoreValue::append(StoreValueSP item) {
+    if (!isList()) return false;
+    std::vector<StoreValueSP> &lvalue = std::get<std::vector<StoreValueSP>>(value_);
+    lvalue.push_back(item);
+    return true;
+}
+
+bool StoreValue::prepend(StoreValueSP item) {
+    if (!isList()) return false;
+    std::vector<StoreValueSP> &lvalue = std::get<std::vector<StoreValueSP>>(value_);
+    lvalue.insert(lvalue.begin(), item);
+    return true;
+}
+
 // Getting the string() of list elements
 std::string stringList_(const std::vector<StoreValueSP> &arg) {
     std::string res = "list: [";

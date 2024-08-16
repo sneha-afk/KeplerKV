@@ -68,9 +68,11 @@ A NoSQL key-value pair store for quick access.
 ## dev journal
 
 ### August 15, 2024
+* Implementing new commands to mutate the keys
 * `INCR` and `DECR` for integers and floats: throws errors on other types
     * Also works if invoked on an alias to an numeric value!
     * Using `RESOLVE` internally
+* `APPEND` and `PREPEND` for lists
 
 ### August 10, 2024
 

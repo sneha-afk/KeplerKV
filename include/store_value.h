@@ -52,8 +52,8 @@ public:
     // Manipulate the value, returns true on success
     bool incr();
     bool decr();
-    bool append();
-    bool prepend();
+    bool append(StoreValueSP);
+    bool prepend(StoreValueSP);
 
     std::string string() const;
     void toFile(std::ofstream &) const;

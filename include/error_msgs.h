@@ -3,6 +3,7 @@
 
 using RuntimeErr = std::runtime_error;
 
+#define UNEXPECTED      "Error: something went wrong, try again?"
 #define WRONG_FMT       "Error: incorrect command format"
 #define NOT_IDENT       "Error: expected identifier"
 #define NOT_FOUND       "Error: not found in store"
