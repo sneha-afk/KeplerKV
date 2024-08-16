@@ -26,6 +26,8 @@ public:
     void saveToFile(const std::string &);
     void loadFromFile(const std::string &);
 
+    size_t size() { return map_.size(); }
+
     // Store is iterable: https://stackoverflow.com/a/46432381
     std::unordered_map<std::string, StoreValueSP>::iterator begin() {
         return map_.begin();

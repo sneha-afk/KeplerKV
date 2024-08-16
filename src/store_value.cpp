@@ -40,6 +40,30 @@ std::vector<StoreValueSP> &StoreValue::getModifiableList() {
         throw RuntimeErr(SV_WRONG_TYPE);
 }
 
+bool StoreValue::incr() {
+    // Have to resolve type so the compiler doesn't complain
+    if (isInt()) {
+        value_ = std::get<int>(value_) + 1;
+        return true;
+    } else if (isFloat()) {
+        value_ = std::get<float>(value_) + 1;
+        return true;
+    }
+    return false;
+}
+
+bool StoreValue::decr() {
+    if (isInt()) {
+        value_ = std::get<int>(value_) - 1;
+        return true;
+    } else if (isFloat()) {
+        value_ = std::get<float>(value_) - 1;
+        return true;
+    }
+    return false;
+}
+
+// Getting the string() of list elements
 std::string stringList_(const std::vector<StoreValueSP> &arg) {
     std::string res = "list: [";
     for (size_t i = 0; i < arg.size(); i++) {

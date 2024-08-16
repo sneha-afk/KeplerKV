@@ -1,0 +1,26 @@
+Welcome to KeplerKV! Type \q to quit!
+OK
+OK
+b | float: 2.300000
+a | int: 1
+OK
+OK
+b | float: 1.300000
+a | int: 2
+OK
+OK
+b | float: 2.300000
+a | int: 1
+OK
+OK
+OK
+OK
+b | float: 2.300000
+a | int: 1
+OK
+Error: not numeric (integer or float)
+Error: not numeric (integer or float)
+OK
+OK
+c | int: 2
+Farewell!

@@ -55,6 +55,9 @@ bool Handler::handleQuery(std::string &query) {
                 return false;
             case CommandType::CLEAR: std::cout << "\033[H\033[2J" << std::endl; break;
             case CommandType::LIST:
+                if (store_.size() < 1)
+                    std::cout << T_BYLLW << "(empty)" << T_RESET << std::endl;
+
                 for (const auto &item : store_)
                     print_item_(item.first, item.second);
                 break;
@@ -237,4 +240,60 @@ void Handler::handleRename_(std::vector<ValueNodeSP> &args, const std::size_t nu
         store_.rename(oldName, newName);
         std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
     }
+}
+
+void Handler::handleIncr_(std::vector<ValueNodeSP> &args, const std::size_t numArgs) {
+    if (numArgs < 1) throw MIN_ONE_ARG_K("INCR");
+
+    for (std::size_t i = 0; i < numArgs; i++) {
+        if (!args[i]) continue;
+
+        ValueNodeSP identNode = args[i];
+        if (identNode->getValueType() != ValueType::IDENTIFIER)
+            throw RuntimeErr(NOT_IDENT);
+        std::string ident = identNode->value->getString();
+
+        StoreValueSP value = store_.resolve(ident);
+        if (value == nullptr) {
+            std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
+            continue;
+        }
+
+        if (value->incr())
+            std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
+        else
+            std::cout << T_BRED << NOT_NUMERIC << T_RESET << std::endl;
+    }
+}
+
+void Handler::handleDecr_(std::vector<ValueNodeSP> &args, const std::size_t numArgs) {
+    if (numArgs < 1) throw MIN_ONE_ARG_K("DECR");
+
+    for (std::size_t i = 0; i < numArgs; i++) {
+        if (!args[i]) continue;
+
+        ValueNodeSP identNode = args[i];
+        if (identNode->getValueType() != ValueType::IDENTIFIER)
+            throw RuntimeErr(NOT_IDENT);
+        std::string ident = identNode->value->getString();
+
+        StoreValueSP value = store_.resolve(ident);
+        if (value == nullptr) {
+            std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
+            continue;
+        }
+
+        if (value->decr())
+            std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
+        else
+            std::cout << T_BRED << NOT_NUMERIC << T_RESET << std::endl;
+    }
+}
+
+void Handler::handleAppend_(std::vector<ValueNodeSP> &args, const std::size_t numArgs) {
+    throw RuntimeErr("not implemented yet");
+}
+
+void Handler::handlePrepend_(std::vector<ValueNodeSP> &args, const std::size_t numArgs) {
+    throw RuntimeErr("not implemented yet");
 }

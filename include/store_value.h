@@ -49,6 +49,12 @@ public:
 
     StoreValueType getType() const { return type_; }
 
+    // Manipulate the value, returns true on success
+    bool incr();
+    bool decr();
+    bool append();
+    bool prepend();
+
     std::string string() const;
     void toFile(std::ofstream &) const;
     static StoreValue fromFile(std::ifstream &);

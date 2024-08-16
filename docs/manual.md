@@ -25,6 +25,8 @@ Last updated: 2024-07-29
         - [Valid filenames](#valid-filenames)
     - [LOAD](#load): load a store from file
     - [RENAME](#rename): rename a key
+    - [INCR](#incr): increment a numeric key
+    - [DECR](#decr): decrement a numeric key
 
 ## General syntax
 
@@ -182,7 +184,7 @@ List out all items that are currently in the store.
 
 ## RESOLVE
 
-**`{\resolve, \res, \r}`**
+**`{\resolve, \res, \r} key [k2 k3 ...]`**
 
 Resolve the values of keys that reference another key (or form a key-chain!). **`RESOLVE` works identically to `GET` when keys are not recursive.**
 
@@ -253,3 +255,29 @@ Renames a value's key.
 ```
 
 **Note: if the new key name already exists in the store, you will be asked to confirm if that key should be overwritten with the data from the old key name.**
+
+## INCR
+
+**`\incr key [k2 k3 ...]`**
+
+Increment a numeric (integer or float) key. Throws an error if invoked on other types.
+
+```bash
+\set a 1
+    a | int: 1
+\incr a
+    a | int: 2
+```
+
+## DECR
+
+**`\decr key [k2 k3 ...]`**
+
+Decrement a numeric (integer or float) key. Throws an error if invoked on other types.
+
+```bash
+\set a 1
+    a | int: 1
+\decr a
+    a | int: 0
+```

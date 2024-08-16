@@ -1,12 +1,12 @@
 Welcome to KeplerKV! Type \q to quit!
-> OK
-> OK
-> OK
-> OK
-> OK
-> e | list: [int: 1, int: 2, list: [int: 3]]
+OK
+OK
+OK
+OK
+OK
+e | list: [int: 1, int: 2, list: [int: 3]]
 d | list: [int: 1, int: 2, int: 3]
 c | str: "hello, world!"
 b | float: 5.200000
 a | int: 1
-> Farewell!
+Farewell!

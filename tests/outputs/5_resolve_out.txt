@@ -1,15 +1,15 @@
 Welcome to KeplerKV! Type \q to quit!
-> OK
-> OK
-> OK
-> OK
-> a | id: b
-> a | int: 1
-> b | int: 1
-> c | int: 1
-> d | int: 1
-> OK
-> OK
-> OK
-> Error: circular reference detected
-> Farewell!
+OK
+OK
+OK
+OK
+a | id: b
+a | int: 1
+b | int: 1
+c | int: 1
+d | int: 1
+OK
+OK
+OK
+Error: circular reference detected
+Farewell!

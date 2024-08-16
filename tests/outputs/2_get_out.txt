@@ -1,5 +1,5 @@
 Welcome to KeplerKV! Type \q to quit!
-> OK
-> a | int: 1
-> NOT FOUND
-> Farewell!
+OK
+a | int: 1
+NOT FOUND
+Farewell!

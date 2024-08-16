@@ -68,7 +68,9 @@ A NoSQL key-value pair store for quick access.
 ## dev journal
 
 ### August 15, 2024
-* Starting on data manipulation: incrementing/decrementing from integers, appending/preprending to lists
+* `INCR` and `DECR` for integers and floats: throws errors on other types
+    * Also works if invoked on an alias to an numeric value!
+    * Using `RESOLVE` internally
 
 ### August 10, 2024
 
