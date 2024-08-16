@@ -9,30 +9,20 @@
 #include <variant>
 #include <vector>
 
+// clang-format off
 enum class NodeType { COMMAND, VALUE, NIL };
 
-enum class CommandType {
-    SET,
-    GET,
-    DELETE,
-    UPDATE,
-    UNKNOWN,
-    QUIT,
-    LIST,
-    RESOLVE,
-    SAVE,
-    LOAD,
-    CLEAR,
-    RENAME
-};
+enum class ValueType { INT, FLOAT, STRING, LIST, IDENTIFIER };
 
-enum class ValueType {
-    INT,
-    FLOAT,
-    STRING,
-    LIST,
-    IDENTIFIER,
+enum class CommandType {
+    SET,        GET,            DELETE,
+    UPDATE,     UNKNOWN,        QUIT,
+    LIST,       RESOLVE,        SAVE,
+    LOAD,       CLEAR,          RENAME,
+    INCR,       DECR,           APPEND,
+    PREPEND,
 };
+// clang-format on
 
 static const std::unordered_map<std::string, CommandType> mapToCmd
     = { { "SET", CommandType::SET }, { "S", CommandType::SET },
@@ -45,7 +35,9 @@ static const std::unordered_map<std::string, CommandType> mapToCmd
           { "R", CommandType::RESOLVE }, { "RES", CommandType::RESOLVE },
           { "RESOLVE", CommandType::RESOLVE }, { "SAVE", CommandType::SAVE },
           { "LOAD", CommandType::LOAD }, { "CLEAR", CommandType::CLEAR },
-          { "RENAME", CommandType::RENAME }, { "RN", CommandType::RENAME } };
+          { "RENAME", CommandType::RENAME }, { "RN", CommandType::RENAME },
+          { "INCR", CommandType::INCR }, { "DECR", CommandType::DECR },
+          { "APPEND", CommandType::APPEND }, { "PREPEND", CommandType::PREPEND } };
 
 // https://en.wikipedia.org/wiki/Abstract_syntax_tree
 // https://stackoverflow.com/a/54596

@@ -28,14 +28,15 @@ A NoSQL key-value pair store for quick access.
 
 ### overall
 - [X] Build a parser system to implement a user CLI
-- [ ] Manage key-values in efficent data structures
 - [X] Serialization/deserialization from file
 - [ ] Allow for data manipulation to supported types
 
 ### reach
+- [ ] Manage key-values in efficent data structures
 - [ ] Allow for folders/indices to group together keys
 - [ ] User credentials and encryption of data
 - [ ] Concurrency
+- [ ] API to a common language?
 
 ### baseline
 - [X] Inserting and deleting key-values
@@ -49,6 +50,15 @@ A NoSQL key-value pair store for quick access.
 * `RESOLVE` will not resolve identifiers within lists
 * Arithmetic expressions are not allowed when setting numbers
 
+## feature list
+* Expandable parser system
+    * For data: SET, GET, RESOLVE, DELETE, UPDATE
+    * Other: LIST, CLEAR, SAVE, LOAD
+* Data types supported: integers, floats, strings, hetereogenous and multidimensional lists
+* Saving and loading state from a `.kep` file
+* Cycle detection in RESOLVE to prevent infinite loops
+* Data types can be changed if UDPATE is used with a different type
+
 ## resources used
 
 1. [How to Write a Programming Language](https://accu.org/journals/overload/26/145/balaam_2510/) series by Andy Balaam
@@ -56,6 +66,9 @@ A NoSQL key-value pair store for quick access.
 
 ---
 ## dev journal
+
+### August 15, 2024
+* Starting on data manipulation: incrementing/decrementing from integers, appending/preprending to lists
 
 ### August 10, 2024
 

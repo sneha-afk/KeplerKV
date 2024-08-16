@@ -7,7 +7,7 @@
 
 static constexpr bool DEBUG = false;
 
-std::unordered_map<CommandType, HandlerFunctionPtr> Handler::CommandToFunction
+std::unordered_map<CommandType, HandlerFunctionPtr> Handler::cmdToFunc_
     = { { CommandType::SET, &Handler::handleSet_ },
           { CommandType::GET, &Handler::handleGet_ },
           { CommandType::DELETE, &Handler::handleDelete_ },
@@ -15,7 +15,11 @@ std::unordered_map<CommandType, HandlerFunctionPtr> Handler::CommandToFunction
           { CommandType::RESOLVE, &Handler::handleResolve_ },
           { CommandType::SAVE, &Handler::handleSave_ },
           { CommandType::LOAD, &Handler::handleLoad_ },
-          { CommandType::RENAME, &Handler::handleRename_ } };
+          { CommandType::RENAME, &Handler::handleRename_ },
+          { CommandType::INCR, &Handler::handleIncr_ },
+          { CommandType::DECR, &Handler::handleDecr_ },
+          { CommandType::APPEND, &Handler::handleAppend_ },
+          { CommandType::PREPEND, &Handler::handlePrepend_ } };
 
 /**
  * Proccesses a query and hands it off to the store to execute.
@@ -36,8 +40,8 @@ bool Handler::handleQuery(std::string &query) {
         if (cmd == nullptr) throw RuntimeErr(WRONG_FMT);
 
         // Retrieve appropriate function pointer and run
-        auto func = CommandToFunction.find(cmd->getCmdType());
-        if (func != CommandToFunction.end()) {
+        auto func = cmdToFunc_.find(cmd->getCmdType());
+        if (func != cmdToFunc_.end()) {
             std::vector<ValueNodeSP> &args = cmd->getArgs();
             const size_t numArgs = args.size();
             func->second(this, args, numArgs);

@@ -37,7 +37,7 @@ private:
     Parser parser_;
     Store store_;
 
-    static std::unordered_map<CommandType, HandlerFunctionPtr> CommandToFunction;
+    static std::unordered_map<CommandType, HandlerFunctionPtr> cmdToFunc_;
 
     void print_item_(const std::string &, StoreValueSP);
 
@@ -51,4 +51,8 @@ private:
     void handleSave_(std::vector<ValueNodeSP> &, const std::size_t);
     void handleLoad_(std::vector<ValueNodeSP> &, const std::size_t);
     void handleRename_(std::vector<ValueNodeSP> &, const std::size_t);
+    void handleIncr_(std::vector<ValueNodeSP> &, const std::size_t);
+    void handleDecr_(std::vector<ValueNodeSP> &, const std::size_t);
+    void handleAppend_(std::vector<ValueNodeSP> &, const std::size_t);
+    void handlePrepend_(std::vector<ValueNodeSP> &, const std::size_t);
 };
