@@ -29,17 +29,17 @@ bool Store::update(const std::string &key, StoreValueSP value) {
     map_[key] = value;
     return true;
 }
-
+#include <iostream>
 // Resolves recursive references (keys storing other keys) until a base value is reached.
 // Essentially, a recursive GET command for when the user wants to unpack a key-chain.
-StoreValueSP Store::resolve(const std::string &key) {
+StoreValueSP Store::resolve(const std::string &key, bool resolveIdentsInList) {
     // Set of keys that have been explored to prevent circular references
     std::unordered_set<std::string> seen;
-    return resolveRecur_(key, seen);
+    return resolveRecur_(key, seen, resolveIdentsInList);
 }
 
-StoreValueSP Store::resolveRecur_(
-    const std::string &key, std::unordered_set<std::string> &seen) {
+StoreValueSP Store::resolveRecur_(const std::string &key,
+    std::unordered_set<std::string> &seen, bool resolveIdentsInList) {
     // If a key is being searched for again, there is a circluar ref
     if (seen.count(key)) throw RuntimeErr(CIRCULAR_REF);
     seen.insert(key);
@@ -49,6 +49,17 @@ StoreValueSP Store::resolveRecur_(
 
     // If another identiifer is found, continue down the chain
     if (found->isIdent()) return resolveRecur_(found->getString(), seen);
+
+    // Resolve list elements (in case there are identifiers) only if requested (makes a copy)
+    if (found->isList() && resolveIdentsInList) {
+        std::vector<StoreValueSP> resolvedL = std::vector<StoreValueSP>(found->getList());
+        for (std::size_t i = 0; i < resolvedL.size(); i++) {
+            if (!resolvedL[i]) continue;
+            if (resolvedL[i]->isIdent())
+                resolvedL[i] = resolve(resolvedL[i]->getString());
+        }
+        return std::make_shared<StoreValue>(resolvedL);
+    }
 
     return found;
 }

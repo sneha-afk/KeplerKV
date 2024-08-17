@@ -163,7 +163,7 @@ void Handler::handleResolve_(std::vector<ValueNodeSP> &args, const std::size_t n
             throw RuntimeErr(NOT_IDENT);
         const std::string &ident = identNode->value->getString();
 
-        StoreValueSP value = store_.resolve(ident);
+        StoreValueSP value = store_.resolve(ident, true);
         if (value)
             print_item_(ident, value);
         else

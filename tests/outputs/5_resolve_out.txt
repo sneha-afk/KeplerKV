@@ -12,4 +12,10 @@ OK
 OK
 OK
 Error: circular reference detected
+OK
+OK
+list | list: [id: elem1, id: elem2]
+list | list: [int: 1, <nil>]
+OK
+list | list: [<nil>, <nil>]
 Farewell!

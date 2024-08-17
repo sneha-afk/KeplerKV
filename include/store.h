@@ -17,7 +17,7 @@ public:
     StoreValueSP get(const std::string &);
     bool del(const std::string &);
     bool update(const std::string &, StoreValueSP);
-    StoreValueSP resolve(const std::string &);
+    StoreValueSP resolve(const std::string &, bool resolveIdentsInList = false);
     void rename(const std::string &, const std::string &);
 
     // Indicates whether the store conatains the key.
@@ -43,5 +43,6 @@ public:
 private:
     std::unordered_map<std::string, StoreValueSP> map_;
 
-    StoreValueSP resolveRecur_(const std::string &, std::unordered_set<std::string> &);
+    StoreValueSP resolveRecur_(const std::string &, std::unordered_set<std::string> &,
+        bool resolveIdentsInList = false);
 };

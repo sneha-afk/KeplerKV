@@ -11,4 +11,10 @@
 \set two three
 \set three one
 \resolve one
+\set list [elem1, elem2]
+\set elem1 1
+\get list
+\resolve list
+\delete elem1
+\resolve list
 \q
