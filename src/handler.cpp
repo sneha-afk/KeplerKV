@@ -7,19 +7,16 @@
 
 static constexpr bool DEBUG = false;
 
-std::unordered_map<CommandType, HandlerFunctionPtr> Handler::cmdToFunc_
-    = { { CommandType::SET, &Handler::handleSet_ },
-          { CommandType::GET, &Handler::handleGet_ },
-          { CommandType::DELETE, &Handler::handleDelete_ },
-          { CommandType::UPDATE, &Handler::handleUpdate_ },
-          { CommandType::RESOLVE, &Handler::handleResolve_ },
-          { CommandType::SAVE, &Handler::handleSave_ },
-          { CommandType::LOAD, &Handler::handleLoad_ },
-          { CommandType::RENAME, &Handler::handleRename_ },
-          { CommandType::INCR, &Handler::handleIncr_ },
-          { CommandType::DECR, &Handler::handleDecr_ },
-          { CommandType::APPEND, &Handler::handleAppend_ },
-          { CommandType::PREPEND, &Handler::handlePrepend_ } };
+std::unordered_map<CommandType, HandlerFunctionPtr> Handler::cmdToFunc_ = {
+    { CommandType::SET, &Handler::handleSet_ }, { CommandType::GET, &Handler::handleGet_ },
+    { CommandType::DELETE, &Handler::handleDelete_ },
+    { CommandType::UPDATE, &Handler::handleUpdate_ },
+    { CommandType::RESOLVE, &Handler::handleResolve_ },
+    { CommandType::SAVE, &Handler::handleSave_ }, { CommandType::LOAD, &Handler::handleLoad_ },
+    { CommandType::RENAME, &Handler::handleRename_ }, { CommandType::INCR, &Handler::handleIncr_ },
+    { CommandType::DECR, &Handler::handleDecr_ }, { CommandType::APPEND, &Handler::handleAppend_ },
+    { CommandType::PREPEND, &Handler::handlePrepend_ }
+};
 
 /**
  * Proccesses a query and hands it off to the store to execute.
@@ -55,12 +52,12 @@ bool Handler::handleQuery(std::string &query) {
                 return false;
             case CommandType::CLEAR: std::cout << "\033[H\033[2J" << std::endl; break;
             case CommandType::LIST:
-                if (store_.size() < 1)
-                    std::cout << T_BYLLW << "(empty)" << T_RESET << std::endl;
+                if (store_.size() < 1) std::cout << T_BYLLW << "(empty)" << T_RESET << std::endl;
 
                 for (const auto &item : store_)
                     print_item_(item.first, item.second);
                 break;
+            case CommandType::STATS: handleStats_(); break;
             default: break;
         }
     }
@@ -71,6 +68,61 @@ void Handler::print_item_(const std::string &id, StoreValueSP val) {
     std::cout << T_BBLUE << id << T_RESET << " | " << *val << std::endl;
 }
 
+void Handler::handleStats_() {
+    std::cout << T_BYLLW << "KeplerKV Statistics" << T_RESET << std::endl;
+
+    int totalNum = store_.size(), numInts = 0, numFloats = 0, numStrs = 0, numLists = 0,
+        numAliases = 0;
+    std::size_t totalMem = 0, memInts = 0, memFloats = 0, memStrs = 0, memLists = 0, memAliases = 0,
+                memCurr;
+    for (const auto &pair : store_) {
+        totalMem += sizeof(pair.first);
+        memCurr = pair.second ? pair.second->size() : 0;
+        if (!memCurr) continue;
+        totalMem += memCurr;
+
+        switch (pair.second->getType()) {
+            case StoreValueType::INT:
+                numInts++;
+                memInts += memCurr;
+                break;
+            case StoreValueType::FLOAT:
+                numFloats++;
+                memFloats += memCurr;
+                break;
+            case StoreValueType::STRING:
+                numStrs++;
+                memStrs += memCurr;
+                break;
+            case StoreValueType::LIST:
+                numLists++;
+                memLists += memCurr;
+                break;
+            case StoreValueType::IDENTIIFER:
+                numAliases++;
+                memAliases += memCurr;
+                break;
+            default: break;
+        }
+    }
+
+    std::cout << T_BYLLW << "Total keys: " << T_RESET << totalNum << std::endl;
+
+    std::cout << T_BYLLW << "Key Distribution by Type: " << T_RESET << std::endl;
+    std::cout << "\tIntegers: " << numInts << std::endl;
+    std::cout << "\tFloats: " << numFloats << std::endl;
+    std::cout << "\tStrings: " << numStrs << std::endl;
+    std::cout << "\tLists: " << numLists << std::endl;
+    std::cout << "\tAliases: " << numAliases << std::endl;
+
+    std::cout << T_BYLLW << "Usage (including keys) in bytes: " << T_RESET << totalMem << std::endl;
+    std::cout << "\tIntegers: " << memInts << std::endl;
+    std::cout << "\tFloats: " << memFloats << std::endl;
+    std::cout << "\tStrings: " << memStrs << std::endl;
+    std::cout << "\tLists: " << memLists << std::endl;
+    std::cout << "\tAliases: " << memAliases << std::endl;
+}
+
 void Handler::handleSet_(std::vector<ValueNodeSP> &args, const std::size_t numArgs) {
     if (numArgs < 2) throw MIN_TWO_ARG_KV("SET");
 
@@ -78,8 +130,7 @@ void Handler::handleSet_(std::vector<ValueNodeSP> &args, const std::size_t numAr
         if (!args[i]) continue;
 
         ValueNodeSP identNode = args[i];
-        if (identNode->getValueType() != ValueType::IDENTIFIER)
-            throw RuntimeErr(NOT_IDENT);
+        if (identNode->getValueType() != ValueType::IDENTIFIER) throw RuntimeErr(NOT_IDENT);
         const std::string &ident = identNode->value->getString();
 
         if (!(i + 1 < numArgs) || !args[i + 1]) throw RuntimeErr(VAL_AFTER_IDENT);
@@ -98,8 +149,7 @@ void Handler::handleGet_(std::vector<ValueNodeSP> &args, const std::size_t numAr
         if (!args[i]) continue;
 
         ValueNodeSP identNode = args[i];
-        if (identNode->getValueType() != ValueType::IDENTIFIER)
-            throw RuntimeErr(NOT_IDENT);
+        if (identNode->getValueType() != ValueType::IDENTIFIER) throw RuntimeErr(NOT_IDENT);
         const std::string &ident = identNode->value->getString();
 
         StoreValueSP value = store_.get(ident);
@@ -117,8 +167,7 @@ void Handler::handleDelete_(std::vector<ValueNodeSP> &args, const std::size_t nu
         if (!args[i]) continue;
 
         ValueNodeSP identNode = args[i];
-        if (identNode->getValueType() != ValueType::IDENTIFIER)
-            throw RuntimeErr(NOT_IDENT);
+        if (identNode->getValueType() != ValueType::IDENTIFIER) throw RuntimeErr(NOT_IDENT);
         const std::string &ident = identNode->value->getString();
 
         bool deleted = store_.del(ident);
@@ -136,8 +185,7 @@ void Handler::handleUpdate_(std::vector<ValueNodeSP> &args, const std::size_t nu
         if (!args[i]) continue;
 
         ValueNodeSP identNode = args[i];
-        if (identNode->getValueType() != ValueType::IDENTIFIER)
-            throw RuntimeErr(NOT_IDENT);
+        if (identNode->getValueType() != ValueType::IDENTIFIER) throw RuntimeErr(NOT_IDENT);
         const std::string &ident = identNode->value->getString();
 
         if (!(i + 1 < numArgs) || !args[i + 1]) throw RuntimeErr(VAL_AFTER_IDENT);
@@ -159,8 +207,7 @@ void Handler::handleResolve_(std::vector<ValueNodeSP> &args, const std::size_t n
         if (!args[i]) continue;
 
         ValueNodeSP identNode = args[i];
-        if (identNode->getValueType() != ValueType::IDENTIFIER)
-            throw RuntimeErr(NOT_IDENT);
+        if (identNode->getValueType() != ValueType::IDENTIFIER) throw RuntimeErr(NOT_IDENT);
         const std::string &ident = identNode->value->getString();
 
         StoreValueSP value = store_.resolve(ident, true);
@@ -226,13 +273,12 @@ void Handler::handleRename_(std::vector<ValueNodeSP> &args, const std::size_t nu
         // Make the user confirm overwrites
         if (store_.contains(newName)) {
             std::cout << T_BYLLW << "Warning: key \'" << newName
-                      << "\' already exists. Do you want to overwrite it? (y/n)"
-                      << T_RESET << "\n> ";
+                      << "\' already exists. Do you want to overwrite it? (y/n)" << T_RESET
+                      << "\n> ";
             std::string confirm;
             std::getline(std::cin, confirm);
             if (0 < confirm.size() && (confirm[0]) != 'y') {
-                std::cout << T_BYLLW << "No changes made to the store." << T_RESET
-                          << std::endl;
+                std::cout << T_BYLLW << "No changes made to the store." << T_RESET << std::endl;
                 return;
             }
         }
@@ -249,8 +295,7 @@ void Handler::handleIncr_(std::vector<ValueNodeSP> &args, const std::size_t numA
         if (!args[i]) continue;
 
         ValueNodeSP identNode = args[i];
-        if (identNode->getValueType() != ValueType::IDENTIFIER)
-            throw RuntimeErr(NOT_IDENT);
+        if (identNode->getValueType() != ValueType::IDENTIFIER) throw RuntimeErr(NOT_IDENT);
         const std::string &ident = identNode->value->getString();
 
         StoreValueSP value = store_.resolve(ident);
@@ -273,8 +318,7 @@ void Handler::handleDecr_(std::vector<ValueNodeSP> &args, const std::size_t numA
         if (!args[i]) continue;
 
         ValueNodeSP identNode = args[i];
-        if (identNode->getValueType() != ValueType::IDENTIFIER)
-            throw RuntimeErr(NOT_IDENT);
+        if (identNode->getValueType() != ValueType::IDENTIFIER) throw RuntimeErr(NOT_IDENT);
         const std::string &ident = identNode->value->getString();
 
         StoreValueSP value = store_.resolve(ident);

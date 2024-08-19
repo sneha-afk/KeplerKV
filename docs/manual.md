@@ -2,7 +2,7 @@
 
 The full manual for KeplerKV including syntax and command specifics.
 
-Last updated: 2024-08-15
+Last updated: 2024-08-17
 
 ## Contents
 
@@ -16,6 +16,7 @@ Last updated: 2024-08-15
     - [SAVE](#save): save the store into file
         - [Valid filenames](#valid-filenames)
     - [LOAD](#load): load a store from file
+    - [STATS](#stats): gives basic statistics
 - Commands: [Data](#commands-data)
     - [SET](#set): setting a key
         - [Supported datatypes](#supported-types)
@@ -125,6 +126,13 @@ Load in a store state from a valid save file produced from [`SAVE`](#save), deno
     LOADED
 ```
 
+### STATS
+
+**`\stats`**
+
+Displays basic statistics about the current instance of KeplerKV, including the total number of keys by type, and the memory usage.
+
+> The memory usage may appear bloated, such as one integer being more than four bytes. This is due to the use of `std::variant` inside the program which allows for polymoprhism in the store's values, but introduces some overhead!
 
 ## Commands: Data
 
@@ -320,9 +328,9 @@ Append elements to a list. Throws an error if invoked on other types
     a | list: [int: 1, int: 2]
 ```
 
-### APPEND
+### PREPEND
 
-**`\append key value [v2 v3 ...]`**
+**`\prepend key value [v2 v3 ...]`**
 
 Prepend elements to a list. Throws an error if invoked on other types
 

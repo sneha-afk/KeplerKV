@@ -43,6 +43,8 @@ private:
 
     std::string &getFilename_(ValueNodeSP);
 
+    void handleStats_();
+
     void handleSet_(std::vector<ValueNodeSP> &, const std::size_t);
     void handleGet_(std::vector<ValueNodeSP> &, const std::size_t);
     void handleDelete_(std::vector<ValueNodeSP> &, const std::size_t);

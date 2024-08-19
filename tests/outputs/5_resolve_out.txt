@@ -18,4 +18,8 @@ list | list: [id: elem1, id: elem2]
 list | list: [int: 1, <nil>]
 OK
 list | list: [<nil>, <nil>]
+OK
+cirlist | list: [<nil>, <nil>]
+OK
+Error: circular reference detected
 Farewell!

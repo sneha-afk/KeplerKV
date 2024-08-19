@@ -20,24 +20,21 @@ enum class CommandType {
     LIST,       RESOLVE,        SAVE,
     LOAD,       CLEAR,          RENAME,
     INCR,       DECR,           APPEND,
-    PREPEND,
+    PREPEND,    STATS,
 };
 // clang-format on
 
-static const std::unordered_map<std::string, CommandType> mapToCmd
-    = { { "SET", CommandType::SET }, { "S", CommandType::SET },
-          { "GET", CommandType::GET }, { "G", CommandType::GET },
-          { "DELETE", CommandType::DELETE }, { "DEL", CommandType::DELETE },
-          { "D", CommandType::DELETE }, { "UPDATE", CommandType::UPDATE },
-          { "U", CommandType::UPDATE }, { "Q", CommandType::QUIT },
-          { "QUIT", CommandType::QUIT }, { "L", CommandType::LIST },
-          { "LS", CommandType::LIST }, { "LIST", CommandType::LIST },
-          { "R", CommandType::RESOLVE }, { "RES", CommandType::RESOLVE },
-          { "RESOLVE", CommandType::RESOLVE }, { "SAVE", CommandType::SAVE },
-          { "LOAD", CommandType::LOAD }, { "CLEAR", CommandType::CLEAR },
-          { "RENAME", CommandType::RENAME }, { "RN", CommandType::RENAME },
-          { "INCR", CommandType::INCR }, { "DECR", CommandType::DECR },
-          { "APPEND", CommandType::APPEND }, { "PREPEND", CommandType::PREPEND } };
+static const std::unordered_map<std::string, CommandType> mapToCmd = { { "SET", CommandType::SET },
+    { "S", CommandType::SET }, { "GET", CommandType::GET }, { "G", CommandType::GET },
+    { "DELETE", CommandType::DELETE }, { "DEL", CommandType::DELETE }, { "D", CommandType::DELETE },
+    { "UPDATE", CommandType::UPDATE }, { "U", CommandType::UPDATE }, { "Q", CommandType::QUIT },
+    { "QUIT", CommandType::QUIT }, { "L", CommandType::LIST }, { "LS", CommandType::LIST },
+    { "LIST", CommandType::LIST }, { "R", CommandType::RESOLVE }, { "RES", CommandType::RESOLVE },
+    { "RESOLVE", CommandType::RESOLVE }, { "SAVE", CommandType::SAVE },
+    { "LOAD", CommandType::LOAD }, { "CLEAR", CommandType::CLEAR },
+    { "RENAME", CommandType::RENAME }, { "RN", CommandType::RENAME }, { "INCR", CommandType::INCR },
+    { "DECR", CommandType::DECR }, { "APPEND", CommandType::APPEND },
+    { "PREPEND", CommandType::PREPEND }, { "STATS", CommandType::STATS } };
 
 // https://en.wikipedia.org/wiki/Abstract_syntax_tree
 // https://stackoverflow.com/a/54596

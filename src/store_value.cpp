@@ -77,11 +77,26 @@ bool StoreValue::prepend(StoreValueSP item) {
     return true;
 }
 
+std::size_t StoreValue::size() {
+    // The overhead of the variant makes this larger
+    std::size_t totalSize = sizeof(value_);
+    if (isList()) {
+        // Size of the vector + elements are pointers, need to add those
+        for (const auto &item : getList())
+            totalSize += item->size();
+    }
+    return totalSize;
+}
+
 // Getting the string() of list elements
 std::string stringList_(const std::vector<StoreValueSP> &arg) {
     std::string res = "list: [";
     for (size_t i = 0; i < arg.size(); i++) {
-        res += arg[i]->string();
+        if (arg[i])
+            res += arg[i]->string();
+        else
+            res += "<nil>";
+
         if (i < arg.size() - 1) res += ", ";
     }
     res += "]";
@@ -148,8 +163,7 @@ void StoreValue::toFile(std::ofstream &fp) const {
         type = 'l';
         fp.WRITE_CHAR(type);
 
-        const std::vector<StoreValueSP> &list
-            = std::get<std::vector<StoreValueSP>>(value_);
+        const std::vector<StoreValueSP> &list = std::get<std::vector<StoreValueSP>>(value_);
         const size_t &numElem = list.size();
         fp.write(reinterpret_cast<const char *>(&numElem), sizeof(numElem));
 

@@ -17,4 +17,8 @@
 \resolve list
 \delete elem1
 \resolve list
+\set cirlist [elem1, elem2]
+\resolve cirlist
+\set elem2 cirlist
+\resolve cirlist
 \q

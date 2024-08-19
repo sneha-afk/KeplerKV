@@ -9,7 +9,7 @@ AlignOperands: true
 AllowShortEnumsOnASingleLine: true
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortIfStatementsOnASingleLine: true
-ColumnLimit: 90
+ColumnLimit: 100
 IncludeBlocks: Regroup
 IndentCaseLabels: true
 IndentWrappedFunctionNames: true

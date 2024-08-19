@@ -29,7 +29,7 @@ bool Store::update(const std::string &key, StoreValueSP value) {
     map_[key] = value;
     return true;
 }
-#include <iostream>
+
 // Resolves recursive references (keys storing other keys) until a base value is reached.
 // Essentially, a recursive GET command for when the user wants to unpack a key-chain.
 StoreValueSP Store::resolve(const std::string &key, bool resolveIdentsInList) {
@@ -38,8 +38,8 @@ StoreValueSP Store::resolve(const std::string &key, bool resolveIdentsInList) {
     return resolveRecur_(key, seen, resolveIdentsInList);
 }
 
-StoreValueSP Store::resolveRecur_(const std::string &key,
-    std::unordered_set<std::string> &seen, bool resolveIdentsInList) {
+StoreValueSP Store::resolveRecur_(
+    const std::string &key, std::unordered_set<std::string> &seen, bool resolveIdentsInList) {
     // If a key is being searched for again, there is a circluar ref
     if (seen.count(key)) throw RuntimeErr(CIRCULAR_REF);
     seen.insert(key);
@@ -55,8 +55,12 @@ StoreValueSP Store::resolveRecur_(const std::string &key,
         std::vector<StoreValueSP> resolvedL = std::vector<StoreValueSP>(found->getList());
         for (std::size_t i = 0; i < resolvedL.size(); i++) {
             if (!resolvedL[i]) continue;
-            if (resolvedL[i]->isIdent())
-                resolvedL[i] = resolve(resolvedL[i]->getString());
+            if (resolvedL[i]->isIdent()) {
+                // Each element should inherit parent history
+                std::unordered_set<std::string> newSeen = std::unordered_set<std::string>(seen);
+                resolvedL[i]
+                    = resolveRecur_(resolvedL[i]->getString(), newSeen, resolveIdentsInList);
+            }
         }
         return std::make_shared<StoreValue>(resolvedL);
     }

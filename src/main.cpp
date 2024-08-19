@@ -1,5 +1,4 @@
 #include "handler.h"
-#include "store.h"
 #include "terminal_colors.h"
 
 #include <iostream>
@@ -8,11 +7,9 @@
 int main() {
     std::string input;
     bool running = true;
-    Store store;
-    Handler handler = Handler(store);
+    Handler handler = Handler();
 
-    std::cout << T_BBLUE << "Welcome to KeplerKV! Type \\q to quit!" << T_RESET
-              << std::endl;
+    std::cout << T_BBLUE << "Welcome to KeplerKV! Type \\q to quit!" << T_RESET << std::endl;
     while (running) {
         std::cout << "> ";
         std::getline(std::cin, input);

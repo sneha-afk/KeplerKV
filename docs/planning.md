@@ -29,9 +29,10 @@ A NoSQL key-value pair store for quick access.
 ### overall
 - [X] Build a parser system to implement a user CLI
 - [X] Serialization/deserialization from file
-- [ ] Allow for data manipulation to supported types
+- [X] Allow for data manipulation to supported types
 
 ### reach
+- [ ] Allow for transactions, commits, rollbacks
 - [ ] Manage key-values in efficent data structures
 - [ ] Allow for folders/indices to group together keys
 - [ ] User credentials and encryption of data
@@ -47,17 +48,22 @@ A NoSQL key-value pair store for quick access.
 ## current limitations
 * No nested commands allowed, i.e `\SET a \GET b + 1`
 * No commands allowed within a list definition, i.e `\SET l [\GET a]
-* `RESOLVE` will not resolve identifiers within lists
 * Arithmetic expressions are not allowed when setting numbers
 
 ## feature list
 * Expandable parser system
     * For data: SET, GET, RESOLVE, DELETE, UPDATE
+    * For manipulation: INCR, DECR, APPEND, PREPEND
     * Other: LIST, CLEAR, SAVE, LOAD
+* Most commands can be batched, i.e setting multiple keys at once
 * Data types supported: integers, floats, strings, hetereogenous and multidimensional lists
 * Saving and loading state from a `.kep` file
 * Cycle detection in RESOLVE to prevent infinite loops
+    * RESOLVE will also recursively find identifiers to resolve within lists if requested to
 * Data types can be changed if UDPATE is used with a different type
+* Data manipulation for certain types
+    * Integers, floats: INCR, DECR
+    * Lists: APPEND, PREPEND
 
 ## resources used
 
@@ -66,6 +72,11 @@ A NoSQL key-value pair store for quick access.
 
 ---
 ## dev journal
+
+### August 17, 2024
+* `RESOLVE` will now iterate over base lists and resolve any identifiers present within them
+    * Added a default `false` option for resolving nested lists since this returns a copy of the full resolution to display
+    * Effect: I anticipate resolving very nested identifiers may be slow when done to the extreme!
 
 ### August 15, 2024
 * Implementing new commands to mutate the keys

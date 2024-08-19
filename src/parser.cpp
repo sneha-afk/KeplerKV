@@ -75,8 +75,7 @@ StoreValueSP Parser::parseValue_(TokenSP &t) {
 StoreValueSP Parser::parseList_() {
     std::vector<StoreValueSP> lst = std::vector<StoreValueSP>();
 
-    while (tt_ != tend_ && (*tt_)->type != TokenType::END
-           && (*tt_)->type != TokenType::LIST_END) {
+    while (tt_ != tend_ && (*tt_)->type != TokenType::END && (*tt_)->type != TokenType::LIST_END) {
         TokenSP &t = *tt_;
         switch (t->type) {
             case TokenType::END:

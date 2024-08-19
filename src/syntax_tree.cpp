@@ -21,9 +21,7 @@ std::string ValueNode::string() const {
         case ValueType::FLOAT:
             s += ", type: Float, value: " + std::to_string(value->getFloat()) + "}";
             break;
-        case ValueType::STRING:
-            s += ", type: String, value: " + value->getString() + "}";
-            break;
+        case ValueType::STRING: s += ", type: String, value: " + value->getString() + "}"; break;
         case ValueType::IDENTIFIER:
             s += ", type: Identifier, value: " + value->getString() + "}";
             break;
@@ -46,8 +44,7 @@ std::string ValueNode::string() const {
 }
 
 std::string CommandNode::string() const {
-    std::string s
-        = "{node: Command, cmd: " + std::to_string((int) cmdType_) + ", args: [";
+    std::string s = "{node: Command, cmd: " + std::to_string((int) cmdType_) + ", args: [";
     for (const auto &a : args_) {
         if (!a) continue;
         s += a->string() + ", ";
