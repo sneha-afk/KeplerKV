@@ -54,7 +54,7 @@ A NoSQL key-value pair store for quick access.
 * Expandable parser system
     * For data: SET, GET, RESOLVE, DELETE, UPDATE
     * For manipulation: INCR, DECR, APPEND, PREPEND
-    * Other: LIST, CLEAR, SAVE, LOAD
+    * Other: LIST, CLEAR, SAVE, LOAD, STATS
 * Most commands can be batched, i.e setting multiple keys at once
 * Data types supported: integers, floats, strings, hetereogenous and multidimensional lists
 * Saving and loading state from a `.kep` file
@@ -72,6 +72,11 @@ A NoSQL key-value pair store for quick access.
 
 ---
 ## dev journal
+
+### August 18, 2024
+
+Launching version 1.0!
+* Added `STATS` to display some basic statistics on how many keys, how much memory usage, etc.
 
 ### August 17, 2024
 * `RESOLVE` will now iterate over base lists and resolve any identifiers present within them
