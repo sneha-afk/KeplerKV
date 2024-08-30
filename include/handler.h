@@ -57,4 +57,5 @@ private:
     void handleDecr_(std::vector<ValueNodeSP> &, const std::size_t);
     void handleAppend_(std::vector<ValueNodeSP> &, const std::size_t);
     void handlePrepend_(std::vector<ValueNodeSP> &, const std::size_t);
+    void handleSearch_(std::vector<ValueNodeSP> &, const std::size_t);
 };

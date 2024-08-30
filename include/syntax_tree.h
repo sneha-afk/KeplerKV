@@ -20,7 +20,7 @@ enum class CommandType {
     LIST,       RESOLVE,        SAVE,
     LOAD,       CLEAR,          RENAME,
     INCR,       DECR,           APPEND,
-    PREPEND,    STATS,
+    PREPEND,    STATS,          SEARCH,
 };
 // clang-format on
 
@@ -34,7 +34,8 @@ static const std::unordered_map<std::string, CommandType> mapToCmd = { { "SET", 
     { "LOAD", CommandType::LOAD }, { "CLEAR", CommandType::CLEAR },
     { "RENAME", CommandType::RENAME }, { "RN", CommandType::RENAME }, { "INCR", CommandType::INCR },
     { "DECR", CommandType::DECR }, { "APPEND", CommandType::APPEND },
-    { "PREPEND", CommandType::PREPEND }, { "STATS", CommandType::STATS } };
+    { "PREPEND", CommandType::PREPEND }, { "STATS", CommandType::STATS },
+    { "SEARCH", CommandType::SEARCH } };
 
 // https://en.wikipedia.org/wiki/Abstract_syntax_tree
 // https://stackoverflow.com/a/54596

@@ -5,7 +5,7 @@
 #include <unordered_map>
 
 static const std::string FILE_HEADER = "KEPLERKV-SAVE|";
-static int FILE_HEADER_SIZE = (int) FILE_HEADER.size();
+static const int FILE_HEADER_SIZE = (int) FILE_HEADER.size();
 static std::string DEFAULT_SAVE_FILE = "default_kep_save";
 
 static const char DELIMITER = '|';
@@ -25,3 +25,6 @@ V mapGet(const std::unordered_map<K, V> &map, const K &key, const V &dft) {
 inline bool strContains(const std::string &s, const char &c) {
     return s.find(c) != std::string::npos;
 }
+
+// Removes quotation marks without affecting original string
+std::string removeQuotations(const std::string &s);

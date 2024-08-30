@@ -19,6 +19,7 @@ public:
     bool update(const std::string &, StoreValueSP);
     StoreValueSP resolve(const std::string &, bool resolveIdentsInList = false);
     void rename(const std::string &, const std::string &);
+    std::vector<std::string> search(const std::string &);
 
     // Indicates whether the store conatains the key.
     inline bool contains(const std::string &key) { return map_.find(key) != map_.end(); }

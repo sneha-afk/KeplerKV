@@ -15,6 +15,7 @@ add_executable(${PROJECT_NAME}
     src/handler.cpp
     src/store_value.cpp
     src/store.cpp
+    src/util.cpp
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE

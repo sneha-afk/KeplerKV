@@ -9,19 +9,19 @@ A NoSQL key-value pair store for quick access.
 
 ## structure
 
-* `class Handler`: processes and executes commands to the store
-    * `class Lexer`: lexical analyzer for commands
-        * `class Token`: container of a string token read and its inferred type (i.e command, value, unknown)
-    * `class Parser`: parses semantic meaning out of the tokens generated from the lexer
-        * `class ASTNode`: represents a `Token`'s meaning and any contained data
+* [`class Handler`](/include/handler.h): processes and executes commands to the store
+    * [`class Lexer`](/include/lexer.h): lexical analyzer for commands
+        * [`class Token`](/include/token.h): container of a string token read and its inferred type (i.e command, value, unknown)
+    * [`class Parser`](/include/parser.h): parses semantic meaning out of the tokens generated from the lexer
+        * [`class ASTNode`](/include/syntax_tree.h): represents a `Token`'s meaning and any contained data
     * Execution and validation done within `Handler`: may consider exporting this to a class if too unwiedly
-* `class Store`: in-memory representation of the store
-    * `class StoreValue`: variant type to hold different types of data
+* [`class Store`](/include/store.h): in-memory representation of the store
+    * [`class StoreValue`](/include/store_value.h): variant type to hold different types of data
 
 ### procedure for adding new commands
-1. Register a new value in the `CommandType` enum in `syntax_tree.h`
+1. Register a new value in the `CommandType` enum in [`syntax_tree.h`](/include/syntax_tree.h)
 2. Add the corresponding tokens mapped to the enum in `mapToCmd` in that file
-3. Add to the `CommandToFunction` map in `handler.cpp` if the new command will need a larger handler function, else it can be added to the `switch` statement in the main `handleQuery()` function
+3. Add to the `CommandToFunction` map in [`handler.cpp`](/src/handler.cpp) if the new command will need a larger handler function, else it can be added to the `switch` statement in the main `handleQuery()` function
 4. Implement the necessary functionality within `Store` if applicable
 
 ## goals
@@ -31,17 +31,17 @@ A NoSQL key-value pair store for quick access.
 - [X] Serialization/deserialization from file
 - [X] Allow for data manipulation to supported types
 
-### reach
-- [ ] Allow for transactions, commits, rollbacks
-- [ ] Manage key-values in efficent data structures
-- [ ] Allow for folders/indices to group together keys
-- [ ] User credentials and encryption of data
-- [ ] Concurrency
-- [ ] API to a common language?
-
 ### baseline
 - [X] Inserting and deleting key-values
 - [X] Validate user input and operations
+
+### feature ideas
+- [ ] Allow for transactions, commits, rollbacks
+- [ ] API to a common language?
+- [ ] Allow for folders/indices to group together keys
+- [ ] User credentials and encryption of data
+- [ ] Cache system for larger amounts of keys
+- [ ] Concurrency
 
 ---
 
@@ -73,8 +73,12 @@ A NoSQL key-value pair store for quick access.
 ---
 ## dev journal
 
-### August 18, 2024
+### August 29, 2024
+- Implemented `SEARCH` that allows for searching by regex patterns
+    - An $O(n)$ operation, oh dear
+- Should start looking into better ways of structuring this data
 
+### August 18, 2024
 Launching version 1.0!
 * Added `STATS` to display some basic statistics on how many keys, how much memory usage, etc.
 

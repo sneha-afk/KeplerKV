@@ -15,7 +15,8 @@ std::unordered_map<CommandType, HandlerFunctionPtr> Handler::cmdToFunc_ = {
     { CommandType::SAVE, &Handler::handleSave_ }, { CommandType::LOAD, &Handler::handleLoad_ },
     { CommandType::RENAME, &Handler::handleRename_ }, { CommandType::INCR, &Handler::handleIncr_ },
     { CommandType::DECR, &Handler::handleDecr_ }, { CommandType::APPEND, &Handler::handleAppend_ },
-    { CommandType::PREPEND, &Handler::handlePrepend_ }
+    { CommandType::PREPEND, &Handler::handlePrepend_ },
+    { CommandType::SEARCH, &Handler::handleSearch_ }
 };
 
 /**
@@ -223,20 +224,9 @@ std::string &Handler::getFilename_(ValueNodeSP fnameNode) {
     if (fnameNode->getValueType() == ValueType::IDENTIFIER)
         filename = fnameNode->value->getString();
     else if (fnameNode->getValueType() == ValueType::STRING) {
-        filename = fnameNode->value->getString();
-
-        // Remove the quotation marks
-        size_t first_quote = filename.find_first_of('"');
-        if (first_quote != std::string::npos) {
-            filename.erase(filename.find_last_of('"'), 1);
-        } else {
-            first_quote = filename.find_first_of('\'');
-            filename.erase(filename.find_last_of('\''), 1);
-        }
-        filename.erase(first_quote, 1);
+        filename = removeQuotations(fnameNode->value->getString());
     } else
         throw RuntimeErr(INVALID_FNAME);
-
     return filename;
 }
 
@@ -379,5 +369,26 @@ void Handler::handlePrepend_(std::vector<ValueNodeSP> &args, const std::size_t n
             std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
         else
             std::cout << T_BRED << UNEXPECTED << T_RESET << std::endl;
+    }
+}
+
+void Handler::handleSearch_(std::vector<ValueNodeSP> &args, const std::size_t numArgs) {
+    if (numArgs < 1) throw RuntimeErr("Error: SEARCH requires at least one argument (pattern)");
+
+    for (std::size_t i = 0; i < numArgs; i++) {
+        if (!args[i]) continue;
+
+        ValueNodeSP patNode = args[i];
+
+        if (patNode->getValueType() != ValueType::IDENTIFIER
+            || patNode->getValueType() != ValueType::STRING)
+            throw RuntimeErr(WRONG_FMT);
+
+        std::string pattern = removeQuotations(patNode->value->getString());
+        std::vector<std::string> keys = store_.search(pattern);
+
+        std::cout << T_BYLLW << pattern << " (" << keys.size() << ")" << T_RESET << std::endl;
+        for (const auto &key : keys)
+            std::cout << "  " << key << std::endl;
     }
 }

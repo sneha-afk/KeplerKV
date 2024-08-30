@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <ostream>
+#include <regex>
 
 Store::Store() {
     map_ = std::unordered_map<std::string, StoreValueSP>();
@@ -76,6 +77,19 @@ void Store::rename(const std::string &oldName, const std::string &newName) {
     // Delete old key, insert again
     map_.erase(oldName);
     map_[newName] = val;
+}
+
+// Searches for keys matching the given regex pattern.
+std::vector<std::string> Store::search(const std::string &regexPattern) {
+    std::vector<std::string> keys;
+    std::regex re(regexPattern);
+
+    for (const auto &pair : map_) {
+        if (std::regex_match(pair.first, re)) {
+            keys.push_back(pair.first);
+        }
+    }
+    return keys;
 }
 
 /**
