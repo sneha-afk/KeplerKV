@@ -73,6 +73,13 @@ A NoSQL key-value pair store for quick access.
 ---
 ## dev journal
 
+### September 5, 2024
+The current system using `std::variant` for the `StoreValue` and generic `ValueNode`s introduces a significant overhead within the program and bloated lines of code for type-checking and reducing the true type of a value.
+
+Adding more types and operations will only add onto this bloat, so I believe the next course of action would be implementing the type erasure paradigm and going back to more rigid type specifications.
+1. Make `ValueNode` a base class that specific types need to inherit from.
+2. Similarly, make `StoreValue` a base class.
+
 ### August 29, 2024
 - Implemented `SEARCH` that allows for searching by regex patterns
     - An $O(n)$ operation, oh dear
