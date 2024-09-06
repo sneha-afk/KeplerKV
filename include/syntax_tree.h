@@ -10,7 +10,7 @@
 #include <vector>
 
 // clang-format off
-enum class NodeType { COMMAND, NIL, INT, FLOAT, STRING, LIST, IDENTIIFER };
+enum class NodeType { COMMAND, NIL, INT, FLOAT, STRING, LIST, IDENTIFIER };
 
 enum class CommandType {
     SET,        GET,            DELETE,
@@ -58,19 +58,20 @@ class NilNode : public ASTNode {
     std::string string() { return "{node: nil, value: nil}"; }
 };
 
-class CommandNode : public ASTNode {
+class CommandASTNode : public ASTNode {
 public:
-    CommandNode()
+    CommandASTNode()
         : cmdType_(CommandType::UNKNOWN)
         , args_(std::vector<ValueNodeSP>()) {};
-    CommandNode(const std::string &c)
+    CommandASTNode(const std::string &c)
         : cmdType_(mapGet(mapToCmd, c, CommandType::UNKNOWN))
         , args_(std::vector<ValueNodeSP>()) {};
-    CommandNode(CommandType c)
+    CommandASTNode(CommandType c)
         : cmdType_(c)
         , args_(std::vector<ValueNodeSP>()) {};
 
     NodeType getNodeType() const { return NodeType::COMMAND; };
+    std::string string() const override;
 
     CommandType getCmdType() const { return cmdType_; }
     void addArg(ValueNodeSP &a) { args_.push_back(a); };
@@ -81,7 +82,7 @@ private:
     std::vector<ValueNodeSP> args_;
 };
 
-using CommandNodeSP = std::shared_ptr<CommandNode>;
+using CommandNodeSP = std::shared_ptr<CommandASTNode>;
 
 class ValueASTNode : public ASTNode {
 public:
@@ -96,6 +97,7 @@ public:
         : value_(i) {};
 
     NodeType getNodeType() const { return NodeType::INT; }
+    std::string string() const override;
 
 private:
     int value_;
@@ -107,6 +109,7 @@ public:
         : value_(f) {};
 
     NodeType getNodeType() const { return NodeType::FLOAT; }
+    std::string string() const override;
 
 private:
     float value_;
@@ -118,6 +121,19 @@ public:
         : value_(s) {};
 
     NodeType getNodeType() const { return NodeType::STRING; }
+    std::string string() const override;
+
+private:
+    std::string value_;
+};
+
+class IdentifierASTNode : public ValueASTNode {
+public:
+    IdentifierASTNode(std::string s)
+        : value_(s) {};
+
+    NodeType getNodeType() const { return NodeType::IDENTIFIER; }
+    std::string string() const override;
 
 private:
     std::string value_;
@@ -129,6 +145,9 @@ public:
         : value_(l) {};
 
     void addElem(ValueNodeSP e) { value_.push_back(std::move(e)); }
+
+    NodeType getNodeType() const { return NodeType::LIST; }
+    std::string string() const override;
 
 private:
     std::vector<ValueNodeSP> value_;
