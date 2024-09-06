@@ -14,8 +14,13 @@ class StoreValue {
 public:
     virtual ~StoreValue() = default;
 
-    virtual void serialize(std::ofstream &fp);
+    /* Values are serialized by type identiifer, size of the value, then raw data.
+    * ex. a string "abc" may be stored as s|4|abc
+    */
+    virtual std::vector<uint8_t> serialize() const;
     virtual void deserialize(std::ifstream &fp);
+
+    void toFile(std::ofstream &) const;
 
     virtual ValueType getValueType() const = 0;
     virtual std::size_t size() const = 0;
@@ -35,6 +40,8 @@ public:
 
     int getValue() { return value_; }
 
+    std::vector<uint8_t> serialize() const override;
+
     ValueType getValueType() { return ValueType::INT; }
     std::size_t size() const override { return sizeof(value_); }
     std::string string() const override { return "int: " + std::to_string(value_); }
@@ -52,6 +59,8 @@ public:
         : value_(f) {};
 
     float getValue() { return value_; }
+
+    std::vector<uint8_t> serialize() const override;
 
     ValueType getValueType() { return ValueType::FLOAT; }
     std::size_t size() const override { return sizeof(value_); }
@@ -71,6 +80,8 @@ public:
 
     std::string &getValue() { return value_; }
 
+    std::vector<uint8_t> serialize() const override;
+
     ValueType getValueType() { return ValueType::STRING; }
     std::size_t size() const override { return sizeof(value_); }
     std::string string() const override { return "str: " + value_; }
@@ -86,6 +97,8 @@ public:
 
     std::string getValue() { return value_; }
 
+    std::vector<uint8_t> serialize() const override;
+
     ValueType getValueType() { return ValueType::IDENTIIFER; }
     std::size_t size() const override { return sizeof(value_); }
     std::string string() const override { return "id:" + value_; }
@@ -100,8 +113,12 @@ public:
         : value_(std::vector<StoreValueSP>()) {};
     ListValue(std::vector<StoreValueSP> &l)
         : value_(l) {};
+    ListValue(std::vector<StoreValueSP> &&l)
+        : value_(std::move(l)) {};
 
     std::vector<StoreValueSP> &getValue() { return value_; }
+
+    std::vector<uint8_t> serialize() const override;
 
     ValueType getValueType() { return ValueType::LIST; }
     std::size_t size() const override;

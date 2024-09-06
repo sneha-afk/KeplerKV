@@ -5,6 +5,71 @@
 
 #include <fstream>
 
+std::vector<uint8_t> IntValue::serialize() const {
+    std::vector<uint8_t> buf;
+    buf.push_back('i');
+
+    // Push back multiple bytes with insert()
+    const uint8_t *val_ptr = reinterpret_cast<const uint8_t *>(&value_);
+    buf.insert(buf.end(), val_ptr, val_ptr + sizeof(value_));
+    return buf;
+}
+
+std::vector<uint8_t> FloatValue::serialize() const {
+    std::vector<uint8_t> buf;
+    buf.push_back('f');
+
+    const uint8_t *val_ptr = reinterpret_cast<const uint8_t *>(&value_);
+    buf.insert(buf.end(), val_ptr, val_ptr + sizeof(value_));
+    return buf;
+}
+
+// Strings are serialized as [ss][size][string]
+std::vector<uint8_t> StringValue::serialize() const {
+    std::vector<uint8_t> buf;
+    buf.push_back('s');
+    buf.push_back('s');
+
+    const size_t &strSize = value_.size();
+    const uint8_t *size_ptr = reinterpret_cast<const uint8_t *>(&strSize);
+    buf.insert(buf.end(), size_ptr, size_ptr + sizeof(strSize));
+
+    const uint8_t *val_ptr = reinterpret_cast<const uint8_t *>(&value_);
+    buf.insert(buf.end(), val_ptr, val_ptr + sizeof(value_));
+    return buf;
+}
+
+// Identifiers are serialized as [si][size][string]
+std::vector<uint8_t> IdentifierValue::serialize() const {
+    std::vector<uint8_t> buf;
+    buf.push_back('s');
+    buf.push_back('i');
+
+    const size_t &strSize = value_.size();
+    const uint8_t *size_ptr = reinterpret_cast<const uint8_t *>(&strSize);
+    buf.insert(buf.end(), size_ptr, size_ptr + sizeof(strSize));
+
+    const uint8_t *val_ptr = reinterpret_cast<const uint8_t *>(&value_);
+    buf.insert(buf.end(), val_ptr, val_ptr + sizeof(value_));
+    return buf;
+}
+
+// Lists are serialized as [l][num elements][e1|e2|...|en|]
+std::vector<uint8_t> ListValue::serialize() const {
+    std::vector<uint8_t> buf;
+    buf.push_back('l');
+
+    const size_t &numElem = value_.size();
+    const uint8_t *size_ptr = reinterpret_cast<const uint8_t *>(&numElem);
+    buf.insert(buf.end(), size_ptr, size_ptr + sizeof(numElem));
+
+    for (const auto &item : value_) {
+        std::vector<uint8_t> bytes = item->serialize();
+        buf.insert(buf.end(), bytes.begin(), bytes.end());
+    }
+    return buf;
+}
+
 std::size_t ListValue::size() const {
     std::size_t totalSize = sizeof(value_);
     for (const auto &item : value_)
@@ -28,49 +93,10 @@ std::string ListValue::string() const {
     return res;
 }
 
-/**
- * Serializes this StoreValue in binary format with a type identifier, size of the value,
- * then the value itself.
- * ex. a string "abc" may be stored as s|4|abc
- */
+// Writes the serialized format of this StoreValue into file.
 void StoreValue::toFile(std::ofstream &fp) const {
-    char type;
-    if (std::holds_alternative<int>(value_)) {
-        type = 'i';
-        fp.WRITE_CHAR(type);
-
-        const int &i = std::get<int>(value_);
-        fp.write(reinterpret_cast<const char *>(&i), sizeof(int));
-    } else if (std::holds_alternative<float>(value_)) {
-        type = 'f';
-        fp.WRITE_CHAR(type);
-
-        const float &f = std::get<float>(value_);
-        fp.write(reinterpret_cast<const char *>(&f), sizeof(float));
-    } else if (std::holds_alternative<std::string>(value_)) {
-        // [s][i or s][size][string]
-        type = 's';
-        fp.WRITE_CHAR(type);
-
-        char strType = isIdent() ? 'i' : 's';
-        fp.WRITE_CHAR(strType);
-
-        const std::string &str = std::get<std::string>(value_);
-        const size_t &strSize = str.size();
-        fp.write(reinterpret_cast<const char *>(&strSize), sizeof(strSize));
-        fp.write(str.data(), strSize);
-    } else if (std::holds_alternative<std::vector<StoreValueSP>>(value_)) {
-        // [l][num elements][e1|e2|...|en|]
-        type = 'l';
-        fp.WRITE_CHAR(type);
-
-        const std::vector<StoreValueSP> &list = std::get<std::vector<StoreValueSP>>(value_);
-        const size_t &numElem = list.size();
-        fp.write(reinterpret_cast<const char *>(&numElem), sizeof(numElem));
-
-        for (const auto &item : list)
-            item->toFile(fp);
-    }
+    std::vector<uint8_t> bytes = serialize();
+    fp.write(reinterpret_cast<const char *>(bytes.data()), bytes.size());
 }
 
 // Reads a StoreValue from the file, assuming the file is a valid KEPLER-SAVE.
