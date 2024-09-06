@@ -6,9 +6,10 @@
 #include <variant>
 #include <vector>
 
-// using StoreValueVar = std::variant<int, float, std::string, std::vector<StoreValueSP>>;
-
 enum class ValueType { INT, FLOAT, STRING, LIST, IDENTIIFER };
+
+class StoreValue;
+using StoreValueSP = std::shared_ptr<StoreValue>;
 
 class StoreValue {
 public:
@@ -17,10 +18,11 @@ public:
     /* Values are serialized by type identiifer, size of the value, then raw data.
     * ex. a string "abc" may be stored as s|4|abc
     */
-    virtual std::vector<uint8_t> serialize() const;
-    virtual void deserialize(std::ifstream &fp);
+    virtual std::vector<uint8_t> serialize() const = 0;
+    virtual void deserialize(std::ifstream &) = 0;
 
     void toFile(std::ofstream &) const;
+    static StoreValueSP fromFile(std::ifstream &);
 
     virtual ValueType getValueType() const = 0;
     virtual std::size_t size() const = 0;
@@ -31,8 +33,6 @@ public:
     };
 };
 
-using StoreValueSP = std::shared_ptr<StoreValue>;
-
 class IntValue : public StoreValue {
 public:
     IntValue(int i)
@@ -41,6 +41,7 @@ public:
     int getValue() { return value_; }
 
     std::vector<uint8_t> serialize() const override;
+    void deserialize(std::ifstream &) override;
 
     ValueType getValueType() { return ValueType::INT; }
     std::size_t size() const override { return sizeof(value_); }
@@ -61,6 +62,7 @@ public:
     float getValue() { return value_; }
 
     std::vector<uint8_t> serialize() const override;
+    void deserialize(std::ifstream &) override;
 
     ValueType getValueType() { return ValueType::FLOAT; }
     std::size_t size() const override { return sizeof(value_); }
@@ -73,7 +75,7 @@ private:
     float value_;
 };
 
-class StringValue : public StoreValue {
+class StringValue : public StoreValue, public StringHandler {
 public:
     StringValue(std::string s)
         : value_(s) {};
@@ -81,6 +83,7 @@ public:
     std::string &getValue() { return value_; }
 
     std::vector<uint8_t> serialize() const override;
+    void deserialize(std::ifstream &) override;
 
     ValueType getValueType() { return ValueType::STRING; }
     std::size_t size() const override { return sizeof(value_); }
@@ -90,7 +93,7 @@ private:
     std::string value_;
 };
 
-class IdentifierValue : public StoreValue {
+class IdentifierValue : public StoreValue, public StringHandler {
 public:
     IdentifierValue(std::string s)
         : value_(s) {};
@@ -98,6 +101,7 @@ public:
     std::string getValue() { return value_; }
 
     std::vector<uint8_t> serialize() const override;
+    void deserialize(std::ifstream &) override;
 
     ValueType getValueType() { return ValueType::IDENTIIFER; }
     std::size_t size() const override { return sizeof(value_); }
@@ -119,6 +123,7 @@ public:
     std::vector<StoreValueSP> &getValue() { return value_; }
 
     std::vector<uint8_t> serialize() const override;
+    void deserialize(std::ifstream &) override;
 
     ValueType getValueType() { return ValueType::LIST; }
     std::size_t size() const override;
