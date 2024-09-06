@@ -16,7 +16,7 @@ int main() {
 
         try {
             running = handler.handleQuery(input);
-        } catch (std::runtime_error &e) {
+        } catch (std::exception &e) {
             std::cerr << T_BRED << e.what() << T_RESET << std::endl;
         }
     }

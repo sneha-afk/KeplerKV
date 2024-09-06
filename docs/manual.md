@@ -27,6 +27,7 @@ Last updated: 2024-08-17
     - [RESOLVE](#resolve): resolve nested/recursive references
         - [Explanation of lazy evaluation](#lazy-evaluation)
     - [RENAME](#rename): rename a key
+    - [SEARCH](#search): use regex to search keys
 - Commands: [Data Manipulation](#commands-data-manipulation)
     - [INCR](#incr): increment a numeric key
     - [DECR](#decr): decrement a numeric key
@@ -287,6 +288,21 @@ Renames a value's key.
 ```
 
 **Note: if the new key name already exists in the store, you will be asked to confirm if that key should be overwritten with the data from the old key name.**
+
+### SEARCH
+
+**`\search regex1 [r2 r3 ...]`**
+
+Searches for keys using typical [C++ regex](https://en.cppreference.com/w/cpp/regex) rules. For the least buggy experience, format the regex argument as a string with quotes around it.
+
+```bash
+\set a 1
+\set b 2
+\search "."
+    . (2)
+    b
+    a
+```
 
 ## Commands: Data Manipulation
 ### INCR

@@ -379,9 +379,8 @@ void Handler::handleSearch_(std::vector<ValueNodeSP> &args, const std::size_t nu
         if (!args[i]) continue;
 
         ValueNodeSP patNode = args[i];
-
         if (patNode->getValueType() != ValueType::IDENTIFIER
-            || patNode->getValueType() != ValueType::STRING)
+            && patNode->getValueType() != ValueType::STRING)
             throw RuntimeErr(WRONG_FMT);
 
         std::string pattern = removeQuotations(patNode->value->getString());

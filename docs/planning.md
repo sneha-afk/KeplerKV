@@ -52,7 +52,7 @@ A NoSQL key-value pair store for quick access.
 
 ## feature list
 * Expandable parser system
-    * For data: SET, GET, RESOLVE, DELETE, UPDATE
+    * For data: SET, GET, RESOLVE, DELETE, UPDATE, SEARCH
     * For manipulation: INCR, DECR, APPEND, PREPEND
     * Other: LIST, CLEAR, SAVE, LOAD, STATS
 * Most commands can be batched, i.e setting multiple keys at once
