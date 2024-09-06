@@ -10,9 +10,7 @@
 #include <vector>
 
 // clang-format off
-enum class NodeType { COMMAND, VALUE, NIL };
-
-enum class ValueType { INT, FLOAT, STRING, LIST, IDENTIFIER };
+enum class NodeType { COMMAND, NIL, INT, FLOAT, STRING, LIST, IDENTIIFER };
 
 enum class CommandType {
     SET,        GET,            DELETE,
@@ -53,32 +51,12 @@ public:
     };
 };
 
+using ASTNodeSP = std::shared_ptr<ASTNode>;
+
 class NilNode : public ASTNode {
     NodeType getNodeType() const { return NodeType::NIL; };
     std::string string() { return "{node: nil, value: nil}"; }
 };
-
-class ValueNode : public ASTNode {
-public:
-    StoreValueSP value;
-
-    ValueNode(StoreValueSP);
-    ValueNode(StoreValueSP v, ValueType t)
-        : value(v)
-        , valType_(t) {};
-
-    NodeType getNodeType() const { return NodeType::VALUE; };
-    std::string string() const;
-
-    // Identifiers are also considered strings internally, call this to mark it as such.
-    void setAsIdentifier() { valType_ = ValueType::IDENTIFIER; }
-    ValueType getValueType() const { return valType_; }
-
-private:
-    ValueType valType_;
-};
-
-using ValueNodeSP = std::shared_ptr<ValueNode>;
 
 class CommandNode : public ASTNode {
 public:
@@ -93,7 +71,6 @@ public:
         , args_(std::vector<ValueNodeSP>()) {};
 
     NodeType getNodeType() const { return NodeType::COMMAND; };
-    std::string string() const;
 
     CommandType getCmdType() const { return cmdType_; }
     void addArg(ValueNodeSP &a) { args_.push_back(a); };
@@ -104,5 +81,55 @@ private:
     std::vector<ValueNodeSP> args_;
 };
 
-using ASTNodeSP = std::shared_ptr<ASTNode>;
 using CommandNodeSP = std::shared_ptr<CommandNode>;
+
+class ValueASTNode : public ASTNode {
+public:
+    virtual StoreValueSP evaluate() const = 0;
+};
+
+using ValueNodeSP = std::shared_ptr<ValueASTNode>;
+
+class IntASTNode : public ValueASTNode {
+public:
+    IntASTNode(int i)
+        : value_(i) {};
+
+    NodeType getNodeType() const { return NodeType::INT; }
+
+private:
+    int value_;
+};
+
+class FloatASTNode : public ValueASTNode {
+public:
+    FloatASTNode(float f)
+        : value_(f) {};
+
+    NodeType getNodeType() const { return NodeType::FLOAT; }
+
+private:
+    float value_;
+};
+
+class StringASTNode : public ValueASTNode {
+public:
+    StringASTNode(std::string s)
+        : value_(s) {};
+
+    NodeType getNodeType() const { return NodeType::STRING; }
+
+private:
+    std::string value_;
+};
+
+class ListASTNode : public ValueASTNode {
+public:
+    ListASTNode(std::vector<ValueNodeSP> &l)
+        : value_(l) {};
+
+    void addElem(ValueNodeSP e) { value_.push_back(std::move(e)); }
+
+private:
+    std::vector<ValueNodeSP> value_;
+};
