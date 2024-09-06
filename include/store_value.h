@@ -6,67 +6,110 @@
 #include <variant>
 #include <vector>
 
-class StoreValue;
-using StoreValueSP = std::shared_ptr<StoreValue>;
-using StoreValueVar = std::variant<int, float, std::string, std::vector<StoreValueSP>>;
+// using StoreValueVar = std::variant<int, float, std::string, std::vector<StoreValueSP>>;
 
-enum class StoreValueType { INT, FLOAT, STRING, LIST, IDENTIIFER };
+enum class ValueType { INT, FLOAT, STRING, LIST, IDENTIIFER };
 
 class StoreValue {
 public:
-    StoreValue()
-        : value_(0)
-        , type_(StoreValueType::INT) {};
-    StoreValue(int v)
-        : value_(v)
-        , type_(StoreValueType::INT) {};
-    StoreValue(float v)
-        : value_(v)
-        , type_(StoreValueType::FLOAT) {};
-    StoreValue(const std::string &v)
-        : value_(v)
-        , type_(StoreValueType::STRING) {};
-    StoreValue(const std::string &v, bool is_ident)
-        : value_(v)
-        , type_(is_ident ? StoreValueType::IDENTIIFER : StoreValueType::STRING) {};
-    StoreValue(const std::vector<StoreValueSP> &v)
-        : value_(v)
-        , type_(StoreValueType::LIST) {};
+    virtual ~StoreValue() = default;
 
-    // What type of value is this?
-    bool isInt() const { return type_ == StoreValueType::INT; }
-    bool isFloat() const { return type_ == StoreValueType::FLOAT; }
-    bool isString() const { return type_ == StoreValueType::STRING; }
-    bool isIdent() const { return type_ == StoreValueType::IDENTIIFER; }
-    bool isList() const { return type_ == StoreValueType::LIST; }
+    virtual void serialize(std::ofstream &fp);
+    virtual void deserialize(std::ifstream &fp);
 
-    // Retrieve value, use in conjunction wtih getType()
-    int getInt() const;
-    float getFloat() const;
-    const std::string &getString() const;
-    const std::vector<StoreValueSP> &getList() const;
-    std::vector<StoreValueSP> &getModifiableList();
-
-    StoreValueType getType() const { return type_; }
-
-    // Manipulate the value, returns true on success
-    bool incr();
-    bool decr();
-    bool append(StoreValueSP);
-    bool prepend(StoreValueSP);
-
-    std::string string() const;
-    void toFile(std::ofstream &) const;
-    static StoreValue fromFile(std::ifstream &);
-
-    std::size_t size();
-
-    friend std::ostream &operator<<(std::ostream &os, const StoreValue &sv) {
-        os << sv.string();
+    virtual ValueType getValueType() const = 0;
+    virtual std::size_t size() const = 0;
+    virtual std::string string() const = 0;
+    friend std::ostream &operator<<(std::ostream &os, const StoreValue &s) {
+        os << s.string();
         return os;
     };
+};
+
+using StoreValueSP = std::shared_ptr<StoreValue>;
+
+class IntValue : public StoreValue {
+public:
+    IntValue(int i)
+        : value_(i) {};
+
+    int getValue() { return value_; }
+
+    ValueType getValueType() { return ValueType::INT; }
+    std::size_t size() const override { return sizeof(value_); }
+    std::string string() const override { return "int: " + std::to_string(value_); }
+
+    void incr() { value_ += 1; }
+    void decr() { value_ -= 1; }
 
 private:
-    StoreValueVar value_;
-    StoreValueType type_;
+    int value_;
+};
+
+class FloatValue : public StoreValue {
+public:
+    FloatValue(float f)
+        : value_(f) {};
+
+    float getValue() { return value_; }
+
+    ValueType getValueType() { return ValueType::FLOAT; }
+    std::size_t size() const override { return sizeof(value_); }
+    std::string string() const override { return "float: " + std::to_string(value_); }
+
+    void incr() { value_ += 1; }
+    void decr() { value_ -= 1; }
+
+private:
+    float value_;
+};
+
+class StringValue : public StoreValue {
+public:
+    StringValue(std::string s)
+        : value_(s) {};
+
+    std::string &getValue() { return value_; }
+
+    ValueType getValueType() { return ValueType::STRING; }
+    std::size_t size() const override { return sizeof(value_); }
+    std::string string() const override { return "str: " + value_; }
+
+private:
+    std::string value_;
+};
+
+class IdentifierValue : public StoreValue {
+public:
+    IdentifierValue(std::string s)
+        : value_(s) {};
+
+    std::string getValue() { return value_; }
+
+    ValueType getValueType() { return ValueType::IDENTIIFER; }
+    std::size_t size() const override { return sizeof(value_); }
+    std::string string() const override { return "id:" + value_; }
+
+private:
+    std::string value_;
+};
+
+class ListValue : public StoreValue {
+public:
+    ListValue()
+        : value_(std::vector<StoreValueSP>()) {};
+    ListValue(std::vector<StoreValueSP> &l)
+        : value_(l) {};
+
+    std::vector<StoreValueSP> &getValue() { return value_; }
+
+    ValueType getValueType() { return ValueType::LIST; }
+    std::size_t size() const override;
+    std::string string() const override;
+
+    void append(StoreValueSP item) { value_.push_back(item); }
+    void prepend(StoreValueSP item) { value_.insert(value_.begin(), item); }
+
+private:
+    std::vector<StoreValueSP> value_;
 };

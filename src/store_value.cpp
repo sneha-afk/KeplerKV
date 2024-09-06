@@ -5,126 +5,27 @@
 
 #include <fstream>
 
-int StoreValue::getInt() const {
-    if (isInt())
-        return std::get<int>(value_);
-    else
-        throw RuntimeErr(SV_WRONG_TYPE);
-}
-
-float StoreValue::getFloat() const {
-    if (isFloat())
-        return std::get<float>(value_);
-    else
-        throw RuntimeErr(SV_WRONG_TYPE);
-}
-
-const std::string &StoreValue::getString() const {
-    if (isString() || isIdent())
-        return std::get<std::string>(value_);
-    else
-        throw RuntimeErr(SV_WRONG_TYPE);
-}
-
-const std::vector<StoreValueSP> &StoreValue::getList() const {
-    if (isList())
-        return std::get<std::vector<StoreValueSP>>(value_);
-    else
-        throw RuntimeErr(SV_WRONG_TYPE);
-}
-
-std::vector<StoreValueSP> &StoreValue::getModifiableList() {
-    if (isList())
-        return std::get<std::vector<StoreValueSP>>(value_);
-    else
-        throw RuntimeErr(SV_WRONG_TYPE);
-}
-
-bool StoreValue::incr() {
-    // Have to resolve type so the compiler doesn't complain
-    if (isInt()) {
-        value_ = std::get<int>(value_) + 1;
-        return true;
-    } else if (isFloat()) {
-        value_ = std::get<float>(value_) + 1;
-        return true;
-    }
-    return false;
-}
-
-bool StoreValue::decr() {
-    if (isInt()) {
-        value_ = std::get<int>(value_) - 1;
-        return true;
-    } else if (isFloat()) {
-        value_ = std::get<float>(value_) - 1;
-        return true;
-    }
-    return false;
-}
-
-bool StoreValue::append(StoreValueSP item) {
-    if (!isList()) return false;
-    std::vector<StoreValueSP> &lvalue = std::get<std::vector<StoreValueSP>>(value_);
-    lvalue.push_back(item);
-    return true;
-}
-
-bool StoreValue::prepend(StoreValueSP item) {
-    if (!isList()) return false;
-    std::vector<StoreValueSP> &lvalue = std::get<std::vector<StoreValueSP>>(value_);
-    lvalue.insert(lvalue.begin(), item);
-    return true;
-}
-
-std::size_t StoreValue::size() {
-    // The overhead of the variant makes this larger
+std::size_t ListValue::size() const {
     std::size_t totalSize = sizeof(value_);
-    if (isList()) {
-        // Size of the vector + elements are pointers, need to add those
-        for (const auto &item : getList())
-            totalSize += item->size();
-    }
+    for (const auto &item : value_)
+        totalSize += item->size();
     return totalSize;
 }
 
 // Getting the string() of list elements
-std::string stringList_(const std::vector<StoreValueSP> &arg) {
+std::string ListValue::string() const {
     std::string res = "list: [";
-    for (size_t i = 0; i < arg.size(); i++) {
-        if (arg[i])
-            res += arg[i]->string();
+
+    for (size_t i = 0; i < value_.size(); i++) {
+        if (value_[i])
+            res += value_[i]->string();
         else
             res += "<nil>";
 
-        if (i < arg.size() - 1) res += ", ";
+        if (i < value_.size() - 1) res += ", ";
     }
     res += "]";
     return res;
-}
-
-/**
- * Returns a string representation with the datatype and value of this StoreValue.
- * https://en.cppreference.com/w/cpp/utility/variant/visit
- * https://dzone.com/articles/how-to-use-stdvisit-with-multiple-variants
- */
-std::string StoreValue::string() const {
-    if (isIdent()) return "id: " + std::get<std::string>(value_);
-
-    return std::visit(
-        [](auto &&arg) {
-            using T = std::decay_t<decltype(arg)>;
-
-            if constexpr (std::is_same_v<T, int>)
-                return "int: " + std::to_string(arg);
-            else if constexpr (std::is_same_v<T, float>)
-                return "float: " + std::to_string(arg);
-            else if constexpr (std::is_same_v<T, std::string>)
-                return "str: " + arg;
-            else if constexpr (std::is_same_v<T, std::vector<StoreValueSP>>)
-                return stringList_(arg);
-        },
-        value_);
 }
 
 /**
