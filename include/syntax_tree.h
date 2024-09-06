@@ -62,24 +62,24 @@ class CommandASTNode : public ASTNode {
 public:
     CommandASTNode()
         : cmdType_(CommandType::UNKNOWN)
-        , args_(std::vector<ValueNodeSP>()) {};
+        , args_(std::vector<ValueASTNodeSP>()) {};
     CommandASTNode(const std::string &c)
         : cmdType_(mapGet(mapToCmd, c, CommandType::UNKNOWN))
-        , args_(std::vector<ValueNodeSP>()) {};
+        , args_(std::vector<ValueASTNodeSP>()) {};
     CommandASTNode(CommandType c)
         : cmdType_(c)
-        , args_(std::vector<ValueNodeSP>()) {};
+        , args_(std::vector<ValueASTNodeSP>()) {};
 
     NodeType getNodeType() const { return NodeType::COMMAND; };
     std::string string() const override;
 
     CommandType getCmdType() const { return cmdType_; }
-    void addArg(ValueNodeSP &a) { args_.push_back(a); };
-    std::vector<ValueNodeSP> &getArgs() { return args_; };
+    void addArg(ValueASTNodeSP &a) { args_.push_back(a); };
+    std::vector<ValueASTNodeSP> &getArgs() { return args_; };
 
 private:
     CommandType cmdType_;
-    std::vector<ValueNodeSP> args_;
+    std::vector<ValueASTNodeSP> args_;
 };
 
 using CommandNodeSP = std::shared_ptr<CommandASTNode>;
@@ -89,7 +89,7 @@ public:
     virtual StoreValueSP evaluate() const = 0;
 };
 
-using ValueNodeSP = std::shared_ptr<ValueASTNode>;
+using ValueASTNodeSP = std::shared_ptr<ValueASTNode>;
 
 class IntASTNode : public ValueASTNode {
 public:
@@ -98,6 +98,7 @@ public:
 
     NodeType getNodeType() const { return NodeType::INT; }
     std::string string() const override;
+    StoreValueSP evaluate() const override;
 
 private:
     int value_;
@@ -110,6 +111,7 @@ public:
 
     NodeType getNodeType() const { return NodeType::FLOAT; }
     std::string string() const override;
+    StoreValueSP evaluate() const override;
 
 private:
     float value_;
@@ -122,6 +124,7 @@ public:
 
     NodeType getNodeType() const { return NodeType::STRING; }
     std::string string() const override;
+    StoreValueSP evaluate() const override;
 
 private:
     std::string value_;
@@ -134,6 +137,7 @@ public:
 
     NodeType getNodeType() const { return NodeType::IDENTIFIER; }
     std::string string() const override;
+    StoreValueSP evaluate() const override;
 
 private:
     std::string value_;
@@ -141,14 +145,15 @@ private:
 
 class ListASTNode : public ValueASTNode {
 public:
-    ListASTNode(std::vector<ValueNodeSP> &l)
+    ListASTNode(std::vector<ValueASTNodeSP> &l)
         : value_(l) {};
 
-    void addElem(ValueNodeSP e) { value_.push_back(std::move(e)); }
+    void addNode(ValueASTNodeSP e) { value_.push_back(std::move(e)); }
 
     NodeType getNodeType() const { return NodeType::LIST; }
     std::string string() const override;
+    StoreValueSP evaluate() const override;
 
 private:
-    std::vector<ValueNodeSP> value_;
+    std::vector<ValueASTNodeSP> value_;
 };

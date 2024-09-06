@@ -18,16 +18,26 @@ std::string IntASTNode::string() const {
     return "{node: Value, type: Int, value: " + std::to_string(value_) + "}";
 }
 
+StoreValueSP IntASTNode::evaluate() const { return std::make_shared<IntValue>(value_); }
+
 std::string FloatASTNode::string() const {
     return "{node: Value, type: Float, value: " + std::to_string(value_) + "}";
 }
+
+StoreValueSP FloatASTNode::evaluate() const { return std::make_shared<FloatValue>(value_); }
 
 std::string StringASTNode::string() const {
     return "{node: Value, type: String, value: " + value_ + "}";
 }
 
+StoreValueSP StringASTNode::evaluate() const { return std::make_shared<StringValue>(value_); }
+
 std::string IdentifierASTNode::string() const {
     return "{node: Value, type: Identifier, value: " + value_ + "}";
+}
+
+StoreValueSP IdentifierASTNode::evaluate() const {
+    return std::make_shared<IdentifierValue>(value_);
 }
 
 std::string ListASTNode::string() const {
@@ -42,4 +52,11 @@ std::string ListASTNode::string() const {
     }
     s += "]}";
     return s;
+}
+
+StoreValueSP ListASTNode::evaluate() const {
+    std::shared_ptr<ListValue> listVal = std::make_shared<ListValue>();
+    for (const auto &node : value_)
+        listVal->append(node->evaluate());
+    return listVal;
 }
