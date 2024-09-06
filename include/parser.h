@@ -7,7 +7,8 @@ class Parser {
 public:
     std::vector<ASTNodeSP> nodes;
 
-    Parser() { nodes = std::vector<ASTNodeSP>(); };
+    Parser()
+        : nodes(std::vector<ASTNodeSP>()) {};
 
     std::vector<ASTNodeSP> &parse(std::vector<TokenSP> &);
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "util.h"
+
 #include <memory>
 #include <stdexcept>
 #include <string>
