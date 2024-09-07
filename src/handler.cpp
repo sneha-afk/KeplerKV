@@ -136,9 +136,7 @@ void Handler::handleSet_(std::vector<ValueASTNodeSP> &args, const std::size_t nu
 
         if (!(i + 1 < numArgs) || !args[i + 1]) throw RuntimeErr(VAL_AFTER_IDENT);
 
-        StoreValueSP valueNode = (args[i + 1])->evaluate();
-
-        store_.set(ident, valueNode);
+        store_.set(ident, (args[i + 1])->evaluate());
         std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
     }
 }
@@ -265,7 +263,7 @@ void Handler::handleRename_(std::vector<ValueASTNodeSP> &args, const std::size_t
                       << "\n> ";
             std::string confirm;
             std::getline(std::cin, confirm);
-            if (0 < confirm.size() && (confirm[0]) != 'y') {
+            if (confirm.size() && (confirm[0]) != 'y') {
                 std::cout << T_BYLLW << "No changes made to the store." << T_RESET << std::endl;
                 return;
             }
@@ -292,7 +290,7 @@ void Handler::handleIncr_(std::vector<ValueASTNodeSP> &args, const std::size_t n
             continue;
         }
 
-        NumberValueTypeSP number = std::dynamic_pointer_cast<NumberValueType>(value);
+        NumericTypeSP number = std::dynamic_pointer_cast<NumericType>(value);
         if (!number) {
             std::cout << T_BRED << NOT_NUMERIC << T_RESET << std::endl;
             continue;
@@ -319,7 +317,7 @@ void Handler::handleDecr_(std::vector<ValueASTNodeSP> &args, const std::size_t n
             continue;
         }
 
-        NumberValueTypeSP number = std::dynamic_pointer_cast<NumberValueType>(value);
+        NumericTypeSP number = std::dynamic_pointer_cast<NumericType>(value);
         if (!number) {
             std::cout << T_BRED << NOT_NUMERIC << T_RESET << std::endl;
             continue;

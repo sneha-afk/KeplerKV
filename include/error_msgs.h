@@ -1,4 +1,5 @@
 #pragma once
+
 #include <stdexcept>
 
 using Exception = std::exception;
@@ -9,12 +10,10 @@ using RuntimeErr = std::runtime_error;
 #define WRONG_F_FMT     "Error: incorrect float format"
 #define WRONG_I_FMT     "Error: incorrect integer format"
 #define NOT_IDENT       "Error: expected identifier"
-#define NOT_FOUND       "Error: not found in store"
 #define NOT_NUMERIC     "Error: not numeric (integer or float)"
 #define NOT_LIST        "Error: not a list"
 #define VAL_AFTER_IDENT "Error: expected value after identifier"
 #define CIRCULAR_REF    "Error: circular reference detected"
-#define SV_WRONG_TYPE   "Error: wrong type getter used with this value"
 #define NESTED_CMD      "Error: nested commands not supported (yet?)"
 #define CMD_IN_LIST     "Error: commands not supported within lists"
 #define FAIL_OPEN_WRITE "Error: failed to open file to write"
@@ -36,7 +35,7 @@ inline RuntimeErr MIN_TWO_ARG_KK(const std::string &c) {
 }
 
 inline RuntimeErr INVALID_CMD(const std::string &c) {
-    return RuntimeErr("Error: invalid command \'" + c + "\' (did you forget an '\'?)");
+    return RuntimeErr("Error: invalid command \'" + c + "\' (did you forget a quote or slsah?)");
 }
 
 inline RuntimeErr UNKNOWN_TOKEN(const std::string &t) {

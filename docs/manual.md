@@ -2,7 +2,7 @@
 
 The full manual for KeplerKV including syntax and command specifics.
 
-Last updated: 2024-08-17
+Last updated: 2024-09-06
 
 ## Contents
 
@@ -66,6 +66,13 @@ Multiple commands can be completed at once by separating them with semicolons:
 Commands are **case-insentive** and may have alternate syntax. This documentation denotes commands and their arguments as:
 ```
 {set of equivalent invocations} required-argument [optional-arguments]
+```
+
+Many commands allow for batching such that multiple of the same command can be invoked:
+```bash
+\get a b
+    a | ...
+    b | ...
 ```
 
 ### Identifiers
@@ -132,8 +139,6 @@ Load in a store state from a valid save file produced from [`SAVE`](#save), deno
 **`\stats`**
 
 Displays basic statistics about the current instance of KeplerKV, including the total number of keys by type, and the memory usage.
-
-> The memory usage may appear bloated, such as one integer being more than four bytes. This is due to the use of `std::variant` inside the program which allows for polymoprhism in the store's values, but introduces some overhead!
 
 ## Commands: Data
 

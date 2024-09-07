@@ -35,15 +35,13 @@ public:
     };
 };
 
-class NumberValueType {
+class NumericType {
 public:
     virtual void incr() = 0;
     virtual void decr() = 0;
 };
 
-using NumberValueTypeSP = std::shared_ptr<NumberValueType>;
-
-class IntValue : public StoreValue, public NumberValueType {
+class IntValue : public StoreValue, public NumericType {
 public:
     IntValue()
         : value_(0) {};
@@ -66,7 +64,7 @@ private:
     int value_;
 };
 
-class FloatValue : public StoreValue, public NumberValueType {
+class FloatValue : public StoreValue, public NumericType {
 public:
     FloatValue()
         : value_(0) {};
@@ -119,7 +117,7 @@ public:
     std::vector<uint8_t> serialize() const override;
 
     ValueType getValueType() const override { return ValueType::IDENTIIFER; }
-    std::string string() const override { return "id:" + value_; }
+    std::string string() const override { return "id: " + value_; }
 };
 
 class ListValue : public StoreValue {
@@ -147,6 +145,7 @@ private:
     std::vector<StoreValueSP> value_;
 };
 
+using NumericTypeSP = std::shared_ptr<NumericType>;
 using IntValueSP = std::shared_ptr<IntValue>;
 using FloatValueSP = std::shared_ptr<FloatValue>;
 using StringValueSP = std::shared_ptr<StringValue>;

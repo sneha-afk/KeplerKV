@@ -29,10 +29,3 @@ inline bool strContains(const std::string &s, const char &c) {
 
 // Removes quotation marks without affecting original string
 std::string removeQuotations(const std::string &s);
-
-// Provides common functionality to be used for string operations.
-class StringHandler {
-public:
-    static void serializeToBuffer(std::vector<uint8_t> &, const std::string &s);
-    static std::string deserializeFromFile(std::ifstream &);
-};

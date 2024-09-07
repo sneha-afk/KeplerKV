@@ -65,11 +65,11 @@ StoreValueSP Store::resolveRecur_(
                 // Each element should inherit parent history
                 std::unordered_set<std::string> newSeen = std::unordered_set<std::string>(seen);
 
-                IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(found);
+                IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(resolvedL[i]);
                 resolvedL[i] = resolveRecur_(idNode->getValue(), newSeen, resolveIdentsInList);
             }
         }
-        return std::make_shared<StoreValue>(resolvedL);
+        return std::make_shared<ListValue>(resolvedL);
     }
 
     return found;
@@ -143,8 +143,7 @@ void Store::loadFromFile(const std::string &filename) {
         fp.read(&key[0], keySize);
         fp.MV_FP_FORWARD;
 
-        StoreValueSP val = StoreValue::fromFile(fp);
-        map_[key] = val;
+        map_[key] = StoreValue::fromFile(fp);
     }
     fp.close();
 }

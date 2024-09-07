@@ -16,7 +16,7 @@ A NoSQL key-value pair store for quick access.
         * [`class ASTNode`](/include/syntax_tree.h): represents a `Token`'s meaning and any contained data
     * Execution and validation done within `Handler`: may consider exporting this to a class if too unwiedly
 * [`class Store`](/include/store.h): in-memory representation of the store
-    * [`class StoreValue`](/include/store_value.h): variant type to hold different types of data
+    * [`class StoreValue`](/include/store_value.h): base class representing a value within the store, from which specific types inherit from, such as `IntValue`
 
 ### procedure for adding new commands
 1. Register a new value in the `CommandType` enum in [`syntax_tree.h`](/include/syntax_tree.h)
@@ -74,12 +74,13 @@ A NoSQL key-value pair store for quick access.
 ## dev journal
 ### September 6, 2024
 - Reworked serialization and deserialization for individual `StoreValue` types
-    - Strings and identifiers utilize the same string functionality. For now I am using a common `StringHandler` interface to share, but perhaps making `IdentifierValue` be a sublass of `StringValue` may simplify this?
+    - Strings and identifiers utilize the same string functionality: identifiers will now inherit from string classes (enums distinguish them)
 - New `evaluate()` functions for each `ASTNode` to create appropriate `StoreValue` type
     - More clear, forward conversion from the parser to actual values
 - Revamped `Parser` to not return anything related to `StoreValue`
     - `Parser` only deals with the `ASTNode` representation of a value
 - Let `Identifier` abstractions (AST and Value) inherit from `String` since they are functionally the same and an enum is used to distinguish them during use
+- Corresponding fixes to `Handler` and `Store` for the new scheme
 
 ### September 5, 2024
 The current system using `std::variant` for the `StoreValue` and generic `ValueNode`s introduces a significant overhead within the program and bloated lines of code for type-checking and reducing the true type of a value.
