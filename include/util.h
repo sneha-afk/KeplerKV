@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 static const std::string FILE_HEADER = "KEPLERKV-SAVE|";
 static const int FILE_HEADER_SIZE = (int) FILE_HEADER.size();

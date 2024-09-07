@@ -9,7 +9,8 @@ class Lexer {
 public:
     std::vector<TokenSP> tokens;
 
-    Lexer() { tokens = std::vector<TokenSP>(); };
+    Lexer()
+        : tokens(std::vector<TokenSP>()) {};
 
     std::vector<TokenSP> &tokenize(std::string &);
 

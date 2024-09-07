@@ -5,212 +5,158 @@
 
 #include <fstream>
 
-int StoreValue::getInt() const {
-    if (isInt())
-        return std::get<int>(value_);
-    else
-        throw RuntimeErr(SV_WRONG_TYPE);
+std::vector<uint8_t> IntValue::serialize() const {
+    std::vector<uint8_t> buf;
+    buf.push_back('i');
+
+    // Push back multiple bytes with insert()
+    const uint8_t *val_ptr = reinterpret_cast<const uint8_t *>(&value_);
+    buf.insert(buf.end(), val_ptr, val_ptr + sizeof(value_));
+    return buf;
 }
 
-float StoreValue::getFloat() const {
-    if (isFloat())
-        return std::get<float>(value_);
-    else
-        throw RuntimeErr(SV_WRONG_TYPE);
+void IntValue::deserialize(std::ifstream &fp) {
+    fp.read(reinterpret_cast<char *>(&value_), sizeof(value_));
 }
 
-const std::string &StoreValue::getString() const {
-    if (isString() || isIdent())
-        return std::get<std::string>(value_);
-    else
-        throw RuntimeErr(SV_WRONG_TYPE);
+std::vector<uint8_t> FloatValue::serialize() const {
+    std::vector<uint8_t> buf;
+    buf.push_back('f');
+
+    const uint8_t *val_ptr = reinterpret_cast<const uint8_t *>(&value_);
+    buf.insert(buf.end(), val_ptr, val_ptr + sizeof(value_));
+    return buf;
 }
 
-const std::vector<StoreValueSP> &StoreValue::getList() const {
-    if (isList())
-        return std::get<std::vector<StoreValueSP>>(value_);
-    else
-        throw RuntimeErr(SV_WRONG_TYPE);
+void FloatValue::deserialize(std::ifstream &fp) {
+    fp.read(reinterpret_cast<char *>(&value_), sizeof(value_));
 }
 
-std::vector<StoreValueSP> &StoreValue::getModifiableList() {
-    if (isList())
-        return std::get<std::vector<StoreValueSP>>(value_);
-    else
-        throw RuntimeErr(SV_WRONG_TYPE);
+// Strings are serialized as [ss][size][string]
+std::vector<uint8_t> StringValue::serialize() const {
+    std::vector<uint8_t> buf;
+    buf.push_back('s');
+    buf.push_back('s');
+
+    const size_t &strSize = value_.size();
+    const uint8_t *size_ptr = reinterpret_cast<const uint8_t *>(&strSize);
+    buf.insert(buf.end(), size_ptr, size_ptr + sizeof(strSize));
+
+    buf.insert(buf.end(), value_.begin(), value_.end());
+    return buf;
 }
 
-bool StoreValue::incr() {
-    // Have to resolve type so the compiler doesn't complain
-    if (isInt()) {
-        value_ = std::get<int>(value_) + 1;
-        return true;
-    } else if (isFloat()) {
-        value_ = std::get<float>(value_) + 1;
-        return true;
+void StringValue::deserialize(std::ifstream &fp) {
+    size_t strSize;
+    fp.read(reinterpret_cast<char *>(&strSize), sizeof(strSize));
+
+    value_ = std::string(strSize, '\0');
+    fp.read(&value_[0], strSize);
+}
+
+// Identifiers are serialized as [si][size][string]
+std::vector<uint8_t> IdentifierValue::serialize() const {
+    std::vector<uint8_t> buf = StringValue::serialize();
+    buf[1] = 'i';
+    return buf;
+}
+
+// Lists are serialized as [l][num elements][e1|e2|...|en|]
+std::vector<uint8_t> ListValue::serialize() const {
+    std::vector<uint8_t> buf;
+    buf.push_back('l');
+
+    const size_t &numElem = value_.size();
+    const uint8_t *size_ptr = reinterpret_cast<const uint8_t *>(&numElem);
+    buf.insert(buf.end(), size_ptr, size_ptr + sizeof(numElem));
+
+    for (const auto &item : value_) {
+        std::vector<uint8_t> bytes = item->serialize();
+        buf.insert(buf.end(), bytes.begin(), bytes.end());
     }
-    return false;
+    return buf;
 }
 
-bool StoreValue::decr() {
-    if (isInt()) {
-        value_ = std::get<int>(value_) - 1;
-        return true;
-    } else if (isFloat()) {
-        value_ = std::get<float>(value_) - 1;
-        return true;
+void ListValue::deserialize(std::ifstream &fp) {
+    size_t numVals;
+    fp.read(reinterpret_cast<char *>(&numVals), sizeof(size_t));
+
+    std::vector<StoreValueSP> lst = std::vector<StoreValueSP>();
+    for (size_t i = 0; i < numVals; i++) {
+        StoreValueSP valsp = fromFile(fp);
+        lst.push_back(valsp);
     }
-    return false;
+    value_ = lst;
 }
 
-bool StoreValue::append(StoreValueSP item) {
-    if (!isList()) return false;
-    std::vector<StoreValueSP> &lvalue = std::get<std::vector<StoreValueSP>>(value_);
-    lvalue.push_back(item);
-    return true;
-}
-
-bool StoreValue::prepend(StoreValueSP item) {
-    if (!isList()) return false;
-    std::vector<StoreValueSP> &lvalue = std::get<std::vector<StoreValueSP>>(value_);
-    lvalue.insert(lvalue.begin(), item);
-    return true;
-}
-
-std::size_t StoreValue::size() {
-    // The overhead of the variant makes this larger
+std::size_t ListValue::size() const {
     std::size_t totalSize = sizeof(value_);
-    if (isList()) {
-        // Size of the vector + elements are pointers, need to add those
-        for (const auto &item : getList())
-            totalSize += item->size();
-    }
+    for (const auto &item : value_)
+        totalSize += item->size();
     return totalSize;
 }
 
 // Getting the string() of list elements
-std::string stringList_(const std::vector<StoreValueSP> &arg) {
+std::string ListValue::string() const {
     std::string res = "list: [";
-    for (size_t i = 0; i < arg.size(); i++) {
-        if (arg[i])
-            res += arg[i]->string();
+
+    for (size_t i = 0; i < value_.size(); i++) {
+        if (value_[i])
+            res += value_[i]->string();
         else
             res += "<nil>";
 
-        if (i < arg.size() - 1) res += ", ";
+        if (i < value_.size() - 1) res += ", ";
     }
     res += "]";
     return res;
 }
 
-/**
- * Returns a string representation with the datatype and value of this StoreValue.
- * https://en.cppreference.com/w/cpp/utility/variant/visit
- * https://dzone.com/articles/how-to-use-stdvisit-with-multiple-variants
- */
-std::string StoreValue::string() const {
-    if (isIdent()) return "id: " + std::get<std::string>(value_);
-
-    return std::visit(
-        [](auto &&arg) {
-            using T = std::decay_t<decltype(arg)>;
-
-            if constexpr (std::is_same_v<T, int>)
-                return "int: " + std::to_string(arg);
-            else if constexpr (std::is_same_v<T, float>)
-                return "float: " + std::to_string(arg);
-            else if constexpr (std::is_same_v<T, std::string>)
-                return "str: " + arg;
-            else if constexpr (std::is_same_v<T, std::vector<StoreValueSP>>)
-                return stringList_(arg);
-        },
-        value_);
-}
-
-/**
- * Serializes this StoreValue in binary format with a type identifier, size of the value,
- * then the value itself.
- * ex. a string "abc" may be stored as s|4|abc
- */
+// Writes the serialized format of this StoreValue into file.
 void StoreValue::toFile(std::ofstream &fp) const {
-    char type;
-    if (std::holds_alternative<int>(value_)) {
-        type = 'i';
-        fp.WRITE_CHAR(type);
-
-        const int &i = std::get<int>(value_);
-        fp.write(reinterpret_cast<const char *>(&i), sizeof(int));
-    } else if (std::holds_alternative<float>(value_)) {
-        type = 'f';
-        fp.WRITE_CHAR(type);
-
-        const float &f = std::get<float>(value_);
-        fp.write(reinterpret_cast<const char *>(&f), sizeof(float));
-    } else if (std::holds_alternative<std::string>(value_)) {
-        // [s][i or s][size][string]
-        type = 's';
-        fp.WRITE_CHAR(type);
-
-        char strType = isIdent() ? 'i' : 's';
-        fp.WRITE_CHAR(strType);
-
-        const std::string &str = std::get<std::string>(value_);
-        const size_t &strSize = str.size();
-        fp.write(reinterpret_cast<const char *>(&strSize), sizeof(strSize));
-        fp.write(str.data(), strSize);
-    } else if (std::holds_alternative<std::vector<StoreValueSP>>(value_)) {
-        // [l][num elements][e1|e2|...|en|]
-        type = 'l';
-        fp.WRITE_CHAR(type);
-
-        const std::vector<StoreValueSP> &list = std::get<std::vector<StoreValueSP>>(value_);
-        const size_t &numElem = list.size();
-        fp.write(reinterpret_cast<const char *>(&numElem), sizeof(numElem));
-
-        for (const auto &item : list)
-            item->toFile(fp);
-    }
+    std::vector<uint8_t> bytes = serialize();
+    fp.write(reinterpret_cast<const char *>(bytes.data()), bytes.size());
 }
 
 // Reads a StoreValue from the file, assuming the file is a valid KEPLER-SAVE.
-StoreValue StoreValue::fromFile(std::ifstream &fp) {
+StoreValueSP StoreValue::fromFile(std::ifstream &fp) {
     char type;
     fp.read(&type, sizeof(char));
 
     switch (type) {
-        case 'i':
-            int ival;
-            fp.read(reinterpret_cast<char *>(&ival), sizeof(int));
-            return StoreValue(ival);
-        case 'f':
-            float fval;
-            fp.read(reinterpret_cast<char *>(&fval), sizeof(float));
-            return StoreValue(fval);
+        case 'i': {
+            std::shared_ptr<IntValue> intVal = std::make_shared<IntValue>();
+            intVal->deserialize(fp);
+            return intVal;
+        }
+        case 'f': {
+            std::shared_ptr<FloatValue> floatVal = std::make_shared<FloatValue>();
+            floatVal->deserialize(fp);
+            return floatVal;
+        }
         case 's': {
             char strType;
             fp.read(&strType, sizeof(char));
 
-            size_t strSize;
-            fp.read(reinterpret_cast<char *>(&strSize), sizeof(strSize));
-            std::string sval(strSize, '\0');
-
-            fp.read(&sval[0], strSize);
-            if (strType == 'i') return StoreValue(sval, true);
-            return StoreValue(sval);
+            if (strType == 's') {
+                std::shared_ptr<StringValue> strVal = std::make_shared<StringValue>();
+                strVal->deserialize(fp);
+                return strVal;
+            } else if (strType == 'i') {
+                std::shared_ptr<IdentifierValue> idVal = std::make_shared<IdentifierValue>();
+                idVal->deserialize(fp);
+                return idVal;
+            } else
+                throw RuntimeErr(UNK_SAVE_ITEM);
+            break;
         }
         case 'l': {
-            size_t numVals;
-            fp.read(reinterpret_cast<char *>(&numVals), sizeof(size_t));
-
-            std::vector<StoreValueSP> lst = std::vector<StoreValueSP>();
-            for (size_t i = 0; i < numVals; i++) {
-                StoreValueSP valsp = std::make_shared<StoreValue>(fromFile(fp));
-                lst.push_back(valsp);
-            }
-            return StoreValue(lst);
+            std::shared_ptr<ListValue> listVal = std::make_shared<ListValue>();
+            listVal->deserialize(fp);
+            return listVal;
         }
         default: throw RuntimeErr(UNK_SAVE_ITEM); break;
     }
 
-    return StoreValue();
+    return nullptr;
 }
