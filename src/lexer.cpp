@@ -68,7 +68,7 @@ TokenSP Lexer::lexCommand_() {
         if (*it_ != '\\') s.push_back(toupper(*it_));
         it_++;
     }
-    return std::make_shared<Token>(TokenType::COMMAND, s);
+    return std::make_shared<Token>(TokenType::COMMAND, std::move(s));
 }
 
 TokenSP Lexer::lexIdentifier_() {
@@ -77,7 +77,7 @@ TokenSP Lexer::lexIdentifier_() {
         s.push_back(*it_);
         it_++;
     }
-    return std::make_shared<Token>(TokenType::IDENTIIFER, s);
+    return std::make_shared<Token>(TokenType::IDENTIIFER, std::move(s));
 }
 
 // Numbers have digits, at most one sign, and at most one decimal
@@ -92,14 +92,14 @@ TokenSP Lexer::lexNumber_() {
         if (c == '-' || c == '+') {
             // Not supporting arithmetic expressions for now
             if (signF || !s.empty())
-                return std::make_shared<Token>(TokenType::UNKNOWN, s);
+                return std::make_shared<Token>(TokenType::UNKNOWN, std::move(s));
             else
                 signF = true;
         }
 
         if (c == '.') {
             if (decimalF)
-                return std::make_shared<Token>(TokenType::UNKNOWN, s);
+                return std::make_shared<Token>(TokenType::UNKNOWN, std::move(s));
             else
                 decimalF = true;
         }
@@ -107,7 +107,7 @@ TokenSP Lexer::lexNumber_() {
         s.push_back(c);
         it_++;
     }
-    return std::make_shared<Token>(TokenType::NUMBER, s);
+    return std::make_shared<Token>(TokenType::NUMBER, std::move(s));
 }
 
 // Valid strings should be denoted with quotations around the string
@@ -123,5 +123,5 @@ TokenSP Lexer::lexString_() {
     if (it_ != iend_) s.push_back(*it_++); // End quote
 
     if (*(s.end() - 1) != quote) return std::make_shared<Token>(TokenType::UNKNOWN, s);
-    return std::make_shared<Token>(TokenType::STRING, s);
+    return std::make_shared<Token>(TokenType::STRING, std::move(s));
 }

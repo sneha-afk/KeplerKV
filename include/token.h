@@ -23,9 +23,15 @@ struct Token {
     Token()
         : type(TokenType::UNKNOWN)
         , value("") {};
+    Token(const TokenType &type)
+        : type(type)
+        , value("") {};
     Token(const TokenType &type, const std::string &s)
         : type(type)
         , value(s) {};
+    Token(const TokenType &type, std::string &&s)
+        : type(type)
+        , value(std::move(s)) {};
     Token(const TokenType &type, char c)
         : type(type)
         , value(std::string(1, c)) {};
