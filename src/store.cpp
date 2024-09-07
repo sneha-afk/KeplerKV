@@ -137,7 +137,7 @@ void Store::loadFromFile(const std::string &filename) {
         fp.read(&key[0], keySize);
         fp.MV_FP_FORWARD;
 
-        StoreValueSP val = std::make_shared<StoreValue>(StoreValue::fromFile(fp));
+        StoreValueSP val = StoreValue::fromFile(fp);
         map_[key] = val;
     }
     fp.close();

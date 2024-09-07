@@ -40,7 +40,7 @@ CommandASTNodeSP Parser::parseCommand_(TokenSP &cmdTok) {
             case TokenType::COMMAND: throw RuntimeErr(NESTED_CMD);
             case TokenType::UNKNOWN: throw UNKNOWN_TOKEN(t->value);
             default:
-                ASTNodeSP val = parseValue_(t);
+                ValueASTNodeSP val = parseValue_(t);
                 if (val != nullptr) cmd->addArg(val);
 
                 // Wary of where parseValue() ended up

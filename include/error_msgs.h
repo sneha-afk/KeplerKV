@@ -11,6 +11,7 @@ using RuntimeErr = std::runtime_error;
 #define NOT_IDENT       "Error: expected identifier"
 #define NOT_FOUND       "Error: not found in store"
 #define NOT_NUMERIC     "Error: not numeric (integer or float)"
+#define NOT_LIST        "Error: not a list"
 #define VAL_AFTER_IDENT "Error: expected value after identifier"
 #define CIRCULAR_REF    "Error: circular reference detected"
 #define SV_WRONG_TYPE   "Error: wrong type getter used with this value"

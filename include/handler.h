@@ -39,7 +39,7 @@ private:
 
     void print_item_(const std::string &, StoreValueSP);
 
-    std::string &getFilename_(ValueASTNodeSP);
+    std::string getFilename_(ValueASTNodeSP);
 
     void handleStats_();
 

@@ -85,7 +85,7 @@ void ListValue::deserialize(std::ifstream &fp) {
 
     std::vector<StoreValueSP> lst = std::vector<StoreValueSP>();
     for (size_t i = 0; i < numVals; i++) {
-        StoreValueSP valsp = std::make_shared<StoreValue>(fromFile(fp));
+        StoreValueSP valsp = fromFile(fp);
         lst.push_back(valsp);
     }
     value_ = lst;

@@ -45,6 +45,8 @@ using NumberValueTypeSP = std::shared_ptr<NumberValueType>;
 
 class IntValue : public StoreValue, public NumberValueType {
 public:
+    IntValue()
+        : value_(0) {};
     IntValue(int i)
         : value_(i) {};
 
@@ -66,6 +68,8 @@ private:
 
 class FloatValue : public StoreValue, public NumberValueType {
 public:
+    FloatValue()
+        : value_(0) {};
     FloatValue(float f)
         : value_(f) {};
 
@@ -87,6 +91,8 @@ private:
 
 class StringValue : public StoreValue {
 public:
+    StringValue()
+        : value_("") {};
     StringValue(std::string s)
         : value_(s) {};
 
@@ -105,6 +111,8 @@ protected:
 
 class IdentifierValue : public StringValue {
 public:
+    IdentifierValue()
+        : StringValue() {};
     IdentifierValue(std::string s)
         : StringValue(s) {};
 
