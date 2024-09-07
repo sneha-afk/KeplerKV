@@ -6,7 +6,6 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <variant>
 #include <vector>
 
 // clang-format off
@@ -42,7 +41,7 @@ public:
     // https://stackoverflow.com/q/461203
     virtual ~ASTNode() = default;
 
-    virtual NodeType getNodeType() const = 0;
+    virtual inline NodeType getNodeType() const = 0;
 
     virtual std::string string() const = 0;
     friend std::ostream &operator<<(std::ostream &os, const ASTNode &t) {
@@ -54,7 +53,7 @@ public:
 using ASTNodeSP = std::shared_ptr<ASTNode>;
 
 class NilNode : public ASTNode {
-    NodeType getNodeType() const { return NodeType::NIL; };
+    inline NodeType getNodeType() const { return NodeType::NIL; };
     std::string string() { return "{node: nil, value: nil}"; }
 };
 
@@ -72,7 +71,7 @@ public:
     IntASTNode(int i)
         : value_(i) {};
 
-    NodeType getNodeType() const { return NodeType::INT; }
+    inline NodeType getNodeType() const { return NodeType::INT; }
     std::string string() const override;
     StoreValueSP evaluate() const override;
 
@@ -87,7 +86,7 @@ public:
     FloatASTNode(float f)
         : value_(f) {};
 
-    NodeType getNodeType() const { return NodeType::FLOAT; }
+    inline NodeType getNodeType() const { return NodeType::FLOAT; }
     std::string string() const override;
     StoreValueSP evaluate() const override;
 
@@ -102,7 +101,7 @@ public:
     StringASTNode(std::string s)
         : value_(s) {};
 
-    NodeType getNodeType() const { return NodeType::STRING; }
+    inline NodeType getNodeType() const { return NodeType::STRING; }
     std::string string() const override;
     StoreValueSP evaluate() const override;
 
@@ -117,7 +116,7 @@ public:
     IdentifierASTNode(std::string s)
         : StringASTNode(s) {};
 
-    NodeType getNodeType() const { return NodeType::IDENTIFIER; }
+    inline NodeType getNodeType() const { return NodeType::IDENTIFIER; }
     std::string string() const override;
     StoreValueSP evaluate() const override;
 };
@@ -129,9 +128,9 @@ public:
     ListASTNode(std::vector<ValueASTNodeSP> &l)
         : value_(l) {};
 
-    void addNode(ValueASTNodeSP e) { value_.push_back(std::move(e)); }
+    inline void addNode(ValueASTNodeSP e) { value_.push_back(std::move(e)); }
 
-    NodeType getNodeType() const { return NodeType::LIST; }
+    inline NodeType getNodeType() const { return NodeType::LIST; }
     std::string string() const override;
     StoreValueSP evaluate() const override;
 
@@ -147,19 +146,19 @@ public:
     CommandASTNode(const std::string &c)
         : cmdType_(mapGet(mapToCmd, c, CommandType::UNKNOWN))
         , args_(std::vector<ValueASTNodeSP>()) {};
-    CommandASTNode(CommandType c)
+    CommandASTNode(const CommandType &c)
         : cmdType_(c)
         , args_(std::vector<ValueASTNodeSP>()) {};
 
-    NodeType getNodeType() const { return NodeType::COMMAND; };
+    inline NodeType getNodeType() const { return NodeType::COMMAND; };
     std::string string() const override;
 
-    CommandType getCmdType() const { return cmdType_; }
-    void addArg(ValueASTNodeSP &a) { args_.push_back(a); };
-    std::vector<ValueASTNodeSP> &getArgs() { return args_; };
+    inline CommandType getCmdType() const { return cmdType_; }
+    inline void addArg(ValueASTNodeSP &a) { args_.push_back(std::move(a)); };
+    inline std::vector<ValueASTNodeSP> &getArgs() { return args_; };
 
 private:
-    CommandType cmdType_;
+    const CommandType cmdType_;
     std::vector<ValueASTNodeSP> args_;
 };
 

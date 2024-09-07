@@ -30,18 +30,20 @@ std::string StringASTNode::string() const {
     return "{node: Value, type: String, value: " + value_ + "}";
 }
 
-StoreValueSP StringASTNode::evaluate() const { return std::make_shared<StringValue>(value_); }
+StoreValueSP StringASTNode::evaluate() const {
+    return std::make_shared<StringValue>(std::move(value_));
+}
 
 std::string IdentifierASTNode::string() const {
     return "{node: Value, type: Identifier, value: " + value_ + "}";
 }
 
 StoreValueSP IdentifierASTNode::evaluate() const {
-    return std::make_shared<IdentifierValue>(value_);
+    return std::make_shared<IdentifierValue>(std::move(value_));
 }
 
 std::string ListASTNode::string() const {
-    std::string s = "{node: Value, type: String, value: [";
+    std::string s = "{node: Value, type: List, value: [";
     for (const auto &v : value_) {
         if (!v) continue;
         s += v->string() + ", ";

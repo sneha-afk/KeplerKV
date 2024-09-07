@@ -1,7 +1,6 @@
 #include "store_value.h"
 
 #include "error_msgs.h"
-#include "util.h"
 
 #include <fstream>
 
@@ -123,40 +122,27 @@ StoreValueSP StoreValue::fromFile(std::ifstream &fp) {
     char type;
     fp.read(&type, sizeof(char));
 
+    StoreValueSP value = nullptr;
     switch (type) {
-        case 'i': {
-            std::shared_ptr<IntValue> intVal = std::make_shared<IntValue>();
-            intVal->deserialize(fp);
-            return intVal;
-        }
-        case 'f': {
-            std::shared_ptr<FloatValue> floatVal = std::make_shared<FloatValue>();
-            floatVal->deserialize(fp);
-            return floatVal;
-        }
+        case 'i': value = std::make_shared<IntValue>(); break;
+        case 'f': value = std::make_shared<FloatValue>(); break;
         case 's': {
             char strType;
             fp.read(&strType, sizeof(char));
 
-            if (strType == 's') {
-                std::shared_ptr<StringValue> strVal = std::make_shared<StringValue>();
-                strVal->deserialize(fp);
-                return strVal;
-            } else if (strType == 'i') {
-                std::shared_ptr<IdentifierValue> idVal = std::make_shared<IdentifierValue>();
-                idVal->deserialize(fp);
-                return idVal;
-            } else
+            if (strType == 's')
+                value = std::make_shared<StringValue>();
+            else if (strType == 'i')
+                value = std::make_shared<IdentifierValue>();
+            else
                 throw RuntimeErr(UNK_SAVE_ITEM);
             break;
         }
-        case 'l': {
-            std::shared_ptr<ListValue> listVal = std::make_shared<ListValue>();
-            listVal->deserialize(fp);
-            return listVal;
-        }
+        case 'l': value = std::make_shared<ListValue>(); break;
         default: throw RuntimeErr(UNK_SAVE_ITEM); break;
     }
 
-    return nullptr;
+    if (!value) return nullptr;
+    value->deserialize(fp);
+    return value;
 }

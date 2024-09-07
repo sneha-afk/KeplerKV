@@ -35,9 +35,9 @@ inline RuntimeErr MIN_TWO_ARG_KK(const std::string &c) {
 }
 
 inline RuntimeErr INVALID_CMD(const std::string &c) {
-    return RuntimeErr("Error: invalid command \'" + c + "\' (did you forget a quote or slsah?)");
+    return RuntimeErr("Error: invalid command \'" + c + "\' (did you forget a quote or slash?)");
 }
 
 inline RuntimeErr UNKNOWN_TOKEN(const std::string &t) {
-    return RuntimeErr("Error: unknown token \'" + t + "\'");
+    return RuntimeErr("Error: unknown token [ " + t + " ]");
 }

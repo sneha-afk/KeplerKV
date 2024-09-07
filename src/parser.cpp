@@ -25,7 +25,7 @@ std::vector<ASTNodeSP> &Parser::parse(std::vector<TokenSP> &tokens) {
     return nodes;
 }
 
-CommandASTNodeSP Parser::parseCommand_(TokenSP &cmdTok) {
+CommandASTNodeSP Parser::parseCommand_(const TokenSP &cmdTok) {
     CommandType cmdType = mapGet(mapToCmd, cmdTok->value, CommandType::UNKNOWN);
     if (cmdType == CommandType::UNKNOWN) throw INVALID_CMD(cmdTok->value);
     tt_++;
@@ -51,7 +51,7 @@ CommandASTNodeSP Parser::parseCommand_(TokenSP &cmdTok) {
     return cmd;
 }
 
-ValueASTNodeSP Parser::parseValue_(TokenSP &t) {
+ValueASTNodeSP Parser::parseValue_(const TokenSP &t) {
     std::string &tValue = t->value;
     switch (t->type) {
         case TokenType::NUMBER:

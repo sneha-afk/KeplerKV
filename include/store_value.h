@@ -1,11 +1,7 @@
 #pragma once
 
-#include "util.h"
-
 #include <memory>
-#include <stdexcept>
 #include <string>
-#include <variant>
 #include <vector>
 
 enum class ValueType { INT, FLOAT, STRING, LIST, IDENTIIFER };
@@ -26,7 +22,7 @@ public:
     void toFile(std::ofstream &) const;
     static StoreValueSP fromFile(std::ifstream &);
 
-    virtual ValueType getValueType() const = 0;
+    virtual inline ValueType getValueType() const = 0;
     virtual std::size_t size() const = 0;
     virtual std::string string() const = 0;
     friend std::ostream &operator<<(std::ostream &os, const StoreValue &s) {
@@ -53,7 +49,7 @@ public:
     std::vector<uint8_t> serialize() const override;
     void deserialize(std::ifstream &) override;
 
-    ValueType getValueType() const override { return ValueType::INT; }
+    inline ValueType getValueType() const override { return ValueType::INT; }
     std::size_t size() const override { return sizeof(value_); }
     std::string string() const override { return "int: " + std::to_string(value_); }
 
@@ -76,7 +72,7 @@ public:
     std::vector<uint8_t> serialize() const override;
     void deserialize(std::ifstream &) override;
 
-    ValueType getValueType() const override { return ValueType::FLOAT; }
+    inline ValueType getValueType() const override { return ValueType::FLOAT; }
     std::size_t size() const override { return sizeof(value_); }
     std::string string() const override { return "float: " + std::to_string(value_); }
 
@@ -99,7 +95,7 @@ public:
     std::vector<uint8_t> serialize() const override;
     void deserialize(std::ifstream &) override;
 
-    ValueType getValueType() const override { return ValueType::STRING; }
+    inline ValueType getValueType() const override { return ValueType::STRING; }
     std::size_t size() const override { return sizeof(value_); }
     std::string string() const override { return "str: " + value_; }
 
@@ -116,7 +112,7 @@ public:
 
     std::vector<uint8_t> serialize() const override;
 
-    ValueType getValueType() const override { return ValueType::IDENTIIFER; }
+    inline ValueType getValueType() const override { return ValueType::IDENTIIFER; }
     std::string string() const override { return "id: " + value_; }
 };
 
@@ -134,7 +130,7 @@ public:
     std::vector<uint8_t> serialize() const override;
     void deserialize(std::ifstream &) override;
 
-    ValueType getValueType() const override { return ValueType::LIST; }
+    inline ValueType getValueType() const override { return ValueType::LIST; }
     std::size_t size() const override;
     std::string string() const override;
 

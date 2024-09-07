@@ -14,20 +14,19 @@ public:
     Store();
 
     void set(const std::string &, StoreValueSP);
-    StoreValueSP get(const std::string &);
+    StoreValueSP get(const std::string &) const;
     bool del(const std::string &);
     bool update(const std::string &, StoreValueSP);
-    StoreValueSP resolve(const std::string &, bool resolveIdentsInList = false);
+    StoreValueSP resolve(const std::string &, bool resolveIdentsInList = false) const;
     void rename(const std::string &, const std::string &);
-    std::vector<std::string> search(const std::string &);
+    std::vector<std::string> search(const std::string &) const;
 
-    // Indicates whether the store conatains the key.
-    inline bool contains(const std::string &key) { return map_.find(key) != map_.end(); }
+    bool contains(const std::string &key) const;
 
-    void saveToFile(const std::string &);
+    void saveToFile(const std::string &) const;
     void loadFromFile(const std::string &);
 
-    size_t size() { return map_.size(); }
+    inline size_t size() const { return map_.size(); }
 
     // Store is iterable: https://stackoverflow.com/a/46432381
     std::unordered_map<std::string, StoreValueSP>::iterator begin() { return map_.begin(); }
@@ -40,6 +39,6 @@ public:
 private:
     std::unordered_map<std::string, StoreValueSP> map_;
 
-    StoreValueSP resolveRecur_(
-        const std::string &, std::unordered_set<std::string> &, bool resolveIdentsInList = false);
+    StoreValueSP resolveRecur_(const std::string &, std::unordered_set<std::string> &,
+        bool resolveIdentsInList = false) const;
 };

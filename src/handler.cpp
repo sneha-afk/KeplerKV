@@ -1,6 +1,7 @@
 #include "handler.h"
 
 #include "error_msgs.h"
+#include "file_io_macros.h"
 #include "terminal_colors.h"
 
 #include <iostream>
@@ -35,7 +36,7 @@ bool Handler::handleQuery(std::string &query) {
 
         // https://stackoverflow.com/a/14545746
         CommandASTNodeSP cmd = std::dynamic_pointer_cast<CommandASTNode>(n);
-        if (cmd == nullptr) throw RuntimeErr(WRONG_CMD_FMT);
+        if (!cmd) throw RuntimeErr(WRONG_CMD_FMT);
 
         // Retrieve appropriate function pointer and run
         auto func = cmdToFunc_.find(cmd->getCmdType());
@@ -65,7 +66,7 @@ bool Handler::handleQuery(std::string &query) {
     return true;
 }
 
-void Handler::print_item_(const std::string &id, StoreValueSP val) {
+void Handler::print_item_(const std::string &id, const StoreValueSP val) {
     std::cout << T_BBLUE << id << T_RESET << " | " << *val << std::endl;
 }
 
@@ -144,10 +145,10 @@ void Handler::handleSet_(std::vector<ValueASTNodeSP> &args, const std::size_t nu
 void Handler::handleGet_(std::vector<ValueASTNodeSP> &args, const std::size_t numArgs) {
     if (numArgs < 1) throw MIN_ONE_ARG_K("GET");
 
-    for (std::size_t i = 0; i < numArgs; i++) {
-        if (!args[i]) continue;
+    for (const auto &arg : args) {
+        if (!arg) continue;
 
-        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(args[i]->evaluate());
+        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
         if (!idNode) throw RuntimeErr(NOT_IDENT);
         const std::string &ident = idNode->getValue();
 
@@ -162,10 +163,10 @@ void Handler::handleGet_(std::vector<ValueASTNodeSP> &args, const std::size_t nu
 void Handler::handleDelete_(std::vector<ValueASTNodeSP> &args, const std::size_t numArgs) {
     if (numArgs < 1) throw MIN_ONE_ARG_K("DELETE");
 
-    for (std::size_t i = 0; i < numArgs; i++) {
-        if (!args[i]) continue;
+    for (const auto &arg : args) {
+        if (!arg) continue;
 
-        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(args[i]->evaluate());
+        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
         if (!idNode) throw RuntimeErr(NOT_IDENT);
         const std::string &ident = idNode->getValue();
 
@@ -200,10 +201,10 @@ void Handler::handleUpdate_(std::vector<ValueASTNodeSP> &args, const std::size_t
 void Handler::handleResolve_(std::vector<ValueASTNodeSP> &args, const std::size_t numArgs) {
     if (numArgs < 1) throw MIN_ONE_ARG_K("RESOLVE");
 
-    for (std::size_t i = 0; i < numArgs; i++) {
-        if (!args[i]) continue;
+    for (const auto &arg : args) {
+        if (!arg) continue;
 
-        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(args[i]->evaluate());
+        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
         if (!idNode) throw RuntimeErr(NOT_IDENT);
         const std::string &ident = idNode->getValue();
 
@@ -215,14 +216,14 @@ void Handler::handleResolve_(std::vector<ValueASTNodeSP> &args, const std::size_
     }
 }
 
-std::string Handler::getFilename_(ValueASTNodeSP fnameNode) {
+std::string Handler::getFilename_(const ValueASTNodeSP node) {
     std::string &filename = DEFAULT_SAVE_FILE;
 
-    StringValueSP asStrNode = std::dynamic_pointer_cast<StringValue>(fnameNode);
-    if (!asStrNode) throw RuntimeErr(INVALID_FNAME);
-    filename = asStrNode->getValue();
+    StringValueSP fnNode = std::dynamic_pointer_cast<StringValue>(node);
+    if (!fnNode) throw RuntimeErr(INVALID_FNAME);
+    filename = fnNode->getValue();
 
-    return removeQuotations(filename);
+    return fnNode->getValueType() == ValueType::IDENTIIFER ? filename : removeQuotations(filename);
 }
 
 void Handler::handleSave_(std::vector<ValueASTNodeSP> &args, const std::size_t numArgs) {
@@ -263,7 +264,7 @@ void Handler::handleRename_(std::vector<ValueASTNodeSP> &args, const std::size_t
                       << "\n> ";
             std::string confirm;
             std::getline(std::cin, confirm);
-            if (confirm.size() && (confirm[0]) != 'y') {
+            if (confirm.size() && confirm[0] != 'y') {
                 std::cout << T_BYLLW << "No changes made to the store." << T_RESET << std::endl;
                 return;
             }
@@ -277,10 +278,10 @@ void Handler::handleRename_(std::vector<ValueASTNodeSP> &args, const std::size_t
 void Handler::handleIncr_(std::vector<ValueASTNodeSP> &args, const std::size_t numArgs) {
     if (numArgs < 1) throw MIN_ONE_ARG_K("INCR");
 
-    for (std::size_t i = 0; i < numArgs; i++) {
-        if (!args[i]) continue;
+    for (const auto &arg : args) {
+        if (!arg) continue;
 
-        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(args[i]->evaluate());
+        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
         if (!idNode) throw RuntimeErr(NOT_IDENT);
         const std::string &ident = idNode->getValue();
 
@@ -304,10 +305,10 @@ void Handler::handleIncr_(std::vector<ValueASTNodeSP> &args, const std::size_t n
 void Handler::handleDecr_(std::vector<ValueASTNodeSP> &args, const std::size_t numArgs) {
     if (numArgs < 1) throw MIN_ONE_ARG_K("DECR");
 
-    for (std::size_t i = 0; i < numArgs; i++) {
-        if (!args[i]) continue;
+    for (const auto &arg : args) {
+        if (!arg) continue;
 
-        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(args[i]->evaluate());
+        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
         if (!idNode) throw RuntimeErr(NOT_IDENT);
         const std::string &ident = idNode->getValue();
 
@@ -380,13 +381,15 @@ void Handler::handlePrepend_(std::vector<ValueASTNodeSP> &args, const std::size_
 void Handler::handleSearch_(std::vector<ValueASTNodeSP> &args, const std::size_t numArgs) {
     if (numArgs < 1) throw RuntimeErr("Error: SEARCH requires at least one argument (pattern)");
 
-    for (std::size_t i = 0; i < numArgs; i++) {
-        if (!args[i]) continue;
+    for (const auto &arg : args) {
+        if (!arg) continue;
 
-        StringValueSP patternNode = std::dynamic_pointer_cast<StringValue>((args[i])->evaluate());
-        if (!patternNode) throw RuntimeErr(WRONG_CMD_FMT);
+        StringValueSP node = std::dynamic_pointer_cast<StringValue>(arg->evaluate());
+        if (!node) throw RuntimeErr(WRONG_CMD_FMT);
 
-        std::string pattern = removeQuotations(patternNode->getValue());
+        const std::string &pattern = node->getValueType() == ValueType::IDENTIIFER
+                                         ? node->getValue()
+                                         : removeQuotations(node->getValue());
         std::vector<std::string> keys = store_.search(pattern);
 
         std::cout << T_BYLLW << pattern << " (" << keys.size() << ")" << T_RESET << std::endl;

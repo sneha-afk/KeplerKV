@@ -2,6 +2,14 @@
 
 #include <cctype>
 
+#define WHITESPACE   ' '
+#define BACKSLASH    '\\'
+#define SINGLE_QUOTE '\''
+#define DOUBLE_QUOTE '\"'
+#define UNDERSCORE   '_'
+#define COMMA        ','
+#define SEMICOLON    ';'
+
 std::vector<TokenSP> &Lexer::tokenize(std::string &query) {
     tokens.clear();
     if (query.empty()) return tokens;

@@ -37,9 +37,9 @@ private:
 
     static std::unordered_map<CommandType, HandlerFunctionPtr> cmdToFunc_;
 
-    void print_item_(const std::string &, StoreValueSP);
+    void print_item_(const std::string &, const StoreValueSP);
 
-    std::string getFilename_(ValueASTNodeSP);
+    std::string getFilename_(const ValueASTNodeSP);
 
     void handleStats_();
 

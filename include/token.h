@@ -4,14 +4,6 @@
 #include <ostream>
 #include <string>
 
-#define WHITESPACE   ' '
-#define BACKSLASH    '\\'
-#define SINGLE_QUOTE '\''
-#define DOUBLE_QUOTE '\"'
-#define UNDERSCORE   '_'
-#define COMMA        ','
-#define SEMICOLON    ';'
-
 enum class TokenType {
     COMMAND,
     IDENTIIFER,
@@ -25,16 +17,16 @@ enum class TokenType {
 };
 
 struct Token {
-    TokenType type;
+    const TokenType type;
     std::string value;
 
     Token()
         : type(TokenType::UNKNOWN)
         , value("") {};
-    Token(TokenType type, std::string value)
+    Token(const TokenType &type, const std::string &s)
         : type(type)
-        , value(value) {};
-    Token(TokenType type, char c)
+        , value(s) {};
+    Token(const TokenType &type, char c)
         : type(type)
         , value(std::string(1, c)) {};
 

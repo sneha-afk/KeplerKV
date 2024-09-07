@@ -1,7 +1,7 @@
 #include "store.h"
 
 #include "error_msgs.h"
-#include "util.h"
+#include "file_io_macros.h"
 
 #include <fstream>
 #include <iostream>
@@ -13,11 +13,14 @@ Store::Store() {
     map_.reserve(STORE_MIN_SIZE);
 }
 
+// Indicates whether the store conatains the key.
+bool Store::contains(const std::string &key) const { return map_.find(key) != map_.end(); }
+
 // Inserts a new key into the map, or updates the value if it exists.
 void Store::set(const std::string &key, StoreValueSP value) { map_[key] = value; }
 
 // Returns the key's value, or nullptr if it is not present.
-StoreValueSP Store::get(const std::string &key) {
+StoreValueSP Store::get(const std::string &key) const {
     return mapGet(map_, key, (StoreValueSP) nullptr);
 }
 
@@ -33,14 +36,14 @@ bool Store::update(const std::string &key, StoreValueSP value) {
 
 // Resolves recursive references (keys storing other keys) until a base value is reached.
 // Essentially, a recursive GET command for when the user wants to unpack a key-chain.
-StoreValueSP Store::resolve(const std::string &key, bool resolveIdentsInList) {
+StoreValueSP Store::resolve(const std::string &key, bool resolveIdentsInList) const {
     // Set of keys that have been explored to prevent circular references
     std::unordered_set<std::string> seen;
     return resolveRecur_(key, seen, resolveIdentsInList);
 }
 
 StoreValueSP Store::resolveRecur_(
-    const std::string &key, std::unordered_set<std::string> &seen, bool resolveIdentsInList) {
+    const std::string &key, std::unordered_set<std::string> &seen, bool resolveIdentsInList) const {
     // If a key is being searched for again, there is a circluar ref
     if (seen.count(key)) throw RuntimeErr(CIRCULAR_REF);
     seen.insert(key);
@@ -86,7 +89,7 @@ void Store::rename(const std::string &oldName, const std::string &newName) {
 }
 
 // Searches for keys matching the given regex pattern.
-std::vector<std::string> Store::search(const std::string &regexPattern) {
+std::vector<std::string> Store::search(const std::string &regexPattern) const {
     std::vector<std::string> keys;
     std::regex re(regexPattern);
 
@@ -104,7 +107,7 @@ std::vector<std::string> Store::search(const std::string &regexPattern) {
  * https://www.eecs.umich.edu/courses/eecs380/HANDOUTS/cppBinaryFileIO-2.html
  * https://gist.github.com/molpopgen/9123133
  */
-void Store::saveToFile(const std::string &filename) {
+void Store::saveToFile(const std::string &filename) const {
     std::ofstream fp;
     fp.open(filename, std::ios::out | std::ios::binary);
     if (!fp.is_open()) throw RuntimeErr(FAIL_OPEN_WRITE);
