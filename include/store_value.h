@@ -35,7 +35,15 @@ public:
     };
 };
 
-class IntValue : public StoreValue {
+class NumberValueType {
+public:
+    virtual void incr() = 0;
+    virtual void decr() = 0;
+};
+
+using NumberValueTypeSP = std::shared_ptr<NumberValueType>;
+
+class IntValue : public StoreValue, public NumberValueType {
 public:
     IntValue(int i)
         : value_(i) {};
@@ -49,14 +57,14 @@ public:
     std::size_t size() const override { return sizeof(value_); }
     std::string string() const override { return "int: " + std::to_string(value_); }
 
-    void incr() { value_ += 1; }
-    void decr() { value_ -= 1; }
+    void incr() override { value_ += 1; }
+    void decr() override { value_ -= 1; }
 
 private:
     int value_;
 };
 
-class FloatValue : public StoreValue {
+class FloatValue : public StoreValue, public NumberValueType {
 public:
     FloatValue(float f)
         : value_(f) {};
@@ -70,8 +78,8 @@ public:
     std::size_t size() const override { return sizeof(value_); }
     std::string string() const override { return "float: " + std::to_string(value_); }
 
-    void incr() { value_ += 1; }
-    void decr() { value_ -= 1; }
+    void incr() override { value_ += 1; }
+    void decr() override { value_ -= 1; }
 
 private:
     float value_;

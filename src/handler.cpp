@@ -294,10 +294,14 @@ void Handler::handleIncr_(std::vector<ValueASTNodeSP> &args, const std::size_t n
             continue;
         }
 
-        if (value->incr())
-            std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
-        else
+        NumberValueTypeSP number = std::dynamic_pointer_cast<NumberValueType>(value);
+        if (!number) {
             std::cout << T_BRED << NOT_NUMERIC << T_RESET << std::endl;
+            continue;
+        }
+
+        number->incr();
+        std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
     }
 }
 
@@ -317,10 +321,14 @@ void Handler::handleDecr_(std::vector<ValueASTNodeSP> &args, const std::size_t n
             continue;
         }
 
-        if (value->decr())
-            std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
-        else
+        NumberValueTypeSP number = std::dynamic_pointer_cast<NumberValueType>(value);
+        if (!number) {
             std::cout << T_BRED << NOT_NUMERIC << T_RESET << std::endl;
+            continue;
+        }
+
+        number->decr();
+        std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
     }
 }
 
