@@ -77,6 +77,9 @@ A NoSQL key-value pair store for quick access.
     - Strings and identifiers utilize the same string functionality. For now I am using a common `StringHandler` interface to share, but perhaps making `IdentifierValue` be a sublass of `StringValue` may simplify this?
 - New `evaluate()` functions for each `ASTNode` to create appropriate `StoreValue` type
     - More clear, forward conversion from the parser to actual values
+- Revamped `Parser` to not return anything related to `StoreValue`
+    - `Parser` only deals with the `ASTNode` representation of a value
+- Let `Identifier` abstractions (AST and Value) inherit from `String` since they are functionally the same and an enum is used to distinguish them during use
 
 ### September 5, 2024
 The current system using `std::variant` for the `StoreValue` and generic `ValueNode`s introduces a significant overhead within the program and bloated lines of code for type-checking and reducing the true type of a value.

@@ -37,22 +37,31 @@ std::vector<uint8_t> StringValue::serialize() const {
     std::vector<uint8_t> buf;
     buf.push_back('s');
     buf.push_back('s');
-    serializeToBuffer(buf, value_);
+
+    const size_t &strSize = value_.size();
+    const uint8_t *size_ptr = reinterpret_cast<const uint8_t *>(&strSize);
+    buf.insert(buf.end(), size_ptr, size_ptr + sizeof(strSize));
+
+    const uint8_t *val_ptr = reinterpret_cast<const uint8_t *>(&value_);
+    buf.insert(buf.end(), val_ptr, val_ptr + strSize);
     return buf;
 }
 
-void StringValue::deserialize(std::ifstream &fp) { value_ = deserializeFromFile(fp); }
+void StringValue::deserialize(std::ifstream &fp) {
+    size_t strSize;
+    fp.read(reinterpret_cast<char *>(&strSize), sizeof(strSize));
+    std::string sval(strSize, '\0');
+
+    fp.read(&sval[0], strSize);
+    value_ = sval;
+}
 
 // Identifiers are serialized as [si][size][string]
 std::vector<uint8_t> IdentifierValue::serialize() const {
-    std::vector<uint8_t> buf;
-    buf.push_back('s');
-    buf.push_back('i');
-    serializeToBuffer(buf, value_);
+    std::vector<uint8_t> buf = StringValue::serialize();
+    buf[1] = 'i';
     return buf;
 }
-
-void IdentifierValue::deserialize(std::ifstream &fp) { value_ = deserializeFromFile(fp); }
 
 // Lists are serialized as [l][num elements][e1|e2|...|en|]
 std::vector<uint8_t> ListValue::serialize() const {

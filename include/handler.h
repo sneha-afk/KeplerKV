@@ -24,9 +24,9 @@ public:
         , store_(s) {};
 
     Handler(Store &s)
-        : store_(s)
-        , lexer_(Lexer())
-        , parser_(Parser()) {};
+        : lexer_(Lexer())
+        , parser_(Parser())
+        , store_(s) {};
 
     bool handleQuery(std::string &);
 

@@ -106,23 +106,20 @@ public:
     std::string string() const override;
     StoreValueSP evaluate() const override;
 
-private:
+protected:
     std::string value_;
 };
 
-class IdentifierASTNode : public ValueASTNode {
+class IdentifierASTNode : public StringASTNode {
 public:
     IdentifierASTNode()
-        : value_("") {};
+        : StringASTNode() {};
     IdentifierASTNode(std::string s)
-        : value_(s) {};
+        : StringASTNode(s) {};
 
     NodeType getNodeType() const { return NodeType::IDENTIFIER; }
     std::string string() const override;
     StoreValueSP evaluate() const override;
-
-private:
-    std::string value_;
 };
 
 class ListASTNode : public ValueASTNode {

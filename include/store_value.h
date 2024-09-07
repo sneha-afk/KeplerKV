@@ -77,7 +77,7 @@ private:
     float value_;
 };
 
-class StringValue : public StoreValue, public StringHandler {
+class StringValue : public StoreValue {
 public:
     StringValue(std::string s)
         : value_(s) {};
@@ -91,26 +91,19 @@ public:
     std::size_t size() const override { return sizeof(value_); }
     std::string string() const override { return "str: " + value_; }
 
-private:
+protected:
     std::string value_;
 };
 
-class IdentifierValue : public StoreValue, public StringHandler {
+class IdentifierValue : public StringValue {
 public:
     IdentifierValue(std::string s)
-        : value_(s) {};
-
-    std::string getValue() { return value_; }
+        : StringValue(s) {};
 
     std::vector<uint8_t> serialize() const override;
-    void deserialize(std::ifstream &) override;
 
     ValueType getValueType() const override { return ValueType::IDENTIIFER; }
-    std::size_t size() const override { return sizeof(value_); }
     std::string string() const override { return "id:" + value_; }
-
-private:
-    std::string value_;
 };
 
 class ListValue : public StoreValue {
