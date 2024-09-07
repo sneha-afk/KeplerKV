@@ -16,7 +16,7 @@ private:
     std::vector<TokenSP>::iterator tt_;
     std::vector<TokenSP>::iterator tend_;
 
-    ASTNodeSP parseCommand_(TokenSP &);
-    StoreValueSP parseValue_(TokenSP &);
-    StoreValueSP parseList_();
+    CommandNodeSP parseCommand_(TokenSP &);
+    ValueASTNodeSP parseValue_(TokenSP &);
+    ValueASTNodeSP parseList_();
 };

@@ -45,7 +45,7 @@ public:
     std::vector<uint8_t> serialize() const override;
     void deserialize(std::ifstream &) override;
 
-    ValueType getValueType() { return ValueType::INT; }
+    ValueType getValueType() const override { return ValueType::INT; }
     std::size_t size() const override { return sizeof(value_); }
     std::string string() const override { return "int: " + std::to_string(value_); }
 
@@ -66,7 +66,7 @@ public:
     std::vector<uint8_t> serialize() const override;
     void deserialize(std::ifstream &) override;
 
-    ValueType getValueType() { return ValueType::FLOAT; }
+    ValueType getValueType() const override { return ValueType::FLOAT; }
     std::size_t size() const override { return sizeof(value_); }
     std::string string() const override { return "float: " + std::to_string(value_); }
 
@@ -87,7 +87,7 @@ public:
     std::vector<uint8_t> serialize() const override;
     void deserialize(std::ifstream &) override;
 
-    ValueType getValueType() { return ValueType::STRING; }
+    ValueType getValueType() const override { return ValueType::STRING; }
     std::size_t size() const override { return sizeof(value_); }
     std::string string() const override { return "str: " + value_; }
 
@@ -105,7 +105,7 @@ public:
     std::vector<uint8_t> serialize() const override;
     void deserialize(std::ifstream &) override;
 
-    ValueType getValueType() { return ValueType::IDENTIIFER; }
+    ValueType getValueType() const override { return ValueType::IDENTIIFER; }
     std::size_t size() const override { return sizeof(value_); }
     std::string string() const override { return "id:" + value_; }
 
@@ -127,7 +127,7 @@ public:
     std::vector<uint8_t> serialize() const override;
     void deserialize(std::ifstream &) override;
 
-    ValueType getValueType() { return ValueType::LIST; }
+    ValueType getValueType() const override { return ValueType::LIST; }
     std::size_t size() const override;
     std::string string() const override;
 

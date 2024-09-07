@@ -67,6 +67,8 @@ using ValueASTNodeSP = std::shared_ptr<ValueASTNode>;
 
 class IntASTNode : public ValueASTNode {
 public:
+    IntASTNode()
+        : value_(0) {};
     IntASTNode(int i)
         : value_(i) {};
 
@@ -80,6 +82,8 @@ private:
 
 class FloatASTNode : public ValueASTNode {
 public:
+    FloatASTNode()
+        : value_(0) {};
     FloatASTNode(float f)
         : value_(f) {};
 
@@ -93,6 +97,8 @@ private:
 
 class StringASTNode : public ValueASTNode {
 public:
+    StringASTNode()
+        : value_("") {};
     StringASTNode(std::string s)
         : value_(s) {};
 
@@ -106,6 +112,8 @@ private:
 
 class IdentifierASTNode : public ValueASTNode {
 public:
+    IdentifierASTNode()
+        : value_("") {};
     IdentifierASTNode(std::string s)
         : value_(s) {};
 
@@ -119,6 +127,8 @@ private:
 
 class ListASTNode : public ValueASTNode {
 public:
+    ListASTNode()
+        : value_(std::vector<ValueASTNodeSP>()) {};
     ListASTNode(std::vector<ValueASTNodeSP> &l)
         : value_(l) {};
 
@@ -136,24 +146,24 @@ class CommandASTNode : public ASTNode {
 public:
     CommandASTNode()
         : cmdType_(CommandType::UNKNOWN)
-        , args_(std::vector<ValueASTNodeSP>()) {};
+        , args_(std::vector<ASTNodeSP>()) {};
     CommandASTNode(const std::string &c)
         : cmdType_(mapGet(mapToCmd, c, CommandType::UNKNOWN))
-        , args_(std::vector<ValueASTNodeSP>()) {};
+        , args_(std::vector<ASTNodeSP>()) {};
     CommandASTNode(CommandType c)
         : cmdType_(c)
-        , args_(std::vector<ValueASTNodeSP>()) {};
+        , args_(std::vector<ASTNodeSP>()) {};
 
     NodeType getNodeType() const { return NodeType::COMMAND; };
     std::string string() const override;
 
     CommandType getCmdType() const { return cmdType_; }
-    void addArg(ValueASTNodeSP &a) { args_.push_back(a); };
-    std::vector<ValueASTNodeSP> &getArgs() { return args_; };
+    void addArg(ASTNodeSP &a) { args_.push_back(a); };
+    std::vector<ASTNodeSP> &getArgs() { return args_; };
 
 private:
     CommandType cmdType_;
-    std::vector<ValueASTNodeSP> args_;
+    std::vector<ASTNodeSP> args_;
 };
 
 using CommandNodeSP = std::shared_ptr<CommandASTNode>;
