@@ -6,7 +6,6 @@ std::vector<TokenSP> &Lexer::tokenize(std::string &query) {
     tokens.clear();
     if (query.empty()) return tokens;
 
-    input_ = query;
     it_ = query.begin();
     iend_ = query.end();
     while (it_ != iend_) {
@@ -113,7 +112,7 @@ TokenSP Lexer::lexString_() {
         s.push_back(*it_);
         it_++;
     }
-    s.push_back(*it_++); // End quote
+    if (it_ != iend_) s.push_back(*it_++); // End quote
 
     if (*(s.end() - 1) != quote) return std::make_shared<Token>(TokenType::UNKNOWN, s);
     return std::make_shared<Token>(TokenType::STRING, s);

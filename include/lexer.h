@@ -15,7 +15,6 @@ public:
     std::vector<TokenSP> &tokenize(std::string &);
 
 private:
-    std::string input_;
     std::string::iterator it_;
     std::string::iterator iend_;
 
