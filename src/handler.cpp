@@ -34,7 +34,7 @@ bool Handler::handleQuery(std::string &query) {
         if (DEBUG) std::cout << "\t" << *n << std::endl;
 
         // https://stackoverflow.com/a/14545746
-        CommandNodeSP cmd = std::dynamic_pointer_cast<CommandASTNode>(n);
+        CommandASTNodeSP cmd = std::dynamic_pointer_cast<CommandASTNode>(n);
         if (cmd == nullptr) throw RuntimeErr(WRONG_CMD_FMT);
 
         // Retrieve appropriate function pointer and run
@@ -130,15 +130,15 @@ void Handler::handleSet_(std::vector<ValueASTNodeSP> &args, const std::size_t nu
     for (std::size_t i = 0; i < numArgs; i += 2) {
         if (!args[i]) continue;
 
-        ValueASTNodeSP identNode = args[i];
-        if (identNode->getNodeType() != NodeType::IDENTIFIER) throw RuntimeErr(NOT_IDENT);
-        const std::string &ident = identNode->value->getString();
+        IdentifierValueSP identNode = std::dynamic_pointer_cast<IdentifierValue>((args[i])->evaluate());
+        if (!identNode) throw RuntimeErr(NOT_IDENT);
+        const std::string &ident = identNode->getValue();
 
         if (!(i + 1 < numArgs) || !args[i + 1]) throw RuntimeErr(VAL_AFTER_IDENT);
 
-        ValueASTNodeSP valueNode = args[i + 1];
+        StoreValueSP valueNode = (args[i + 1])->evaluate();
 
-        store_.set(ident, valueNode->value);
+        store_.set(ident, valueNode);
         std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
     }
 }
@@ -149,9 +149,9 @@ void Handler::handleGet_(std::vector<ValueASTNodeSP> &args, const std::size_t nu
     for (std::size_t i = 0; i < numArgs; i++) {
         if (!args[i]) continue;
 
-        ValueASTNodeSP identNode = args[i];
-        if (identNode->getNodeType() != NodeType::IDENTIFIER) throw RuntimeErr(NOT_IDENT);
-        const std::string &ident = identNode->value->getString();
+        IdentifierValueSP identNode = std::dynamic_pointer_cast<IdentifierValue>(args[i]->evaluate());
+        if (!identNode) throw RuntimeErr(NOT_IDENT);
+        const std::string &ident = identNode->getValue();
 
         StoreValueSP value = store_.get(ident);
         if (value)
@@ -167,9 +167,9 @@ void Handler::handleDelete_(std::vector<ValueASTNodeSP> &args, const std::size_t
     for (std::size_t i = 0; i < numArgs; i++) {
         if (!args[i]) continue;
 
-        ValueASTNodeSP identNode = args[i];
-        if (identNode->getNodeType() != NodeType::IDENTIFIER) throw RuntimeErr(NOT_IDENT);
-        const std::string &ident = identNode->value->getString();
+        IdentifierValueSP identNode = std::dynamic_pointer_cast<IdentifierValue>(args[i]->evaluate());
+        if (!identNode) throw RuntimeErr(NOT_IDENT);
+        const std::string &ident = identNode->getValue();
 
         bool deleted = store_.del(ident);
         if (deleted)
@@ -185,9 +185,9 @@ void Handler::handleUpdate_(std::vector<ValueASTNodeSP> &args, const std::size_t
     for (std::size_t i = 0; i < numArgs; i += 2) {
         if (!args[i]) continue;
 
-        ValueASTNodeSP identNode = args[i];
-        if (identNode->getNodeType() != NodeType::IDENTIFIER) throw RuntimeErr(NOT_IDENT);
-        const std::string &ident = identNode->value->getString();
+        IdentifierValueSP identNode = std::dynamic_pointer_cast<IdentifierValue>(args[i]->evaluate());
+        if (!identNode) throw RuntimeErr(NOT_IDENT);
+        const std::string &ident = identNode->getValue();
 
         if (!(i + 1 < numArgs) || !args[i + 1]) throw RuntimeErr(VAL_AFTER_IDENT);
 
@@ -207,9 +207,9 @@ void Handler::handleResolve_(std::vector<ValueASTNodeSP> &args, const std::size_
     for (std::size_t i = 0; i < numArgs; i++) {
         if (!args[i]) continue;
 
-        ValueASTNodeSP identNode = args[i];
-        if (identNode->getNodeType() != NodeType::IDENTIFIER) throw RuntimeErr(NOT_IDENT);
-        const std::string &ident = identNode->value->getString();
+        IdentifierValueSP identNode = std::dynamic_pointer_cast<IdentifierValue>(args[i]->evaluate());
+        if (!identNode) throw RuntimeErr(NOT_IDENT);
+        const std::string &ident = identNode->getValue();
 
         StoreValueSP value = store_.resolve(ident, true);
         if (value)
@@ -284,9 +284,9 @@ void Handler::handleIncr_(std::vector<ValueASTNodeSP> &args, const std::size_t n
     for (std::size_t i = 0; i < numArgs; i++) {
         if (!args[i]) continue;
 
-        ValueASTNodeSP identNode = args[i];
-        if (identNode->getNodeType() != NodeType::IDENTIFIER) throw RuntimeErr(NOT_IDENT);
-        const std::string &ident = identNode->value->getString();
+        IdentifierValueSP identNode = std::dynamic_pointer_cast<IdentifierValue>(args[i]->evaluate());
+        if (!identNode) throw RuntimeErr(NOT_IDENT);
+        const std::string &ident = identNode->getValue();
 
         StoreValueSP value = store_.resolve(ident);
         if (value == nullptr) {
@@ -307,9 +307,9 @@ void Handler::handleDecr_(std::vector<ValueASTNodeSP> &args, const std::size_t n
     for (std::size_t i = 0; i < numArgs; i++) {
         if (!args[i]) continue;
 
-        ValueASTNodeSP identNode = args[i];
-        if (identNode->getNodeType() != NodeType::IDENTIFIER) throw RuntimeErr(NOT_IDENT);
-        const std::string &ident = identNode->value->getString();
+        IdentifierValueSP identNode = std::dynamic_pointer_cast<IdentifierValue>(args[i]->evaluate());
+        if (!identNode) throw RuntimeErr(NOT_IDENT);
+        const std::string &ident = identNode->getValue();
 
         StoreValueSP value = store_.resolve(ident);
         if (value == nullptr) {

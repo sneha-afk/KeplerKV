@@ -163,4 +163,9 @@ private:
     std::vector<ValueASTNodeSP> args_;
 };
 
-using CommandNodeSP = std::shared_ptr<CommandASTNode>;
+using CommandASTNodeSP = std::shared_ptr<CommandASTNode>;
+using IntASTNodeSP = std::shared_ptr<IntASTNode>;
+using FloatASTNodeSP = std::shared_ptr<FloatASTNode>;
+using StringASTNodeSP = std::shared_ptr<StringASTNode>;
+using IdentifierASTNodeSP = std::shared_ptr<IdentifierASTNode>;
+using ListASTNodeSP = std::shared_ptr<ListASTNode>;

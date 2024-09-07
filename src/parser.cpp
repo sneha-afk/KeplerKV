@@ -25,12 +25,12 @@ std::vector<ASTNodeSP> &Parser::parse(std::vector<TokenSP> &tokens) {
     return nodes;
 }
 
-CommandNodeSP Parser::parseCommand_(TokenSP &cmdTok) {
+CommandASTNodeSP Parser::parseCommand_(TokenSP &cmdTok) {
     CommandType cmdType = mapGet(mapToCmd, cmdTok->value, CommandType::UNKNOWN);
     if (cmdType == CommandType::UNKNOWN) throw INVALID_CMD(cmdTok->value);
     tt_++;
 
-    CommandNodeSP cmd = std::make_shared<CommandASTNode>(cmdType);
+    CommandASTNodeSP cmd = std::make_shared<CommandASTNode>(cmdType);
     while (tt_ != tend_ && (*tt_)->type != TokenType::END) {
         TokenSP &t = *tt_;
         switch (t->type) {

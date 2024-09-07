@@ -130,3 +130,9 @@ public:
 private:
     std::vector<StoreValueSP> value_;
 };
+
+using IntValueSP = std::shared_ptr<IntValue>;
+using FloatValueSP = std::shared_ptr<FloatValue>;
+using StringValueSP = std::shared_ptr<StringValue>;
+using IdentifierValueSP = std::shared_ptr<IdentifierValue>;
+using ListValueSP = std::shared_ptr<ListValue>;
