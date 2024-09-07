@@ -55,14 +55,23 @@ ValueASTNodeSP Parser::parseValue_(TokenSP &t) {
     std::string &tValue = t->value;
     switch (t->type) {
         case TokenType::NUMBER:
-            if (strContains(tValue, '.'))
-                return std::make_shared<FloatASTNode>(std::stof(tValue));
-            else
-                return std::make_shared<IntASTNode>(std::stoi(tValue));
+            if (strContains(tValue, '.')) {
+                try {
+                    return std::make_shared<FloatASTNode>(std::stof(tValue));
+                } catch (Exception &e) {
+                    throw RuntimeErr(WRONG_F_FMT);
+                }
+            } else {
+                try {
+                    return std::make_shared<IntASTNode>(std::stoi(tValue));
+                } catch (Exception &e) {
+                    throw RuntimeErr(WRONG_I_FMT);
+                }
+            }
         case TokenType::IDENTIIFER: return std::make_shared<IdentifierASTNode>(tValue);
         case TokenType::STRING: return std::make_shared<StringASTNode>(tValue);
         case TokenType::LIST_START: tt_++; return parseList_();
-        default: break;
+        default: throw UNKNOWN_TOKEN(t->value); break;
     }
     return nullptr;
 }

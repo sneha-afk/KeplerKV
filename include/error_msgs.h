@@ -1,10 +1,13 @@
 #pragma once
 #include <stdexcept>
 
+using Exception = std::exception;
 using RuntimeErr = std::runtime_error;
 
 #define UNEXPECTED      "Error: something went wrong, try again?"
-#define WRONG_FMT       "Error: incorrect command format"
+#define WRONG_CMD_FMT   "Error: incorrect command format"
+#define WRONG_F_FMT     "Error: incorrect float format"
+#define WRONG_I_FMT     "Error: incorrect integer format"
 #define NOT_IDENT       "Error: expected identifier"
 #define NOT_FOUND       "Error: not found in store"
 #define NOT_NUMERIC     "Error: not numeric (integer or float)"
