@@ -42,7 +42,6 @@ do
 
     res_file="${RESULTS_DIR}${name_base}_memory_result.txt"
 
-    # sed to remove ANSI escape sequences: https://superuser.com/a/380778
     valgrind -s --leak-check=full $KEPLER < "$input_file" 2>&1| ${CLEAN_OUT} &> "$res_file"
 
     if [ $? -eq 0 ]; then

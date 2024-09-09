@@ -44,7 +44,6 @@ do
     res_file="${RESULTS_DIR}${name_base}_result.txt"
     diff_file="${RESULTS_DIR}${name_base}_diff.txt"
 
-    # sed to remove ANSI escape sequences: https://superuser.com/a/380778
     $KEPLER < "$input_file" 2>&1| ${CLEAN_OUT} &> "$res_file"
     
     # Find any error messages

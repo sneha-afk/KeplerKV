@@ -54,7 +54,7 @@ StoreValueSP Store::resolveRecur_(
     // If another identiifer is found, continue down the chain
     if (found->getValueType() == ValueType::IDENTIIFER) {
         IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(found);
-        return resolveRecur_(idNode->getValue(), seen);
+        return resolveRecur_(idNode->getValue(), seen, resolveIdentsInList);
     }
 
     // Resolve list elements (in case there are identifiers) only if requested (makes a copy)
@@ -101,12 +101,7 @@ std::vector<std::string> Store::search(const std::string &regexPattern) const {
     return keys;
 }
 
-/**
- * Serializes the Store into binary at the filename specified.
- * 
- * https://www.eecs.umich.edu/courses/eecs380/HANDOUTS/cppBinaryFileIO-2.html
- * https://gist.github.com/molpopgen/9123133
- */
+// Serializes the Store into binary at the filename specified.
 void Store::saveToFile(const std::string &filename) const {
     std::ofstream fp;
     fp.open(filename, std::ios::out | std::ios::binary);

@@ -34,7 +34,6 @@ bool Handler::handleQuery(std::string &query) {
     for (const auto &n : nodes) {
         if (DEBUG) std::cout << "\t" << *n << std::endl;
 
-        // https://stackoverflow.com/a/14545746
         CommandASTNodeSP cmd = std::dynamic_pointer_cast<CommandASTNode>(n);
         if (!cmd) throw RuntimeErr(WRONG_CMD_FMT);
 

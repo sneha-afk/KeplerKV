@@ -65,13 +65,36 @@ A NoSQL key-value pair store for quick access.
     * Integers, floats: INCR, DECR
     * Lists: APPEND, PREPEND
 
-## resources used
-
-1. [How to Write a Programming Language](https://accu.org/journals/overload/26/145/balaam_2510/) series by Andy Balaam
-2. [TosLang](https://faouellet.github.io/categories/toslang/) series by Félix-Antoine Ouellet
+## sources
+- [How to Write a Programming Language](https://accu.org/journals/overload/26/145/balaam_2510/) series by Andy Balaam
+- [TosLang](https://faouellet.github.io/categories/toslang/) series by Félix-Antoine Ouellet
+- [Wiki: Abstract syntax trees](https://en.wikipedia.org/wiki/Abstract_syntax_tree)
+- File I/O
+    - [GH Gist by molpopgen](https://gist.github.com/molpopgen/9123133)
+    - [UMich - binary file I/O](https://www.eecs.umich.edu/courses/eecs380/HANDOUTS/cppBinaryFileIO-2.html)
+- StackOverflow
+    - [Using `sed` to remove ANSI escape sequences](https://superuser.com/a/380778)
+        - [List of color ANSI escape sequences](https://stackoverflow.com/q/5947742)
+    - [Using `std::dynamic_pointer_cast` on `std::shared_ptr`](https://stackoverflow.com/a/14545746)
+    - [Virtual destructors in inheritance](https://stackoverflow.com/q/461203)
+    - [Making custom classes iterable](https://stackoverflow.com/a/46432381)
 
 ---
 ## dev journal
+### September 7, 2024
+- Bugs found and fixed:
+    - Lone quotes can cause segfaults: not checking the iterator when appending the end quote (or, lack thereof)
+    - `removeQuotations()` had similar quote finding issues (and was wrong on cases like `'"'`)
+- Downgraded to standard 11 from 17 since `std::variant` is gone
+- Lowered some heap usage:
+    - `Lexer` didn't need to store the input
+    - `const &`, love them
+    - Going forward, being more mindful on strings
+- `inline`d smaller functions, especially the returning enum ones
+- Moved macros to more sensible locations
+- Lots of minor code quallity issues
+- Up next: learning more about `std::move` and move constructors, potentially very beneficial for a program so reliant on passing strings through a pipeline!
+
 ### September 6, 2024
 - Reworked serialization and deserialization for individual `StoreValue` types
     - Strings and identifiers utilize the same string functionality: identifiers will now inherit from string classes (enums distinguish them)

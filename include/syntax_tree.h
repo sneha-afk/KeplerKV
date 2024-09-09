@@ -34,11 +34,8 @@ static const std::unordered_map<std::string, CommandType> mapToCmd = { { "SET", 
     { "PREPEND", CommandType::PREPEND }, { "STATS", CommandType::STATS },
     { "SEARCH", CommandType::SEARCH } };
 
-// https://en.wikipedia.org/wiki/Abstract_syntax_tree
-// https://stackoverflow.com/a/54596
 class ASTNode {
 public:
-    // https://stackoverflow.com/q/461203
     virtual ~ASTNode() = default;
 
     virtual inline NodeType getNodeType() const = 0;

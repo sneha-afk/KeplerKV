@@ -28,7 +28,6 @@ public:
 
     inline size_t size() const { return map_.size(); }
 
-    // Store is iterable: https://stackoverflow.com/a/46432381
     std::unordered_map<std::string, StoreValueSP>::iterator begin() { return map_.begin(); }
     std::unordered_map<std::string, StoreValueSP>::const_iterator begin() const {
         return map_.begin();
