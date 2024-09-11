@@ -81,6 +81,13 @@ A NoSQL key-value pair store for quick access.
 
 ---
 ## dev journal
+### September 10, 2024
+Transactions can be implemented in several ways: I am leaning towards the write-ahead logging (WAL) method which utilizes a log.
+- Statements are stored in a WAL log as they are recieved, but are not directly applied to the data
+- If the system fails, the WAL should detect the transaction is incomplete (having start/end indicators would help)
+    - Can rollback or let the user continue
+- Once a commit is done, the WAL is replayed and the operations are applied
+
 ### September 7, 2024
 - Bugs found and fixed:
     - Lone quotes can cause segfaults: not checking the iterator when appending the end quote (or, lack thereof)
