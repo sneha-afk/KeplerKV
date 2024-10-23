@@ -9,13 +9,13 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 
 add_executable(${PROJECT_NAME}
     src/main.cpp
+    src/util.cpp
+    src/store_value.cpp
+    src/store.cpp
     src/syntax_tree.cpp
     src/lexer.cpp
     src/parser.cpp
     src/handler.cpp
-    src/store_value.cpp
-    src/store.cpp
-    src/util.cpp
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE

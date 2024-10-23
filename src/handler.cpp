@@ -48,16 +48,16 @@ bool Handler::handleQuery(std::string &query) {
 
         // If not in the map, then it is one of these
         switch (cmd->getCmdType()) {
+            // temp
+            case CommandType::SET:
+                if (!cmd->validate()) throw RuntimeErr("set flopped");
+                cmd->execute(store_);
+                break;
             case CommandType::QUIT:
                 std::cout << T_BBLUE << "Farewell!" << T_RESET << std::endl;
                 return false;
             case CommandType::CLEAR: std::cout << "\033[H\033[2J" << std::endl; break;
-            case CommandType::LIST:
-                if (store_.size() < 1) std::cout << T_BYLLW << "(empty)" << T_RESET << std::endl;
-
-                for (const auto &item : store_)
-                    print_item_(item.first, item.second);
-                break;
+            case CommandType::LIST: cmd->execute(store_); break;
             case CommandType::STATS: handleStats_(); break;
             default: break;
         }
@@ -125,38 +125,38 @@ void Handler::handleStats_() {
 }
 
 void Handler::handleSet_(std::vector<ValueASTNodeSP> &args, const std::size_t numArgs) {
-    if (numArgs < 2) throw MIN_TWO_ARG_KV("SET");
+    // if (numArgs < 2) throw MIN_TWO_ARG_KV("SET");
 
-    for (std::size_t i = 0; i < numArgs; i += 2) {
-        if (!args[i]) continue;
+    // for (std::size_t i = 0; i < numArgs; i += 2) {
+    //     if (!args[i]) continue;
 
-        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(args[i]->evaluate());
-        if (!idNode) throw RuntimeErr(NOT_IDENT);
-        const std::string &ident = idNode->getValue();
+    //     IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(args[i]->evaluate());
+    //     if (!idNode) throw RuntimeErr(NOT_IDENT);
+    //     const std::string &ident = idNode->getValue();
 
-        if (!(i + 1 < numArgs) || !args[i + 1]) throw RuntimeErr(VAL_AFTER_IDENT);
+    //     if (!(i + 1 < numArgs) || !args[i + 1]) throw RuntimeErr(VAL_AFTER_IDENT);
 
-        store_.set(ident, (args[i + 1])->evaluate());
-        std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
-    }
+    //     store_.set(ident, (args[i + 1])->evaluate());
+    //     std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
+    // }
 }
 
 void Handler::handleGet_(std::vector<ValueASTNodeSP> &args, const std::size_t numArgs) {
-    if (numArgs < 1) throw MIN_ONE_ARG_K("GET");
+    // if (numArgs < 1) throw MIN_ONE_ARG_K("GET");
 
-    for (const auto &arg : args) {
-        if (!arg) continue;
+    // for (const auto &arg : args) {
+    //     if (!arg) continue;
 
-        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
-        if (!idNode) throw RuntimeErr(NOT_IDENT);
-        const std::string &ident = idNode->getValue();
+    //     IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
+    //     if (!idNode) throw RuntimeErr(NOT_IDENT);
+    //     const std::string &ident = idNode->getValue();
 
-        StoreValueSP value = store_.get(ident);
-        if (value)
-            print_item_(ident, value);
-        else
-            std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
-    }
+    //     StoreValueSP value = store_.get(ident);
+    //     if (value)
+    //         print_item_(ident, value);
+    //     else
+    //         std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
+    // }
 }
 
 void Handler::handleDelete_(std::vector<ValueASTNodeSP> &args, const std::size_t numArgs) {

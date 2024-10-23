@@ -1,7 +1,6 @@
 #pragma once
 
 #include "store_value.h"
-#include "syntax_tree.h"
 
 #include <string>
 #include <unordered_map>

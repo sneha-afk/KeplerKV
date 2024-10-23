@@ -2,6 +2,7 @@
 
 #include "error_msgs.h"
 #include "file_io_macros.h"
+#include "util.h"
 
 #include <fstream>
 #include <iostream>

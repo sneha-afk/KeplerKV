@@ -1,5 +1,8 @@
 #pragma once
 
+#include "terminal_colors.h"
+
+#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -18,3 +21,7 @@ inline bool strContains(const std::string &s, const char &c) {
 
 // Removes quotation marks without affecting original string
 std::string removeQuotations(const std::string &s);
+
+// void printItem(const std::pair<const std::string, StoreValueSP> &item) {
+//     std::cout << T_BBLUE << item.first << T_RESET << " | " << *(item.second) << std::endl;
+// }

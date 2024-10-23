@@ -1,5 +1,6 @@
 #pragma once
 
+#include "store.h"
 #include "store_value.h"
 #include "util.h"
 
@@ -49,7 +50,7 @@ public:
 
 using ASTNodeSP = std::shared_ptr<ASTNode>;
 
-class NilNode : public ASTNode {
+class Node : public ASTNode {
     inline NodeType getNodeType() const { return NodeType::NIL; };
     std::string string() { return "{node: nil, value: nil}"; }
 };
@@ -147,16 +148,56 @@ public:
         : cmdType_(c)
         , args_(std::vector<ValueASTNodeSP>()) {};
 
-    inline NodeType getNodeType() const { return NodeType::COMMAND; };
+    inline NodeType getNodeType() const { return NodeType::COMMAND; }
     std::string string() const override;
 
     inline CommandType getCmdType() const { return cmdType_; }
-    inline void addArg(ValueASTNodeSP &a) { args_.push_back(std::move(a)); };
-    inline std::vector<ValueASTNodeSP> &getArgs() { return args_; };
+    inline void addArg(ValueASTNodeSP &a) { args_.push_back(std::move(a)); }
+    inline std::vector<ValueASTNodeSP> &getArgs() { return args_; }
+    inline std::size_t numArgs() const { return args_.size(); }
 
-private:
+    // Validates the syntax and semantics of a command.
+    // Not all commands have syntax to validate, so default returns true.
+    virtual bool validate() const { return true; }
+
+    // execute() assumes the node has been validated.
+    // Executing non-validated nodes can have undefined behavior.
+    // Error-handling is the caller's responsibility.
+    virtual void execute(Store &s) const = 0;
+
+protected:
     const CommandType cmdType_;
     std::vector<ValueASTNodeSP> args_;
+};
+
+class ItemPrinter {
+public:
+    void printItem(const std::string &ident, const StoreValueSP &value) const {
+        std::cout << T_BBLUE << ident << T_RESET << " | " << *value << std::endl;
+    }
+};
+
+class SetCmdASTNode : public CommandASTNode {
+public:
+    SetCmdASTNode()
+        : CommandASTNode(CommandType::SET) { }
+    virtual bool validate() const override;
+    virtual void execute(Store &s) const override;
+};
+
+class GetCmdASTNode : public CommandASTNode, public ItemPrinter {
+public:
+    GetCmdASTNode()
+        : CommandASTNode(CommandType::GET) { }
+    virtual bool validate() const override;
+    virtual void execute(Store &s) const override;
+};
+
+class ListCmdASTNode : public CommandASTNode, public ItemPrinter {
+public:
+    ListCmdASTNode()
+        : CommandASTNode(CommandType::LIST) { }
+    virtual void execute(Store &s) const override;
 };
 
 using CommandASTNodeSP = std::shared_ptr<CommandASTNode>;

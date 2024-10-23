@@ -30,7 +30,12 @@ CommandASTNodeSP Parser::parseCommand_(const TokenSP &cmdTok) {
     if (cmdType == CommandType::UNKNOWN) throw INVALID_CMD(cmdTok->value);
     tt_++;
 
-    CommandASTNodeSP cmd = std::make_shared<CommandASTNode>(cmdType);
+    CommandASTNodeSP cmd;
+    switch (cmdType) {
+        case CommandType::SET: cmd = std::make_shared<SetCmdASTNode>(); break;
+        default: return nullptr; break;
+    }
+
     while (tt_ != tend_ && (*tt_)->type != TokenType::END) {
         TokenSP &t = *tt_;
         switch (t->type) {

@@ -1,5 +1,7 @@
 #include "syntax_tree.h"
 
+#include <iostream>
+
 std::string CommandASTNode::string() const {
     std::string s = "{node: Command, cmd: " + std::to_string((int) cmdType_) + ", args: [";
     for (const auto &a : args_) {
@@ -61,4 +63,63 @@ StoreValueSP ListASTNode::evaluate() const {
     for (const auto &node : value_)
         listVal->append(node->evaluate());
     return listVal;
+}
+
+bool SetCmdASTNode::validate() const {
+    if (numArgs() < 2) return false;
+
+    for (std::size_t i = 0; i < numArgs(); i += 2) {
+        if (!args_[i]) continue;
+
+        // First node must be an identifier
+        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(args_[i]->evaluate());
+        if (!idNode) return false;
+
+        // Identiifer must follow a value
+        if (!(i + 1 < numArgs()) || !args_[i + 1]) return false;
+    }
+
+    return true;
+}
+
+void SetCmdASTNode::execute(Store &s) const {
+    for (std::size_t i = 0; i < numArgs(); i += 2) {
+        if (!args_[i]) continue;
+
+        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(args_[i]->evaluate());
+        const std::string &ident = idNode->getValue();
+
+        s.set(ident, (args_[i + 1])->evaluate());
+    }
+}
+
+bool GetCmdASTNode::validate() const {
+    if (numArgs() < 1) return false;
+
+    for (const auto &arg : args_) {
+        if (!arg) continue;
+
+        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
+        if (!idNode) return false;
+    }
+    return true;
+}
+
+void GetCmdASTNode::execute(Store &s) const {
+    for (const auto &arg : args_) {
+        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
+        const std::string &ident = idNode->getValue();
+
+        StoreValueSP value = s.get(ident);
+        if (value)
+            printItem(ident, value);
+        else
+            std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
+    }
+}
+
+void ListCmdASTNode::execute(Store &s) const {
+    if (s.size() < 1) std::cout << T_BYLLW << "(empty)" << T_RESET << std::endl;
+    for (const auto &item : s)
+        printItem(item.first, item.second);
 }
