@@ -32,7 +32,10 @@ CommandASTNodeSP Parser::parseCommand_(const TokenSP &cmdTok) {
 
     CommandASTNodeSP cmd;
     switch (cmdType) {
+        case CommandType::QUIT: cmd = std::make_shared<QuitCmdASTNode>(); break;
         case CommandType::SET: cmd = std::make_shared<SetCmdASTNode>(); break;
+        case CommandType::GET: cmd = std::make_shared<GetCmdASTNode>(); break;
+        case CommandType::LIST: cmd = std::make_shared<ListCmdASTNode>(); break;
         default: return nullptr; break;
     }
 

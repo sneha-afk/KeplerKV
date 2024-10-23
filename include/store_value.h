@@ -1,5 +1,7 @@
 #pragma once
+#include "terminal_colors.h"
 
+#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -147,3 +149,7 @@ using FloatValueSP = std::shared_ptr<FloatValue>;
 using StringValueSP = std::shared_ptr<StringValue>;
 using IdentifierValueSP = std::shared_ptr<IdentifierValue>;
 using ListValueSP = std::shared_ptr<ListValue>;
+
+void printItem(const std::string &ident, const StoreValueSP &value) {
+    std::cout << T_BBLUE << ident << T_RESET << " | " << *value << std::endl;
+}

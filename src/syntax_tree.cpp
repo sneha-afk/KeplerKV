@@ -90,6 +90,7 @@ void SetCmdASTNode::execute(Store &s) const {
         const std::string &ident = idNode->getValue();
 
         s.set(ident, (args_[i + 1])->evaluate());
+        std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
     }
 }
 

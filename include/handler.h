@@ -43,8 +43,6 @@ private:
 
     void handleStats_();
 
-    void handleSet_(std::vector<ValueASTNodeSP> &, const std::size_t);
-    void handleGet_(std::vector<ValueASTNodeSP> &, const std::size_t);
     void handleDelete_(std::vector<ValueASTNodeSP> &, const std::size_t);
     void handleUpdate_(std::vector<ValueASTNodeSP> &, const std::size_t);
     void handleResolve_(std::vector<ValueASTNodeSP> &, const std::size_t);

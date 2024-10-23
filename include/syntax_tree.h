@@ -170,13 +170,6 @@ protected:
     std::vector<ValueASTNodeSP> args_;
 };
 
-class ItemPrinter {
-public:
-    void printItem(const std::string &ident, const StoreValueSP &value) const {
-        std::cout << T_BBLUE << ident << T_RESET << " | " << *value << std::endl;
-    }
-};
-
 class SetCmdASTNode : public CommandASTNode {
 public:
     SetCmdASTNode()
@@ -185,7 +178,7 @@ public:
     virtual void execute(Store &s) const override;
 };
 
-class GetCmdASTNode : public CommandASTNode, public ItemPrinter {
+class GetCmdASTNode : public CommandASTNode {
 public:
     GetCmdASTNode()
         : CommandASTNode(CommandType::GET) { }
@@ -193,7 +186,7 @@ public:
     virtual void execute(Store &s) const override;
 };
 
-class ListCmdASTNode : public CommandASTNode, public ItemPrinter {
+class ListCmdASTNode : public CommandASTNode {
 public:
     ListCmdASTNode()
         : CommandASTNode(CommandType::LIST) { }

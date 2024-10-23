@@ -9,7 +9,6 @@
 static constexpr bool DEBUG = false;
 
 std::unordered_map<CommandType, HandlerFunctionPtr> Handler::cmdToFunc_ = {
-    { CommandType::SET, &Handler::handleSet_ }, { CommandType::GET, &Handler::handleGet_ },
     { CommandType::DELETE, &Handler::handleDelete_ },
     { CommandType::UPDATE, &Handler::handleUpdate_ },
     { CommandType::RESOLVE, &Handler::handleResolve_ },
@@ -38,28 +37,25 @@ bool Handler::handleQuery(std::string &query) {
         if (!cmd) throw RuntimeErr(WRONG_CMD_FMT);
 
         // Retrieve appropriate function pointer and run
-        auto func = cmdToFunc_.find(cmd->getCmdType());
-        if (func != cmdToFunc_.end()) {
-            std::vector<ValueASTNodeSP> &args = cmd->getArgs();
-            const size_t numArgs = args.size();
-            func->second(this, args, numArgs);
-            return true;
-        }
+        // auto func = cmdToFunc_.find(cmd->getCmdType());
+        // if (func != cmdToFunc_.end()) {
+        //     std::vector<ValueASTNodeSP> &args = cmd->getArgs();
+        //     const size_t numArgs = args.size();
+        //     func->second(this, args, numArgs);
+        //     return true;
+        // }
 
         // If not in the map, then it is one of these
         switch (cmd->getCmdType()) {
-            // temp
-            case CommandType::SET:
-                if (!cmd->validate()) throw RuntimeErr("set flopped");
-                cmd->execute(store_);
-                break;
             case CommandType::QUIT:
                 std::cout << T_BBLUE << "Farewell!" << T_RESET << std::endl;
                 return false;
             case CommandType::CLEAR: std::cout << "\033[H\033[2J" << std::endl; break;
-            case CommandType::LIST: cmd->execute(store_); break;
             case CommandType::STATS: handleStats_(); break;
-            default: break;
+            default:
+                if (!cmd->validate()) throw RuntimeErr(WRONG_CMD_FMT);
+                cmd->execute(store_);
+                break;
         }
     }
     return true;
@@ -122,41 +118,6 @@ void Handler::handleStats_() {
     std::cout << "\tStrings: " << memStrs << std::endl;
     std::cout << "\tLists: " << memLists << std::endl;
     std::cout << "\tAliases: " << memAliases << std::endl;
-}
-
-void Handler::handleSet_(std::vector<ValueASTNodeSP> &args, const std::size_t numArgs) {
-    // if (numArgs < 2) throw MIN_TWO_ARG_KV("SET");
-
-    // for (std::size_t i = 0; i < numArgs; i += 2) {
-    //     if (!args[i]) continue;
-
-    //     IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(args[i]->evaluate());
-    //     if (!idNode) throw RuntimeErr(NOT_IDENT);
-    //     const std::string &ident = idNode->getValue();
-
-    //     if (!(i + 1 < numArgs) || !args[i + 1]) throw RuntimeErr(VAL_AFTER_IDENT);
-
-    //     store_.set(ident, (args[i + 1])->evaluate());
-    //     std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
-    // }
-}
-
-void Handler::handleGet_(std::vector<ValueASTNodeSP> &args, const std::size_t numArgs) {
-    // if (numArgs < 1) throw MIN_ONE_ARG_K("GET");
-
-    // for (const auto &arg : args) {
-    //     if (!arg) continue;
-
-    //     IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
-    //     if (!idNode) throw RuntimeErr(NOT_IDENT);
-    //     const std::string &ident = idNode->getValue();
-
-    //     StoreValueSP value = store_.get(ident);
-    //     if (value)
-    //         print_item_(ident, value);
-    //     else
-    //         std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
-    // }
 }
 
 void Handler::handleDelete_(std::vector<ValueASTNodeSP> &args, const std::size_t numArgs) {
