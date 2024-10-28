@@ -50,7 +50,7 @@ public:
 
 using ASTNodeSP = std::shared_ptr<ASTNode>;
 
-class Node : public ASTNode {
+class NilASTNode : public ASTNode {
     inline NodeType getNodeType() const { return NodeType::NIL; };
     std::string string() { return "{node: nil, value: nil}"; }
 };
@@ -160,36 +160,63 @@ public:
     // Not all commands have syntax to validate, so default returns true.
     virtual bool validate() const { return true; }
 
-    // execute() assumes the node has been validated.
-    // Executing non-validated nodes can have undefined behavior.
-    // Error-handling is the caller's responsibility.
-    virtual void execute(Store &s) const = 0;
-
 protected:
     const CommandType cmdType_;
     std::vector<ValueASTNodeSP> args_;
 };
 
-class SetCmdASTNode : public CommandASTNode {
+// Store commands interact with the store itself.
+class StoreCmdASTNode : public CommandASTNode {
+public:
+    StoreCmdASTNode()
+        : CommandASTNode() { }
+    StoreCmdASTNode(const std::string &c)
+        : CommandASTNode(c) { }
+    StoreCmdASTNode(const CommandType &c)
+        : CommandASTNode(c) { }
+
+    // execute() assumes the node has been validated.
+    // Executing non-validated nodes can have undefined behavior.
+    // Error-handling is the caller's responsibility.
+    virtual void execute(Store &s) const = 0;
+};
+
+// System commands do not interact with the store.
+class SystemCmdASTNode : public CommandASTNode {
+public:
+    SystemCmdASTNode()
+        : CommandASTNode() { }
+    SystemCmdASTNode(const std::string &c)
+        : CommandASTNode(c) { }
+    SystemCmdASTNode(const CommandType &c)
+        : CommandASTNode(c) { }
+
+    // execute() assumes the node has been validated.
+    // Executing non-validated nodes can have undefined behavior.
+    // Error-handling is the caller's responsibility.
+    virtual void execute() const = 0;
+};
+
+class SetCmdASTNode : public StoreCmdASTNode {
 public:
     SetCmdASTNode()
-        : CommandASTNode(CommandType::SET) { }
+        : StoreCmdASTNode(CommandType::SET) { }
     virtual bool validate() const override;
     virtual void execute(Store &s) const override;
 };
 
-class GetCmdASTNode : public CommandASTNode {
+class GetCmdASTNode : public StoreCmdASTNode {
 public:
     GetCmdASTNode()
-        : CommandASTNode(CommandType::GET) { }
+        : StoreCmdASTNode(CommandType::GET) { }
     virtual bool validate() const override;
     virtual void execute(Store &s) const override;
 };
 
-class ListCmdASTNode : public CommandASTNode {
+class ListCmdASTNode : public StoreCmdASTNode {
 public:
     ListCmdASTNode()
-        : CommandASTNode(CommandType::LIST) { }
+        : StoreCmdASTNode(CommandType::LIST) { }
     virtual void execute(Store &s) const override;
 };
 
@@ -198,4 +225,4 @@ using IntASTNodeSP = std::shared_ptr<IntASTNode>;
 using FloatASTNodeSP = std::shared_ptr<FloatASTNode>;
 using StringASTNodeSP = std::shared_ptr<StringASTNode>;
 using IdentifierASTNodeSP = std::shared_ptr<IdentifierASTNode>;
-using ListASTNodeSP = std::shared_ptr<ListValueASTNode>;
+using ListValueASTNodeSP = std::shared_ptr<ListValueASTNode>;
