@@ -85,7 +85,7 @@ ValueASTNodeSP Parser::parseValue_(const TokenSP &t) {
 }
 
 ValueASTNodeSP Parser::parseList_() {
-    std::shared_ptr<ListASTNode> lstNode = std::make_shared<ListASTNode>();
+    std::shared_ptr<ListValueASTNode> lstNode = std::make_shared<ListValueASTNode>();
 
     while (tt_ != tend_ && (*tt_)->type != TokenType::END && (*tt_)->type != TokenType::LIST_END) {
         TokenSP &t = *tt_;

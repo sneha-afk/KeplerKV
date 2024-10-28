@@ -44,7 +44,7 @@ StoreValueSP IdentifierASTNode::evaluate() const {
     return std::make_shared<IdentifierValue>(std::move(value_));
 }
 
-std::string ListASTNode::string() const {
+std::string ListValueASTNode::string() const {
     std::string s = "{node: Value, type: List, value: [";
     for (const auto &v : value_) {
         if (!v) continue;
@@ -58,7 +58,7 @@ std::string ListASTNode::string() const {
     return s;
 }
 
-StoreValueSP ListASTNode::evaluate() const {
+StoreValueSP ListValueASTNode::evaluate() const {
     std::shared_ptr<ListValue> listVal = std::make_shared<ListValue>();
     for (const auto &node : value_)
         listVal->append(node->evaluate());

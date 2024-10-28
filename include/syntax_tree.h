@@ -119,11 +119,11 @@ public:
     StoreValueSP evaluate() const override;
 };
 
-class ListASTNode : public ValueASTNode {
+class ListValueASTNode : public ValueASTNode {
 public:
-    ListASTNode()
+    ListValueASTNode()
         : value_(std::vector<ValueASTNodeSP>()) {};
-    ListASTNode(std::vector<ValueASTNodeSP> &l)
+    ListValueASTNode(std::vector<ValueASTNodeSP> &l)
         : value_(l) {};
 
     inline void addNode(ValueASTNodeSP e) { value_.push_back(std::move(e)); }
@@ -198,4 +198,4 @@ using IntASTNodeSP = std::shared_ptr<IntASTNode>;
 using FloatASTNodeSP = std::shared_ptr<FloatASTNode>;
 using StringASTNodeSP = std::shared_ptr<StringASTNode>;
 using IdentifierASTNodeSP = std::shared_ptr<IdentifierASTNode>;
-using ListASTNodeSP = std::shared_ptr<ListASTNode>;
+using ListASTNodeSP = std::shared_ptr<ListValueASTNode>;
