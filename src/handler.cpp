@@ -36,26 +36,23 @@ bool Handler::handleQuery(std::string &query) {
         CommandASTNodeSP cmd = std::dynamic_pointer_cast<CommandASTNode>(n);
         if (!cmd) throw RuntimeErr(WRONG_CMD_FMT);
 
-        // Retrieve appropriate function pointer and run
-        // auto func = cmdToFunc_.find(cmd->getCmdType());
-        // if (func != cmdToFunc_.end()) {
-        //     std::vector<ValueASTNodeSP> &args = cmd->getArgs();
-        //     const size_t numArgs = args.size();
-        //     func->second(this, args, numArgs);
-        //     return true;
-        // }
+        // Check what kind of command this is
+        SystemCmdASTNodeSP sysCmd = std::dynamic_pointer_cast<SystemCmdASTNode>(cmd);
+        if (sysCmd) {
+            switch (sysCmd->getCmdType()) {
+                case CommandType::CLEAR: std::cout << "\033[H\033[2J" << std::endl; break;
+                case CommandType::STATS: handleStats_(); break;
+                default:
+                    if (!sysCmd->validate()) throw RuntimeErr(WRONG_CMD_FMT);
+                    sysCmd->execute();
+                    break;
+            }
+        } else {
+            StoreCmdASTNodeSP storeCmd = std::dynamic_pointer_cast<StoreCmdASTNode>(cmd);
 
-        // If not in the map, then it is one of these
-        switch (cmd->getCmdType()) {
-            case CommandType::QUIT:
-                std::cout << T_BBLUE << "Farewell!" << T_RESET << std::endl;
-                return false;
-            case CommandType::CLEAR: std::cout << "\033[H\033[2J" << std::endl; break;
-            case CommandType::STATS: handleStats_(); break;
-            default:
-                if (!cmd->validate()) throw RuntimeErr(WRONG_CMD_FMT);
-                cmd->execute(store_);
-                break;
+            if (!storeCmd->validate()) throw RuntimeErr(WRONG_CMD_FMT);
+            storeCmd->execute(store_);
+            break;
         }
     }
     return true;

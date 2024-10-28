@@ -65,6 +65,11 @@ StoreValueSP ListValueASTNode::evaluate() const {
     return listVal;
 }
 
+void QuitCmdASTNode::execute() const {
+    std::cout << T_BBLUE << "Farewell!" << T_RESET << std::endl;
+    exit(EXIT_SUCCESS);
+};
+
 bool SetCmdASTNode::validate() const {
     if (numArgs() < 2) return false;
 

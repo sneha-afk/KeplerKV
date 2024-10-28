@@ -197,6 +197,13 @@ public:
     virtual void execute() const = 0;
 };
 
+class QuitCmdASTNode : public SystemCmdASTNode {
+public:
+    QuitCmdASTNode()
+        : SystemCmdASTNode(CommandType::QUIT) { }
+    virtual void execute() const override;
+};
+
 class SetCmdASTNode : public StoreCmdASTNode {
 public:
     SetCmdASTNode()
@@ -221,6 +228,8 @@ public:
 };
 
 using CommandASTNodeSP = std::shared_ptr<CommandASTNode>;
+using StoreCmdASTNodeSP = std::shared_ptr<StoreCmdASTNode>;
+using SystemCmdASTNodeSP = std::shared_ptr<SystemCmdASTNode>;
 using IntASTNodeSP = std::shared_ptr<IntASTNode>;
 using FloatASTNodeSP = std::shared_ptr<FloatASTNode>;
 using StringASTNodeSP = std::shared_ptr<StringASTNode>;

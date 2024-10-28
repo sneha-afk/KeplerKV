@@ -4,6 +4,10 @@
 
 #include <fstream>
 
+void printItem(const std::string &ident, const StoreValueSP &value) {
+    std::cout << T_BBLUE << ident << T_RESET << " | " << *value << std::endl;
+}
+
 std::vector<uint8_t> IntValue::serialize() const {
     std::vector<uint8_t> buf;
     buf.push_back('i');
