@@ -36,22 +36,4 @@ private:
     Store store_;
 
     static std::unordered_map<CommandType, HandlerFunctionPtr> cmdToFunc_;
-
-    void print_item_(const std::string &, const StoreValueSP);
-
-    std::string getFilename_(const ValueASTNodeSP);
-
-    void handleStats_();
-
-    void handleDelete_(std::vector<ValueASTNodeSP> &, const std::size_t);
-    void handleUpdate_(std::vector<ValueASTNodeSP> &, const std::size_t);
-    void handleResolve_(std::vector<ValueASTNodeSP> &, const std::size_t);
-    void handleSave_(std::vector<ValueASTNodeSP> &, const std::size_t);
-    void handleLoad_(std::vector<ValueASTNodeSP> &, const std::size_t);
-    void handleRename_(std::vector<ValueASTNodeSP> &, const std::size_t);
-    void handleIncr_(std::vector<ValueASTNodeSP> &, const std::size_t);
-    void handleDecr_(std::vector<ValueASTNodeSP> &, const std::size_t);
-    void handleAppend_(std::vector<ValueASTNodeSP> &, const std::size_t);
-    void handlePrepend_(std::vector<ValueASTNodeSP> &, const std::size_t);
-    void handleSearch_(std::vector<ValueASTNodeSP> &, const std::size_t);
 };

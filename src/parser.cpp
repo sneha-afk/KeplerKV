@@ -48,6 +48,7 @@ CommandASTNodeSP Parser::parseCommand_(const TokenSP &cmdTok) {
         case CommandType::APPEND: cmd = std::make_shared<AppendCmdASTNode>(); break;
         case CommandType::PREPEND: cmd = std::make_shared<PrependCmdASTNode>(); break;
         case CommandType::SEARCH: cmd = std::make_shared<SearchCmdASTNode>(); break;
+        case CommandType::STATS: cmd = std::make_shared<StatsCmdASTNode>(); break;
         default: return nullptr; break;
     }
 

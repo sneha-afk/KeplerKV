@@ -259,20 +259,21 @@ public:
 };
 
 class SaveCmdASTNode : public StoreCmdASTNode {
+public:
     SaveCmdASTNode()
         : StoreCmdASTNode(CommandType::SAVE) { }
-    virtual bool validate() const override;
     virtual void execute(Store &) const override;
 };
 
 class LoadCmdASTNode : public StoreCmdASTNode {
+public:
     LoadCmdASTNode()
         : StoreCmdASTNode(CommandType::LOAD) { }
-    virtual bool validate() const override;
     virtual void execute(Store &) const override;
 };
 
 class RenameCmdASTNode : public StoreCmdASTNode {
+public:
     RenameCmdASTNode()
         : StoreCmdASTNode(CommandType::RENAME) { }
     virtual bool validate() const override;
@@ -280,6 +281,7 @@ class RenameCmdASTNode : public StoreCmdASTNode {
 };
 
 class IncrCmdASTNode : public StoreCmdASTNode {
+public:
     IncrCmdASTNode()
         : StoreCmdASTNode(CommandType::INCR) { }
     virtual bool validate() const override;
@@ -287,6 +289,7 @@ class IncrCmdASTNode : public StoreCmdASTNode {
 };
 
 class DecrCmdASTNode : public StoreCmdASTNode {
+public:
     DecrCmdASTNode()
         : StoreCmdASTNode(CommandType::DECR) { }
     virtual bool validate() const override;
@@ -294,6 +297,7 @@ class DecrCmdASTNode : public StoreCmdASTNode {
 };
 
 class AppendCmdASTNode : public StoreCmdASTNode {
+public:
     AppendCmdASTNode()
         : StoreCmdASTNode(CommandType::APPEND) { }
     virtual bool validate() const override;
@@ -301,6 +305,7 @@ class AppendCmdASTNode : public StoreCmdASTNode {
 };
 
 class PrependCmdASTNode : public StoreCmdASTNode {
+public:
     PrependCmdASTNode()
         : StoreCmdASTNode(CommandType::PREPEND) { }
     virtual bool validate() const override;
@@ -308,9 +313,17 @@ class PrependCmdASTNode : public StoreCmdASTNode {
 };
 
 class SearchCmdASTNode : public StoreCmdASTNode {
+public:
     SearchCmdASTNode()
         : StoreCmdASTNode(CommandType::SEARCH) { }
     virtual bool validate() const override;
+    virtual void execute(Store &) const override;
+};
+
+class StatsCmdASTNode : public StoreCmdASTNode {
+public:
+    StatsCmdASTNode()
+        : StoreCmdASTNode(CommandType::STATS) { }
     virtual void execute(Store &) const override;
 };
 
