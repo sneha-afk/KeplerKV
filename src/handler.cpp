@@ -9,9 +9,6 @@
 static constexpr bool DEBUG = false;
 
 std::unordered_map<CommandType, HandlerFunctionPtr> Handler::cmdToFunc_ = {
-    { CommandType::DELETE, &Handler::handleDelete_ },
-    { CommandType::UPDATE, &Handler::handleUpdate_ },
-    { CommandType::RESOLVE, &Handler::handleResolve_ },
     { CommandType::SAVE, &Handler::handleSave_ }, { CommandType::LOAD, &Handler::handleLoad_ },
     { CommandType::RENAME, &Handler::handleRename_ }, { CommandType::INCR, &Handler::handleIncr_ },
     { CommandType::DECR, &Handler::handleDecr_ }, { CommandType::APPEND, &Handler::handleAppend_ },
@@ -40,7 +37,6 @@ bool Handler::handleQuery(std::string &query) {
         SystemCmdASTNodeSP sysCmd = std::dynamic_pointer_cast<SystemCmdASTNode>(cmd);
         if (sysCmd) {
             switch (sysCmd->getCmdType()) {
-                case CommandType::CLEAR: std::cout << "\033[H\033[2J" << std::endl; break;
                 case CommandType::STATS: handleStats_(); break;
                 default:
                     if (!sysCmd->validate()) throw RuntimeErr(WRONG_CMD_FMT);
@@ -115,44 +111,6 @@ void Handler::handleStats_() {
     std::cout << "\tStrings: " << memStrs << std::endl;
     std::cout << "\tLists: " << memLists << std::endl;
     std::cout << "\tAliases: " << memAliases << std::endl;
-}
-
-void Handler::handleDelete_(std::vector<ValueASTNodeSP> &args, const std::size_t numArgs) {
-    if (numArgs < 1) throw MIN_ONE_ARG_K("DELETE");
-
-    for (const auto &arg : args) {
-        if (!arg) continue;
-
-        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
-        if (!idNode) throw RuntimeErr(NOT_IDENT);
-        const std::string &ident = idNode->getValue();
-
-        bool deleted = store_.del(ident);
-        if (deleted)
-            std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
-        else
-            std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
-    }
-}
-
-void Handler::handleUpdate_(std::vector<ValueASTNodeSP> &args, const std::size_t numArgs) {
-    if (numArgs < 2) throw MIN_TWO_ARG_KV("UPDATE");
-
-    for (std::size_t i = 0; i < numArgs; i += 2) {
-        if (!args[i]) continue;
-
-        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(args[i]->evaluate());
-        if (!idNode) throw RuntimeErr(NOT_IDENT);
-        const std::string &ident = idNode->getValue();
-
-        if (!(i + 1 < numArgs) || !args[i + 1]) throw RuntimeErr(VAL_AFTER_IDENT);
-
-        bool updated = store_.update(ident, (args[i + 1])->evaluate());
-        if (updated)
-            std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
-        else
-            std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
-    }
 }
 
 void Handler::handleResolve_(std::vector<ValueASTNodeSP> &args, const std::size_t numArgs) {

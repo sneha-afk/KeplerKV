@@ -178,7 +178,7 @@ public:
     // execute() assumes the node has been validated.
     // Executing non-validated nodes can have undefined behavior.
     // Error-handling is the caller's responsibility.
-    virtual void execute(Store &s) const = 0;
+    virtual void execute(Store &) const = 0;
 };
 
 // System commands do not interact with the store.
@@ -204,12 +204,19 @@ public:
     virtual void execute() const override;
 };
 
+class ClearCmdASTNode : public SystemCmdASTNode {
+public:
+    ClearCmdASTNode()
+        : SystemCmdASTNode(CommandType::CLEAR) { }
+    virtual void execute() const override;
+};
+
 class SetCmdASTNode : public StoreCmdASTNode {
 public:
     SetCmdASTNode()
         : StoreCmdASTNode(CommandType::SET) { }
     virtual bool validate() const override;
-    virtual void execute(Store &s) const override;
+    virtual void execute(Store &) const override;
 };
 
 class GetCmdASTNode : public StoreCmdASTNode {
@@ -217,14 +224,94 @@ public:
     GetCmdASTNode()
         : StoreCmdASTNode(CommandType::GET) { }
     virtual bool validate() const override;
-    virtual void execute(Store &s) const override;
+    virtual void execute(Store &) const override;
 };
 
 class ListCmdASTNode : public StoreCmdASTNode {
 public:
     ListCmdASTNode()
         : StoreCmdASTNode(CommandType::LIST) { }
-    virtual void execute(Store &s) const override;
+    virtual void execute(Store &) const override;
+};
+
+class DeleteCmdASTNode : public StoreCmdASTNode {
+public:
+    DeleteCmdASTNode()
+        : StoreCmdASTNode(CommandType::DELETE) { }
+    virtual bool validate() const override;
+    virtual void execute(Store &) const override;
+};
+
+class UpdateCmdASTNode : public StoreCmdASTNode {
+public:
+    UpdateCmdASTNode()
+        : StoreCmdASTNode(CommandType::UPDATE) { }
+    virtual bool validate() const override;
+    virtual void execute(Store &) const override;
+};
+
+class ResolveCmdASTNode : public StoreCmdASTNode {
+public:
+    ResolveCmdASTNode()
+        : StoreCmdASTNode(CommandType::RESOLVE) { }
+    virtual bool validate() const override;
+    virtual void execute(Store &) const override;
+};
+
+class SaveCmdASTNode : public StoreCmdASTNode {
+    SaveCmdASTNode()
+        : StoreCmdASTNode(CommandType::SAVE) { }
+    virtual bool validate() const override;
+    virtual void execute(Store &) const override;
+};
+
+class LoadCmdASTNode : public StoreCmdASTNode {
+    LoadCmdASTNode()
+        : StoreCmdASTNode(CommandType::LOAD) { }
+    virtual bool validate() const override;
+    virtual void execute(Store &) const override;
+};
+
+class RenameCmdASTNode : public StoreCmdASTNode {
+    RenameCmdASTNode()
+        : StoreCmdASTNode(CommandType::RENAME) { }
+    virtual bool validate() const override;
+    virtual void execute(Store &) const override;
+};
+
+class IncrCmdASTNode : public StoreCmdASTNode {
+    IncrCmdASTNode()
+        : StoreCmdASTNode(CommandType::INCR) { }
+    virtual bool validate() const override;
+    virtual void execute(Store &) const override;
+};
+
+class DecrCmdASTNode : public StoreCmdASTNode {
+    DecrCmdASTNode()
+        : StoreCmdASTNode(CommandType::DECR) { }
+    virtual bool validate() const override;
+    virtual void execute(Store &) const override;
+};
+
+class AppendCmdASTNode : public StoreCmdASTNode {
+    AppendCmdASTNode()
+        : StoreCmdASTNode(CommandType::APPEND) { }
+    virtual bool validate() const override;
+    virtual void execute(Store &) const override;
+};
+
+class PrependCmdASTNode : public StoreCmdASTNode {
+    PrependCmdASTNode()
+        : StoreCmdASTNode(CommandType::PREPEND) { }
+    virtual bool validate() const override;
+    virtual void execute(Store &) const override;
+};
+
+class SearchCmdASTNode : public StoreCmdASTNode {
+    SearchCmdASTNode()
+        : StoreCmdASTNode(CommandType::SEARCH) { }
+    virtual bool validate() const override;
+    virtual void execute(Store &) const override;
 };
 
 using CommandASTNodeSP = std::shared_ptr<CommandASTNode>;

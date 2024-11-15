@@ -70,6 +70,8 @@ void QuitCmdASTNode::execute() const {
     exit(EXIT_SUCCESS);
 };
 
+void ClearCmdASTNode::execute() const { std::cout << "\033[H\033[2J" << std::endl; };
+
 bool SetCmdASTNode::validate() const {
     if (numArgs() < 2) return false;
 
@@ -83,7 +85,6 @@ bool SetCmdASTNode::validate() const {
         // Identiifer must follow a value
         if (!(i + 1 < numArgs()) || !args_[i + 1]) return false;
     }
-
     return true;
 }
 
@@ -128,4 +129,87 @@ void ListCmdASTNode::execute(Store &s) const {
     if (s.size() < 1) std::cout << T_BYLLW << "(empty)" << T_RESET << std::endl;
     for (const auto &item : s)
         printItem(item.first, item.second);
+}
+
+bool DeleteCmdASTNode::validate() const {
+    if (numArgs() < 1) return false;
+
+    for (const auto &arg : args_) {
+        if (!arg) continue;
+
+        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
+        if (!idNode) return false;
+    }
+    return true;
+}
+
+void DeleteCmdASTNode::execute(Store &s) const {
+    for (const auto &arg : args_) {
+        if (!arg) continue;
+
+        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
+        const std::string &ident = idNode->getValue();
+
+        bool deleted = s.del(ident);
+        if (deleted)
+            std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
+        else
+            std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
+    }
+}
+
+bool UpdateCmdASTNode::validate() const {
+    if (numArgs() < 2) return false;
+
+    for (std::size_t i = 0; i < numArgs(); i += 2) {
+        if (!args_[i]) continue;
+
+        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(args_[i]->evaluate());
+        if (!idNode) return false;
+
+        if (!(i + 1 < numArgs()) || !args_[i + 1]) return false;
+    }
+    return true;
+}
+
+void UpdateCmdASTNode::execute(Store &s) const {
+    for (std::size_t i = 0; i < numArgs(); i += 2) {
+        if (!args_[i]) continue;
+
+        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(args_[i]->evaluate());
+        const std::string &ident = idNode->getValue();
+
+        bool updated = s.update(ident, (args_[i + 1])->evaluate());
+        if (updated)
+            std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
+        else
+            std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
+    }
+}
+
+bool ResolveCmdASTNode::validate() const {
+    if (numArgs() < 1) return false;
+
+    for (const auto &arg : args_) {
+        if (!arg) continue;
+
+        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
+        if (!idNode) return false;
+    }
+    return true;
+}
+
+void ResolveCmdASTNode::execute(Store &s) const {
+    for (const auto &arg : args_) {
+        if (!arg) continue;
+
+        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
+        const std::string &ident = idNode->getValue();
+
+        StoreValueSP value = s.resolve(ident, true);
+        if (value)
+            printItem(ident, value);
+        else
+            std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
+    }
 }

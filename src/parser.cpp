@@ -33,9 +33,21 @@ CommandASTNodeSP Parser::parseCommand_(const TokenSP &cmdTok) {
     CommandASTNodeSP cmd;
     switch (cmdType) {
         case CommandType::QUIT: cmd = std::make_shared<QuitCmdASTNode>(); break;
+        case CommandType::CLEAR: cmd = std::make_shared<ClearCmdASTNode>(); break;
         case CommandType::SET: cmd = std::make_shared<SetCmdASTNode>(); break;
         case CommandType::GET: cmd = std::make_shared<GetCmdASTNode>(); break;
         case CommandType::LIST: cmd = std::make_shared<ListCmdASTNode>(); break;
+        case CommandType::DELETE: cmd = std::make_shared<DeleteCmdASTNode>(); break;
+        case CommandType::UPDATE: cmd = std::make_shared<UpdateCmdASTNode>(); break;
+        case CommandType::RESOLVE: cmd = std::make_shared<ResolveCmdASTNode>(); break;
+        case CommandType::SAVE: cmd = std::make_shared<SaveCmdASTNode>(); break;
+        case CommandType::LOAD: cmd = std::make_shared<LoadCmdASTNode>(); break;
+        case CommandType::RENAME: cmd = std::make_shared<RenameCmdASTNode>(); break;
+        case CommandType::INCR: cmd = std::make_shared<IncrCmdASTNode>(); break;
+        case CommandType::DECR: cmd = std::make_shared<DecrCmdASTNode>(); break;
+        case CommandType::APPEND: cmd = std::make_shared<AppendCmdASTNode>(); break;
+        case CommandType::PREPEND: cmd = std::make_shared<PrependCmdASTNode>(); break;
+        case CommandType::SEARCH: cmd = std::make_shared<SearchCmdASTNode>(); break;
         default: return nullptr; break;
     }
 
