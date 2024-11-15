@@ -78,9 +78,22 @@ A NoSQL key-value pair store for quick access.
     - [Using `std::dynamic_pointer_cast` on `std::shared_ptr`](https://stackoverflow.com/a/14545746)
     - [Virtual destructors in inheritance](https://stackoverflow.com/q/461203)
     - [Making custom classes iterable](https://stackoverflow.com/a/46432381)
+- RefactoringGuru
+    - [Command design pattern](https://refactoring.guru/design-patterns/command)
 
 ---
 ## dev journal
+### November 14, 2024
+Slowed development after starting a new degree program.
+- Moving over to the [Command](https://refactoring.guru/design-patterns/command) pattern
+    - Treating each command as its own type will allow for accessing the possible command set as an interface in multiple modals: CLI, separating validation for transactions, and future API
+- Commands each have a `validate()` that should be run before `execute()`
+    - Transactions will validate a command before settling it into a proposed WAL log
+- Future design considerations:
+    - Request/response like communication from each command object (e.x. arguments and each OK response)
+    - Rethinking the inheritance structure of commands
+    - Repeated validation for commands that have simple identifier value checks
+
 ### September 10, 2024
 Transactions can be implemented in several ways: I am leaning towards the write-ahead logging (WAL) method which utilizes a log.
 - Statements are stored in a WAL log as they are recieved, but are not directly applied to the data
