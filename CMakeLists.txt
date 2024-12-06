@@ -13,6 +13,7 @@ add_executable(${PROJECT_NAME}
     src/store_value.cpp
     src/store.cpp
     src/syntax_tree.cpp
+    src/command_ast_nodes.cpp
     src/lexer.cpp
     src/parser.cpp
     src/handler.cpp

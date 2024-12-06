@@ -1,5 +1,6 @@
 #include "parser.h"
 
+#include "command_ast_nodes.h"
 #include "error_msgs.h"
 #include "util.h"
 
@@ -49,6 +50,9 @@ CommandASTNodeSP Parser::parseCommand_(const TokenSP &cmdTok) {
         case CommandType::PREPEND: cmd = std::make_shared<PrependCmdASTNode>(); break;
         case CommandType::SEARCH: cmd = std::make_shared<SearchCmdASTNode>(); break;
         case CommandType::STATS: cmd = std::make_shared<StatsCmdASTNode>(); break;
+        case CommandType::BEGIN: cmd = std::make_shared<BeginCmdASTNode>(); break;
+        case CommandType::COMMIT: cmd = std::make_shared<CommitCmdASTNode>(); break;
+        case CommandType::ROLLBACK: cmd = std::make_shared<RollbackCmdASTNode>(); break;
         default: return nullptr; break;
     }
 

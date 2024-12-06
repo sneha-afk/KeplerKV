@@ -8,6 +8,8 @@
 
 static constexpr bool DEBUG = false;
 
+bool inTransaction_ = true;
+
 /**
  * Proccesses a query and hands it off to the store to execute.
  * Returns whether to keep running the program.
@@ -35,7 +37,36 @@ bool Handler::handleQuery(std::string &query) {
             StoreCmdASTNodeSP storeCmd = std::dynamic_pointer_cast<StoreCmdASTNode>(cmd);
 
             if (!storeCmd->validate()) throw RuntimeErr(WRONG_CMD_FMT);
-            storeCmd->execute(store_);
+
+            switch (storeCmd->getCmdType()) {
+                case CommandType::BEGIN:
+                    inTransaction_ = true;
+                    storeCmd->execute(store_);
+                    break;
+                case CommandType::COMMIT:
+                    inTransaction_ = false;
+                    while (0 < wal_.size()) {
+                        StoreCmdASTNodeSP frontCmd = wal_.front();
+                        wal_.pop_front();
+                        frontCmd->execute(store_);
+                    }
+                    storeCmd->execute(store_);
+                    break;
+                case CommandType::ROLLBACK:
+                    inTransaction_ = false;
+                    wal_.clear();
+                    storeCmd->execute(store_);
+                    break;
+                default:
+                    if (inTransaction_) {
+                        wal_.push_back(storeCmd);
+                        std::cout << T_BYLLW << "LOGGED" << T_RESET << std::endl;
+                    } else {
+                        storeCmd->execute(store_);
+                    }
+                    break;
+            }
+
             break;
         }
     }

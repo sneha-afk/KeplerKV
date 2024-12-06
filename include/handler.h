@@ -4,12 +4,9 @@
 #include "parser.h"
 #include "store.h"
 
+#include <deque>
 #include <functional>
 #include <string>
-
-class Handler;
-using HandlerFunctionPtr
-    = std::function<void(Handler *, std::vector<ValueASTNodeSP> &, const std::size_t)>;
 
 class Handler {
 public:
@@ -35,5 +32,5 @@ private:
     Parser parser_;
     Store store_;
 
-    static std::unordered_map<CommandType, HandlerFunctionPtr> cmdToFunc_;
+    std::deque<StoreCmdASTNodeSP> wal_;
 };

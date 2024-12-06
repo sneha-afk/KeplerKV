@@ -19,6 +19,7 @@ enum class CommandType {
     LOAD,       CLEAR,          RENAME,
     INCR,       DECR,           APPEND,
     PREPEND,    STATS,          SEARCH,
+    BEGIN,      COMMIT,         ROLLBACK,
 };
 // clang-format on
 
@@ -33,7 +34,8 @@ static const std::unordered_map<std::string, CommandType> mapToCmd = { { "SET", 
     { "RENAME", CommandType::RENAME }, { "RN", CommandType::RENAME }, { "INCR", CommandType::INCR },
     { "DECR", CommandType::DECR }, { "APPEND", CommandType::APPEND },
     { "PREPEND", CommandType::PREPEND }, { "STATS", CommandType::STATS },
-    { "SEARCH", CommandType::SEARCH } };
+    { "SEARCH", CommandType::SEARCH }, { "BEGIN", CommandType::BEGIN },
+    { "COMMIT", CommandType::COMMIT }, { "ROLLBACK", CommandType::ROLLBACK } };
 
 class ASTNode {
 public:
@@ -195,136 +197,6 @@ public:
     // Executing non-validated nodes can have undefined behavior.
     // Error-handling is the caller's responsibility.
     virtual void execute() const = 0;
-};
-
-class QuitCmdASTNode : public SystemCmdASTNode {
-public:
-    QuitCmdASTNode()
-        : SystemCmdASTNode(CommandType::QUIT) { }
-    virtual void execute() const override;
-};
-
-class ClearCmdASTNode : public SystemCmdASTNode {
-public:
-    ClearCmdASTNode()
-        : SystemCmdASTNode(CommandType::CLEAR) { }
-    virtual void execute() const override;
-};
-
-class SetCmdASTNode : public StoreCmdASTNode {
-public:
-    SetCmdASTNode()
-        : StoreCmdASTNode(CommandType::SET) { }
-    virtual bool validate() const override;
-    virtual void execute(Store &) const override;
-};
-
-class GetCmdASTNode : public StoreCmdASTNode {
-public:
-    GetCmdASTNode()
-        : StoreCmdASTNode(CommandType::GET) { }
-    virtual bool validate() const override;
-    virtual void execute(Store &) const override;
-};
-
-class ListCmdASTNode : public StoreCmdASTNode {
-public:
-    ListCmdASTNode()
-        : StoreCmdASTNode(CommandType::LIST) { }
-    virtual void execute(Store &) const override;
-};
-
-class DeleteCmdASTNode : public StoreCmdASTNode {
-public:
-    DeleteCmdASTNode()
-        : StoreCmdASTNode(CommandType::DELETE) { }
-    virtual bool validate() const override;
-    virtual void execute(Store &) const override;
-};
-
-class UpdateCmdASTNode : public StoreCmdASTNode {
-public:
-    UpdateCmdASTNode()
-        : StoreCmdASTNode(CommandType::UPDATE) { }
-    virtual bool validate() const override;
-    virtual void execute(Store &) const override;
-};
-
-class ResolveCmdASTNode : public StoreCmdASTNode {
-public:
-    ResolveCmdASTNode()
-        : StoreCmdASTNode(CommandType::RESOLVE) { }
-    virtual bool validate() const override;
-    virtual void execute(Store &) const override;
-};
-
-class SaveCmdASTNode : public StoreCmdASTNode {
-public:
-    SaveCmdASTNode()
-        : StoreCmdASTNode(CommandType::SAVE) { }
-    virtual void execute(Store &) const override;
-};
-
-class LoadCmdASTNode : public StoreCmdASTNode {
-public:
-    LoadCmdASTNode()
-        : StoreCmdASTNode(CommandType::LOAD) { }
-    virtual void execute(Store &) const override;
-};
-
-class RenameCmdASTNode : public StoreCmdASTNode {
-public:
-    RenameCmdASTNode()
-        : StoreCmdASTNode(CommandType::RENAME) { }
-    virtual bool validate() const override;
-    virtual void execute(Store &) const override;
-};
-
-class IncrCmdASTNode : public StoreCmdASTNode {
-public:
-    IncrCmdASTNode()
-        : StoreCmdASTNode(CommandType::INCR) { }
-    virtual bool validate() const override;
-    virtual void execute(Store &) const override;
-};
-
-class DecrCmdASTNode : public StoreCmdASTNode {
-public:
-    DecrCmdASTNode()
-        : StoreCmdASTNode(CommandType::DECR) { }
-    virtual bool validate() const override;
-    virtual void execute(Store &) const override;
-};
-
-class AppendCmdASTNode : public StoreCmdASTNode {
-public:
-    AppendCmdASTNode()
-        : StoreCmdASTNode(CommandType::APPEND) { }
-    virtual bool validate() const override;
-    virtual void execute(Store &) const override;
-};
-
-class PrependCmdASTNode : public StoreCmdASTNode {
-public:
-    PrependCmdASTNode()
-        : StoreCmdASTNode(CommandType::PREPEND) { }
-    virtual bool validate() const override;
-    virtual void execute(Store &) const override;
-};
-
-class SearchCmdASTNode : public StoreCmdASTNode {
-public:
-    SearchCmdASTNode()
-        : StoreCmdASTNode(CommandType::SEARCH) { }
-    virtual bool validate() const override;
-    virtual void execute(Store &) const override;
-};
-
-class StatsCmdASTNode : public StoreCmdASTNode {
-public:
-    StatsCmdASTNode()
-        : StoreCmdASTNode(CommandType::STATS) { }
-    virtual void execute(Store &) const override;
 };
 
 using CommandASTNodeSP = std::shared_ptr<CommandASTNode>;
