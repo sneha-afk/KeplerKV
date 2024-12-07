@@ -63,7 +63,7 @@ Multiple commands can be completed at once by separating them with semicolons:
 
 ### Command syntax
 
-Commands are **case-insentive** and may have alternate syntax. This documentation denotes commands and their arguments as:
+Commands are **case-insensitive** and may have alternate syntax. This documentation denotes commands and their arguments as:
 ```
 {set of equivalent invocations} required-argument [optional-arguments]
 ```

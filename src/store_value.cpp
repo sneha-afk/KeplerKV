@@ -85,10 +85,8 @@ void ListValue::deserialize(std::ifstream &fp) {
     fp.read(reinterpret_cast<char *>(&numVals), sizeof(size_t));
 
     std::vector<StoreValueSP> lst = std::vector<StoreValueSP>();
-    for (size_t i = 0; i < numVals; i++) {
-        StoreValueSP valsp = fromFile(fp);
-        lst.push_back(valsp);
-    }
+    for (size_t i = 0; i < numVals; i++)
+        lst.push_back(fromFile(fp));
     value_ = lst;
 }
 

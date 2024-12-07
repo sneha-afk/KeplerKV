@@ -11,7 +11,7 @@ static constexpr bool DEBUG = false;
 bool inTransaction_ = true;
 
 /**
- * Proccesses a query and hands it off to the store to execute.
+ * Processes a query and hands it off to the store to execute.
  * Returns whether to keep running the program.
  */
 bool Handler::handleQuery(std::string &query) {

@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-enum class ValueType { INT, FLOAT, STRING, LIST, IDENTIIFER };
+enum class ValueType { INT, FLOAT, STRING, LIST, IDENTIFIER };
 
 class StoreValue;
 using StoreValueSP = std::shared_ptr<StoreValue>;
@@ -15,7 +15,7 @@ class StoreValue {
 public:
     virtual ~StoreValue() = default;
 
-    /* Values are serialized by type identiifer, size of the value, then raw data.
+    /* Values are serialized by type identifier, size of the value, then raw data.
     * ex. a string "abc" may be stored as s|4|abc
     */
     virtual std::vector<uint8_t> serialize() const = 0;
@@ -114,7 +114,7 @@ public:
 
     std::vector<uint8_t> serialize() const override;
 
-    inline ValueType getValueType() const override { return ValueType::IDENTIIFER; }
+    inline ValueType getValueType() const override { return ValueType::IDENTIFIER; }
     std::string string() const override { return "id: " + value_; }
 };
 

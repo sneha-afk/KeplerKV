@@ -6,7 +6,7 @@
 
 enum class TokenType {
     COMMAND,
-    IDENTIIFER,
+    IDENTIFIER,
     NUMBER,
     STRING,
     LIST_START,
@@ -40,7 +40,7 @@ struct Token {
         os << "{token: ";
         switch (t.type) {
             case TokenType::COMMAND: os << "CMD"; break;
-            case TokenType::IDENTIIFER: os << "IDENTIFIER"; break;
+            case TokenType::IDENTIFIER: os << "IDENTIFIER"; break;
             case TokenType::NUMBER: os << "NUMBER"; break;
             case TokenType::STRING: os << "STRING"; break;
             case TokenType::LIST_START: os << "LIST_START"; break;

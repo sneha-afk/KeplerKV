@@ -77,7 +77,7 @@ TokenSP Lexer::lexIdentifier_() {
         s.push_back(*it_);
         it_++;
     }
-    return std::make_shared<Token>(TokenType::IDENTIIFER, std::move(s));
+    return std::make_shared<Token>(TokenType::IDENTIFIER, std::move(s));
 }
 
 // Numbers have digits, at most one sign, and at most one decimal

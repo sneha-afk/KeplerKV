@@ -14,7 +14,7 @@ A NoSQL key-value pair store for quick access.
         * [`class Token`](/include/token.h): container of a string token read and its inferred type (i.e command, value, unknown)
     * [`class Parser`](/include/parser.h): parses semantic meaning out of the tokens generated from the lexer
         * [`class ASTNode`](/include/syntax_tree.h): represents a `Token`'s meaning and any contained data
-    * Execution and validation done within `Handler`: may consider exporting this to a class if too unwiedly
+    * Execution and validation done within `Handler`: may consider exporting this to a class if too unwieldy
 * [`class Store`](/include/store.h): in-memory representation of the store
     * [`class StoreValue`](/include/store_value.h): base class representing a value within the store, from which specific types inherit from, such as `IntValue`
 
@@ -56,11 +56,11 @@ A NoSQL key-value pair store for quick access.
     * For manipulation: INCR, DECR, APPEND, PREPEND
     * Other: LIST, CLEAR, SAVE, LOAD, STATS
 * Most commands can be batched, i.e setting multiple keys at once
-* Data types supported: integers, floats, strings, hetereogenous and multidimensional lists
+* Data types supported: integers, floats, strings, heterogenous and multidimensional lists
 * Saving and loading state from a `.kep` file
 * Cycle detection in RESOLVE to prevent infinite loops
     * RESOLVE will also recursively find identifiers to resolve within lists if requested to
-* Data types can be changed if UDPATE is used with a different type
+* Data types can be changed if UPDATE is used with a different type
 * Data manipulation for certain types
     * Integers, floats: INCR, DECR
     * Lists: APPEND, PREPEND
@@ -96,7 +96,7 @@ Slowed development after starting a new degree program.
 
 ### September 10, 2024
 Transactions can be implemented in several ways: I am leaning towards the write-ahead logging (WAL) method which utilizes a log.
-- Statements are stored in a WAL log as they are recieved, but are not directly applied to the data
+- Statements are stored in a WAL log as they are received, but are not directly applied to the data
 - If the system fails, the WAL should detect the transaction is incomplete (having start/end indicators would help)
     - Can rollback or let the user continue
 - Once a commit is done, the WAL is replayed and the operations are applied
@@ -112,7 +112,7 @@ Transactions can be implemented in several ways: I am leaning towards the write-
     - Going forward, being more mindful on strings
 - `inline`d smaller functions, especially the returning enum ones
 - Moved macros to more sensible locations
-- Lots of minor code quallity issues
+- Lots of minor code quality issues
 - Up next: learning more about `std::move` and move constructors, potentially very beneficial for a program so reliant on passing strings through a pipeline!
 
 ### September 6, 2024
@@ -155,13 +155,13 @@ Launching version 1.0!
 
 ### August 10, 2024
 
-* Added a new command `RENAME` to renae keys to new names
+* Added a new command `RENAME` to rename keys to new names
 * Added documentation and a test file
 
 ### August 8, 2024
 
 * Created `tests/execute_all.sh` which takes input and expected output files as test cases
-* Refactored `handler.cpp` to use a function map instead of an unweidly `switch` statement for longer command processes
+* Refactored `handler.cpp` to use a function map instead of an unwieldy `switch` statement for longer command processes
 * Next steps:
     * Aforementioned code review
     * Add some small utility commands: `RENAME`, `STATS`
@@ -208,16 +208,16 @@ Launching version 1.0!
     * Work on recursive identifier handling
         * Thinking about using lazy evaluation for these
         * Can set a currently unbinded identifier, but must be specified before doing a `GET`
-    * Start plannning serialization to file
+    * Start planning serialization to file
 
 ### July 9, 2024
 
-I had been working on this incrementally and continously getting stuck on how to effectively parse so many types of `ValueNodes`. I took a step back and read more about abstract syntax trees and decided a more "flat" approach to parsing since I am only handling very primiive types. After doing so, I had to delve into `std::variant` to make operations easier on the store. This coupling between a `StoreValue` type and its containing `ValueNode` type is hopefully as seamless as I can make it for now.
+I had been working on this incrementally and continuously getting stuck on how to effectively parse so many types of `ValueNodes`. I took a step back and read more about abstract syntax trees and decided a more "flat" approach to parsing since I am only handling very primitive types. After doing so, I had to delve into `std::variant` to make operations easier on the store. This coupling between a `StoreValue` type and its containing `ValueNode` type is hopefully as seamless as I can make it for now.
 * Next steps:
     * Debug parsing issues:
         * Segmentation fault on improperly formed lists, should instead throw an error (or infer end of list scope)
         * Floating type values are not being parsed correctly
-    * Complete the implemenation of `Handler` which interacts with the store
+    * Complete the implementation of `Handler` which interacts with the store
 
 ### July 5, 2024
 
@@ -233,7 +233,7 @@ I had been working on this incrementally and continously getting stuck on how to
 * Using smart pointers to use dynamic memory safely
 * Next steps:
     * Evaluator to enforce syntax rules and command specifications
-    * Planning for the store: how to bridge the gap betweent the evaluator and store itself
+    * Planning for the store: how to bridge the gap between the evaluator and store itself
 
 ### July 1, 2024
 

@@ -11,7 +11,7 @@ std::string getFilename_(const ValueASTNodeSP node) {
     if (!fnNode) throw RuntimeErr(INVALID_FNAME);
     filename = fnNode->getValue();
 
-    return fnNode->getValueType() == ValueType::IDENTIIFER ? filename : removeQuotations(filename);
+    return fnNode->getValueType() == ValueType::IDENTIFIER ? filename : removeQuotations(filename);
 }
 
 void QuitCmdASTNode::execute() const {
@@ -31,7 +31,7 @@ bool SetCmdASTNode::validate() const {
         IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(args_[i]->evaluate());
         if (!idNode) return false;
 
-        // Identiifer must follow a value
+        // Identifier must follow a value
         if (!(i + 1 < numArgs()) || !args_[i + 1]) return false;
     }
     return true;
@@ -373,7 +373,7 @@ void SearchCmdASTNode::execute(Store &s) const {
 
         StringValueSP node = std::dynamic_pointer_cast<StringValue>(arg->evaluate());
 
-        const std::string &pattern = node->getValueType() == ValueType::IDENTIIFER
+        const std::string &pattern = node->getValueType() == ValueType::IDENTIFIER
                                          ? node->getValue()
                                          : removeQuotations(node->getValue());
         std::vector<std::string> keys = s.search(pattern);
@@ -413,7 +413,7 @@ void StatsCmdASTNode::execute(Store &s) const {
                 numLists++;
                 memLists += memCurr;
                 break;
-            case ValueType::IDENTIIFER:
+            case ValueType::IDENTIFIER:
                 numAliases++;
                 memAliases += memCurr;
                 break;

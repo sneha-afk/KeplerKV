@@ -14,7 +14,7 @@ Store::Store() {
     map_.reserve(STORE_MIN_SIZE);
 }
 
-// Indicates whether the store conatains the key.
+// Indicates whether the store contains the key.
 bool Store::contains(const std::string &key) const { return map_.find(key) != map_.end(); }
 
 // Inserts a new key into the map, or updates the value if it exists.
@@ -25,7 +25,7 @@ StoreValueSP Store::get(const std::string &key) const {
     return mapGet(map_, key, (StoreValueSP) nullptr);
 }
 
-// Erases a key from the map, no effect if it is not present. Returns indication whether any deletion occured.
+// Erases a key from the map, no effect if it is not present. Returns indication whether any deletion occurred.
 bool Store::del(const std::string &key) { return map_.erase(key); }
 
 // Updates a key's value. Returns true if updated, false if the key does not exist.
@@ -45,15 +45,15 @@ StoreValueSP Store::resolve(const std::string &key, bool resolveIdentsInList) co
 
 StoreValueSP Store::resolveRecur_(
     const std::string &key, std::unordered_set<std::string> &seen, bool resolveIdentsInList) const {
-    // If a key is being searched for again, there is a circluar ref
+    // If a key is being searched for again, there is a circular ref
     if (seen.count(key)) throw RuntimeErr(CIRCULAR_REF);
     seen.insert(key);
 
     StoreValueSP found = get(key);
     if (!found) return nullptr;
 
-    // If another identiifer is found, continue down the chain
-    if (found->getValueType() == ValueType::IDENTIIFER) {
+    // If another identifier is found, continue down the chain
+    if (found->getValueType() == ValueType::IDENTIFIER) {
         IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(found);
         return resolveRecur_(idNode->getValue(), seen, resolveIdentsInList);
     }
@@ -65,7 +65,7 @@ StoreValueSP Store::resolveRecur_(
         std::vector<StoreValueSP> resolvedL = std::vector<StoreValueSP>(listNode->getValue());
         for (std::size_t i = 0; i < resolvedL.size(); i++) {
             if (!resolvedL[i]) continue;
-            if (resolvedL[i]->getValueType() == ValueType::IDENTIIFER) {
+            if (resolvedL[i]->getValueType() == ValueType::IDENTIFIER) {
                 // Each element should inherit parent history
                 std::unordered_set<std::string> newSeen = std::unordered_set<std::string>(seen);
 

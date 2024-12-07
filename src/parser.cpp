@@ -93,7 +93,7 @@ ValueASTNodeSP Parser::parseValue_(const TokenSP &t) {
                     throw RuntimeErr(WRONG_I_FMT);
                 }
             }
-        case TokenType::IDENTIIFER: return std::make_shared<IdentifierASTNode>(tValue);
+        case TokenType::IDENTIFIER: return std::make_shared<IdentifierASTNode>(tValue);
         case TokenType::STRING: return std::make_shared<StringASTNode>(tValue);
         case TokenType::LIST_START: tt_++; return parseList_();
         default: throw UNKNOWN_TOKEN(t->value); break;
