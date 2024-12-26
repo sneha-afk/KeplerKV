@@ -4,7 +4,7 @@
 #include "error_msgs.h"
 #include "util.h"
 
-std::vector<ASTNodeSP> &Parser::parse(std::vector<TokenSP> &tokens) {
+std::vector<CommandASTNodeSP> &Parser::parse(std::vector<TokenSP> &tokens) {
     nodes.clear();
     if (tokens.empty()) return nodes;
 

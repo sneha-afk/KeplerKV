@@ -8,7 +8,7 @@
 
 static constexpr bool DEBUG = false;
 
-bool inTransaction_ = true;
+bool inTransaction_ = false;
 
 /**
  * Processes a query and hands it off to the store to execute.
@@ -20,24 +20,17 @@ bool Handler::handleQuery(std::string &query) {
         for (const auto &t : tokens)
             std::cout << "\t" << *t << std::endl;
 
-    std::vector<ASTNodeSP> &nodes = parser_.parse(tokens);
-    for (const auto &n : nodes) {
-        if (DEBUG) std::cout << "\t" << *n << std::endl;
+    std::vector<CommandASTNodeSP> &nodes = parser_.parse(tokens);
+    for (const CommandASTNodeSP &cmd : nodes) {
+        if (DEBUG) std::cout << "\t" << *cmd << std::endl;
 
-        CommandASTNodeSP cmd = std::dynamic_pointer_cast<CommandASTNode>(n);
-        if (!cmd) throw RuntimeErr(WRONG_CMD_FMT);
+        // Validate the command
+        if (!cmd || !cmd->validate()) throw RuntimeErr(WRONG_CMD_FMT);
 
         // Check what kind of command this is
-        SystemCmdASTNodeSP sysCmd = std::dynamic_pointer_cast<SystemCmdASTNode>(cmd);
-        if (sysCmd) {
-            if (!sysCmd->validate()) throw RuntimeErr(WRONG_CMD_FMT);
+        if (SystemCmdASTNodeSP sysCmd = std::dynamic_pointer_cast<SystemCmdASTNode>(cmd)) {
             sysCmd->execute();
-            break;
-        } else {
-            StoreCmdASTNodeSP storeCmd = std::dynamic_pointer_cast<StoreCmdASTNode>(cmd);
-
-            if (!storeCmd->validate()) throw RuntimeErr(WRONG_CMD_FMT);
-
+        } else if (StoreCmdASTNodeSP storeCmd = std::dynamic_pointer_cast<StoreCmdASTNode>(cmd)) {
             switch (storeCmd->getCmdType()) {
                 case CommandType::BEGIN:
                     inTransaction_ = true;

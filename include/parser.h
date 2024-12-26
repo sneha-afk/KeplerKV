@@ -5,12 +5,12 @@
 
 class Parser {
 public:
-    std::vector<ASTNodeSP> nodes;
+    std::vector<CommandASTNodeSP> nodes;
 
     Parser()
-        : nodes(std::vector<ASTNodeSP>()) {};
+        : nodes(std::vector<CommandASTNodeSP>()) {};
 
-    std::vector<ASTNodeSP> &parse(std::vector<TokenSP> &);
+    std::vector<CommandASTNodeSP> &parse(std::vector<TokenSP> &);
 
 private:
     std::vector<TokenSP>::iterator tt_;
