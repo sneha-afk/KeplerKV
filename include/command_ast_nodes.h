@@ -2,158 +2,158 @@
 
 #include "syntax_tree.h"
 
-class QuitCmdASTNode : public SystemCmdASTNode {
+class QuitCommand : public SystemCommand {
 public:
-    QuitCmdASTNode()
-        : SystemCmdASTNode(CommandType::QUIT) { }
+    QuitCommand()
+        : SystemCommand(CommandType::QUIT) { }
     virtual void execute() const override;
 };
 
-class ClearCmdASTNode : public SystemCmdASTNode {
+class ClearCommand : public SystemCommand {
 public:
-    ClearCmdASTNode()
-        : SystemCmdASTNode(CommandType::CLEAR) { }
+    ClearCommand()
+        : SystemCommand(CommandType::CLEAR) { }
     virtual void execute() const override;
 };
 
-class SetCmdASTNode : public StoreCmdASTNode {
+class SetCommand : public StoreCommand {
 public:
-    SetCmdASTNode()
-        : StoreCmdASTNode(CommandType::SET) { }
+    SetCommand()
+        : StoreCommand(CommandType::SET) { }
     virtual bool validate() const override;
     virtual void execute(Store &) const override;
 };
 
-class GetCmdASTNode : public StoreCmdASTNode {
+class GetCommand : public StoreCommand {
 public:
-    GetCmdASTNode()
-        : StoreCmdASTNode(CommandType::GET) { }
+    GetCommand()
+        : StoreCommand(CommandType::GET) { }
     virtual bool validate() const override;
     virtual void execute(Store &) const override;
 };
 
-class ListCmdASTNode : public StoreCmdASTNode {
+class ListCommand : public StoreCommand {
 public:
-    ListCmdASTNode()
-        : StoreCmdASTNode(CommandType::LIST) { }
+    ListCommand()
+        : StoreCommand(CommandType::LIST) { }
     virtual void execute(Store &) const override;
 };
 
-class DeleteCmdASTNode : public StoreCmdASTNode {
+class DeleteCommand : public StoreCommand {
 public:
-    DeleteCmdASTNode()
-        : StoreCmdASTNode(CommandType::DELETE) { }
+    DeleteCommand()
+        : StoreCommand(CommandType::DELETE) { }
     virtual bool validate() const override;
     virtual void execute(Store &) const override;
 };
 
-class UpdateCmdASTNode : public StoreCmdASTNode {
+class UpdateCommand : public StoreCommand {
 public:
-    UpdateCmdASTNode()
-        : StoreCmdASTNode(CommandType::UPDATE) { }
+    UpdateCommand()
+        : StoreCommand(CommandType::UPDATE) { }
     virtual bool validate() const override;
     virtual void execute(Store &) const override;
 };
 
-class ResolveCmdASTNode : public StoreCmdASTNode {
+class ResolveCommand : public StoreCommand {
 public:
-    ResolveCmdASTNode()
-        : StoreCmdASTNode(CommandType::RESOLVE) { }
+    ResolveCommand()
+        : StoreCommand(CommandType::RESOLVE) { }
     virtual bool validate() const override;
     virtual void execute(Store &) const override;
 };
 
-class SaveCmdASTNode : public StoreCmdASTNode {
+class SaveCommand : public StoreCommand {
 public:
-    SaveCmdASTNode()
-        : StoreCmdASTNode(CommandType::SAVE) { }
+    SaveCommand()
+        : StoreCommand(CommandType::SAVE) { }
     virtual void execute(Store &) const override;
 };
 
-class LoadCmdASTNode : public StoreCmdASTNode {
+class LoadCommand : public StoreCommand {
 public:
-    LoadCmdASTNode()
-        : StoreCmdASTNode(CommandType::LOAD) { }
+    LoadCommand()
+        : StoreCommand(CommandType::LOAD) { }
     virtual void execute(Store &) const override;
 };
 
-class RenameCmdASTNode : public StoreCmdASTNode {
+class RenameCommand : public StoreCommand {
 public:
-    RenameCmdASTNode()
-        : StoreCmdASTNode(CommandType::RENAME) { }
+    RenameCommand()
+        : StoreCommand(CommandType::RENAME) { }
     virtual bool validate() const override;
     virtual void execute(Store &) const override;
 };
 
-class IncrCmdASTNode : public StoreCmdASTNode {
+class IncrementCommand : public StoreCommand {
 public:
-    IncrCmdASTNode()
-        : StoreCmdASTNode(CommandType::INCR) { }
+    IncrementCommand()
+        : StoreCommand(CommandType::INCR) { }
     virtual bool validate() const override;
     virtual void execute(Store &) const override;
 };
 
-class DecrCmdASTNode : public StoreCmdASTNode {
+class DecrementCommand : public StoreCommand {
 public:
-    DecrCmdASTNode()
-        : StoreCmdASTNode(CommandType::DECR) { }
+    DecrementCommand()
+        : StoreCommand(CommandType::DECR) { }
     virtual bool validate() const override;
     virtual void execute(Store &) const override;
 };
 
-class AppendCmdASTNode : public StoreCmdASTNode {
+class AppendCommand : public StoreCommand {
 public:
-    AppendCmdASTNode()
-        : StoreCmdASTNode(CommandType::APPEND) { }
+    AppendCommand()
+        : StoreCommand(CommandType::APPEND) { }
     virtual bool validate() const override;
     virtual void execute(Store &) const override;
 };
 
-class PrependCmdASTNode : public StoreCmdASTNode {
+class PrependCommand : public StoreCommand {
 public:
-    PrependCmdASTNode()
-        : StoreCmdASTNode(CommandType::PREPEND) { }
+    PrependCommand()
+        : StoreCommand(CommandType::PREPEND) { }
     virtual bool validate() const override;
     virtual void execute(Store &) const override;
 };
 
-class SearchCmdASTNode : public StoreCmdASTNode {
+class SearchCommand : public StoreCommand {
 public:
-    SearchCmdASTNode()
-        : StoreCmdASTNode(CommandType::SEARCH) { }
+    SearchCommand()
+        : StoreCommand(CommandType::SEARCH) { }
     virtual bool validate() const override;
     virtual void execute(Store &) const override;
 };
 
-class StatsCmdASTNode : public StoreCmdASTNode {
+class StatsCommand : public StoreCommand {
 public:
-    StatsCmdASTNode()
-        : StoreCmdASTNode(CommandType::STATS) { }
+    StatsCommand()
+        : StoreCommand(CommandType::STATS) { }
     virtual void execute(Store &) const override;
 };
 
-class BeginCmdASTNode : public StoreCmdASTNode {
+class BeginCommand : public StoreCommand {
 public:
-    BeginCmdASTNode()
-        : StoreCmdASTNode(CommandType::BEGIN) { }
+    BeginCommand()
+        : StoreCommand(CommandType::BEGIN) { }
     void execute(Store &s) const override {
         std::cout << T_BYLLW << "TRANSAC BEGIN" << T_RESET << std::endl;
     }
 };
 
-class CommitCmdASTNode : public StoreCmdASTNode {
+class CommitCommand : public StoreCommand {
 public:
-    CommitCmdASTNode()
-        : StoreCmdASTNode(CommandType::COMMIT) { }
+    CommitCommand()
+        : StoreCommand(CommandType::COMMIT) { }
     void execute(Store &s) const override {
         std::cout << T_BYLLW << "TRANSAC COMMITTED" << T_RESET << std::endl;
     }
 };
 
-class RollbackCmdASTNode : public StoreCmdASTNode {
+class RollbackCommand : public StoreCommand {
 public:
-    RollbackCmdASTNode()
-        : StoreCmdASTNode(CommandType::ROLLBACK) { }
+    RollbackCommand()
+        : StoreCommand(CommandType::ROLLBACK) { }
     void execute(Store &s) const override {
         (void) s;
         std::cout << T_BYLLW << "TRANSAC ROLLBACK" << T_RESET << std::endl;

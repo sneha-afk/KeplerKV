@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-std::string CommandASTNode::string() const {
+std::string Command::string() const {
     std::string s = "{node: Command, cmd: " + std::to_string((int) cmdType_) + ", args: [";
     for (const auto &a : args_) {
         if (!a) continue;
@@ -19,35 +19,35 @@ std::string CommandASTNode::string() const {
     return s;
 }
 
-std::string IntASTNode::string() const {
+std::string IntNode::string() const {
     return "{node: Value, type: Int, value: " + std::to_string(value_) + "}";
 }
 
-StoreValueSP IntASTNode::evaluate() const { return std::make_shared<IntValue>(value_); }
+StoreValueSP IntNode::evaluate() const { return std::make_shared<IntValue>(value_); }
 
-std::string FloatASTNode::string() const {
+std::string FloatNode::string() const {
     return "{node: Value, type: Float, value: " + std::to_string(value_) + "}";
 }
 
-StoreValueSP FloatASTNode::evaluate() const { return std::make_shared<FloatValue>(value_); }
+StoreValueSP FloatNode::evaluate() const { return std::make_shared<FloatValue>(value_); }
 
-std::string StringASTNode::string() const {
+std::string StringNode::string() const {
     return "{node: Value, type: String, value: " + value_ + "}";
 }
 
-StoreValueSP StringASTNode::evaluate() const {
+StoreValueSP StringNode::evaluate() const {
     return std::make_shared<StringValue>(std::move(value_));
 }
 
-std::string IdentifierASTNode::string() const {
+std::string IdentifierNode::string() const {
     return "{node: Value, type: Identifier, value: " + value_ + "}";
 }
 
-StoreValueSP IdentifierASTNode::evaluate() const {
+StoreValueSP IdentifierNode::evaluate() const {
     return std::make_shared<IdentifierValue>(std::move(value_));
 }
 
-std::string ListValueASTNode::string() const {
+std::string ListNode::string() const {
     std::string s = "{node: Value, type: List, value: [";
     for (const auto &v : value_) {
         if (!v) continue;
@@ -61,7 +61,7 @@ std::string ListValueASTNode::string() const {
     return s;
 }
 
-StoreValueSP ListValueASTNode::evaluate() const {
+StoreValueSP ListNode::evaluate() const {
     std::shared_ptr<ListValue> listVal = std::make_shared<ListValue>();
     for (const auto &node : value_)
         listVal->append(node->evaluate());

@@ -52,23 +52,23 @@ public:
 
 using ASTNodeSP = std::shared_ptr<ASTNode>;
 
-class NilASTNode : public ASTNode {
+class Nil : public ASTNode {
     inline NodeType getNodeType() const { return NodeType::NIL; };
     std::string string() { return "{node: nil, value: nil}"; }
 };
 
-class ValueASTNode : public ASTNode {
+class Value : public ASTNode {
 public:
     virtual StoreValueSP evaluate() const = 0;
 };
 
-using ValueASTNodeSP = std::shared_ptr<ValueASTNode>;
+using ValueSP = std::shared_ptr<Value>;
 
-class IntASTNode : public ValueASTNode {
+class IntNode : public Value {
 public:
-    IntASTNode()
+    IntNode()
         : value_(0) {};
-    IntASTNode(int i)
+    IntNode(int i)
         : value_(i) {};
 
     inline NodeType getNodeType() const { return NodeType::INT; }
@@ -79,11 +79,11 @@ private:
     int value_;
 };
 
-class FloatASTNode : public ValueASTNode {
+class FloatNode : public Value {
 public:
-    FloatASTNode()
+    FloatNode()
         : value_(0) {};
-    FloatASTNode(float f)
+    FloatNode(float f)
         : value_(f) {};
 
     inline NodeType getNodeType() const { return NodeType::FLOAT; }
@@ -94,11 +94,11 @@ private:
     float value_;
 };
 
-class StringASTNode : public ValueASTNode {
+class StringNode : public Value {
 public:
-    StringASTNode()
+    StringNode()
         : value_("") {};
-    StringASTNode(std::string s)
+    StringNode(std::string s)
         : value_(s) {};
 
     inline NodeType getNodeType() const { return NodeType::STRING; }
@@ -109,53 +109,53 @@ protected:
     std::string value_;
 };
 
-class IdentifierASTNode : public StringASTNode {
+class IdentifierNode : public StringNode {
 public:
-    IdentifierASTNode()
-        : StringASTNode() {};
-    IdentifierASTNode(std::string s)
-        : StringASTNode(s) {};
+    IdentifierNode()
+        : StringNode() {};
+    IdentifierNode(std::string s)
+        : StringNode(s) {};
 
     inline NodeType getNodeType() const { return NodeType::IDENTIFIER; }
     std::string string() const override;
     StoreValueSP evaluate() const override;
 };
 
-class ListValueASTNode : public ValueASTNode {
+class ListNode : public Value {
 public:
-    ListValueASTNode()
-        : value_(std::vector<ValueASTNodeSP>()) {};
-    ListValueASTNode(std::vector<ValueASTNodeSP> &l)
+    ListNode()
+        : value_(std::vector<ValueSP>()) {};
+    ListNode(std::vector<ValueSP> &l)
         : value_(l) {};
 
-    inline void addNode(ValueASTNodeSP e) { value_.push_back(std::move(e)); }
+    inline void addNode(ValueSP e) { value_.push_back(std::move(e)); }
 
     inline NodeType getNodeType() const { return NodeType::LIST; }
     std::string string() const override;
     StoreValueSP evaluate() const override;
 
 private:
-    std::vector<ValueASTNodeSP> value_;
+    std::vector<ValueSP> value_;
 };
 
-class CommandASTNode : public ASTNode {
+class Command : public ASTNode {
 public:
-    CommandASTNode()
+    Command()
         : cmdType_(CommandType::UNKNOWN)
-        , args_(std::vector<ValueASTNodeSP>()) {};
-    CommandASTNode(const std::string &c)
+        , args_(std::vector<ValueSP>()) {};
+    Command(const std::string &c)
         : cmdType_(mapGet(mapToCmd, c, CommandType::UNKNOWN))
-        , args_(std::vector<ValueASTNodeSP>()) {};
-    CommandASTNode(const CommandType &c)
+        , args_(std::vector<ValueSP>()) {};
+    Command(const CommandType &c)
         : cmdType_(c)
-        , args_(std::vector<ValueASTNodeSP>()) {};
+        , args_(std::vector<ValueSP>()) {};
 
     inline NodeType getNodeType() const { return NodeType::COMMAND; }
     std::string string() const override;
 
     inline CommandType getCmdType() const { return cmdType_; }
-    inline void addArg(ValueASTNodeSP &a) { args_.push_back(std::move(a)); }
-    inline std::vector<ValueASTNodeSP> &getArgs() { return args_; }
+    inline void addArg(ValueSP &a) { args_.push_back(std::move(a)); }
+    inline std::vector<ValueSP> &getArgs() { return args_; }
     inline std::size_t numArgs() const { return args_.size(); }
 
     // Validates the syntax and semantics of a command.
@@ -164,18 +164,18 @@ public:
 
 protected:
     const CommandType cmdType_;
-    std::vector<ValueASTNodeSP> args_;
+    std::vector<ValueSP> args_;
 };
 
 // Store commands interact with the store itself.
-class StoreCmdASTNode : public CommandASTNode {
+class StoreCommand : public Command {
 public:
-    StoreCmdASTNode()
-        : CommandASTNode() { }
-    StoreCmdASTNode(const std::string &c)
-        : CommandASTNode(c) { }
-    StoreCmdASTNode(const CommandType &c)
-        : CommandASTNode(c) { }
+    StoreCommand()
+        : Command() { }
+    StoreCommand(const std::string &c)
+        : Command(c) { }
+    StoreCommand(const CommandType &c)
+        : Command(c) { }
 
     // execute() assumes the node has been validated.
     // Executing non-validated nodes can have undefined behavior.
@@ -184,14 +184,14 @@ public:
 };
 
 // System commands do not interact with the store.
-class SystemCmdASTNode : public CommandASTNode {
+class SystemCommand : public Command {
 public:
-    SystemCmdASTNode()
-        : CommandASTNode() { }
-    SystemCmdASTNode(const std::string &c)
-        : CommandASTNode(c) { }
-    SystemCmdASTNode(const CommandType &c)
-        : CommandASTNode(c) { }
+    SystemCommand()
+        : Command() { }
+    SystemCommand(const std::string &c)
+        : Command(c) { }
+    SystemCommand(const CommandType &c)
+        : Command(c) { }
 
     // execute() assumes the node has been validated.
     // Executing non-validated nodes can have undefined behavior.
@@ -199,11 +199,11 @@ public:
     virtual void execute() const = 0;
 };
 
-using CommandASTNodeSP = std::shared_ptr<CommandASTNode>;
-using StoreCmdASTNodeSP = std::shared_ptr<StoreCmdASTNode>;
-using SystemCmdASTNodeSP = std::shared_ptr<SystemCmdASTNode>;
-using IntASTNodeSP = std::shared_ptr<IntASTNode>;
-using FloatASTNodeSP = std::shared_ptr<FloatASTNode>;
-using StringASTNodeSP = std::shared_ptr<StringASTNode>;
-using IdentifierASTNodeSP = std::shared_ptr<IdentifierASTNode>;
-using ListValueASTNodeSP = std::shared_ptr<ListValueASTNode>;
+using CommandSP = std::shared_ptr<Command>;
+using StoreCommandSP = std::shared_ptr<StoreCommand>;
+using SystemCommandSP = std::shared_ptr<SystemCommand>;
+using IntNodeSP = std::shared_ptr<IntNode>;
+using FloatNodeSP = std::shared_ptr<FloatNode>;
+using StringNodeSP = std::shared_ptr<StringNode>;
+using IdentifierNodeSP = std::shared_ptr<IdentifierNode>;
+using ListNodeSP = std::shared_ptr<ListNode>;

@@ -32,5 +32,5 @@ private:
     Parser parser_;
     Store store_;
 
-    std::deque<StoreCmdASTNodeSP> wal_;
+    std::deque<StoreCommandSP> wal_;
 };

@@ -54,23 +54,23 @@ StoreValueSP Store::resolveRecur_(
 
     // If another identifier is found, continue down the chain
     if (found->getValueType() == ValueType::IDENTIFIER) {
-        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(found);
-        return resolveRecur_(idNode->getValue(), seen, resolveIdentsInList);
+        IdentifierValueSP ident = std::dynamic_pointer_cast<IdentifierValue>(found);
+        return resolveRecur_(ident->getValue(), seen, resolveIdentsInList);
     }
 
     // Resolve list elements (in case there are identifiers) only if requested (makes a copy)
     if (found->getValueType() == ValueType::LIST && resolveIdentsInList) {
-        ListValueSP listNode = std::dynamic_pointer_cast<ListValue>(found);
+        ListValueSP listValue = std::dynamic_pointer_cast<ListValue>(found);
 
-        std::vector<StoreValueSP> resolvedL = std::vector<StoreValueSP>(listNode->getValue());
+        std::vector<StoreValueSP> resolvedL = std::vector<StoreValueSP>(listValue->getValue());
         for (std::size_t i = 0; i < resolvedL.size(); i++) {
             if (!resolvedL[i]) continue;
             if (resolvedL[i]->getValueType() == ValueType::IDENTIFIER) {
                 // Each element should inherit parent history
                 std::unordered_set<std::string> newSeen = std::unordered_set<std::string>(seen);
 
-                IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(resolvedL[i]);
-                resolvedL[i] = resolveRecur_(idNode->getValue(), newSeen, resolveIdentsInList);
+                IdentifierValueSP ident = std::dynamic_pointer_cast<IdentifierValue>(resolvedL[i]);
+                resolvedL[i] = resolveRecur_(ident->getValue(), newSeen, resolveIdentsInList);
             }
         }
         return std::make_shared<ListValue>(resolvedL);

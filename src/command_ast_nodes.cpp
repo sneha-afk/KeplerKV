@@ -4,7 +4,7 @@
 #include "file_io_macros.h"
 
 // Filenames may have been passed in deliminated as strings
-std::string getFilename_(const ValueASTNodeSP node) {
+std::string getFilename_(const ValueSP node) {
     std::string &filename = DEFAULT_SAVE_FILE;
 
     StringValueSP fnNode = std::dynamic_pointer_cast<StringValue>(node);
@@ -14,14 +14,14 @@ std::string getFilename_(const ValueASTNodeSP node) {
     return fnNode->getValueType() == ValueType::IDENTIFIER ? filename : removeQuotations(filename);
 }
 
-void QuitCmdASTNode::execute() const {
+void QuitCommand::execute() const {
     std::cout << T_BBLUE << "Farewell!" << T_RESET << std::endl;
     exit(EXIT_SUCCESS);
 };
 
-void ClearCmdASTNode::execute() const { std::cout << "\033[H\033[2J" << std::endl; };
+void ClearCommand::execute() const { std::cout << "\033[H\033[2J" << std::endl; };
 
-bool SetCmdASTNode::validate() const {
+bool SetCommand::validate() const {
     if (numArgs() < 2) return false;
 
     for (std::size_t i = 0; i < numArgs(); i += 2) {
@@ -37,7 +37,7 @@ bool SetCmdASTNode::validate() const {
     return true;
 }
 
-void SetCmdASTNode::execute(Store &s) const {
+void SetCommand::execute(Store &s) const {
     for (std::size_t i = 0; i < numArgs(); i += 2) {
         if (!args_[i]) continue;
 
@@ -49,7 +49,7 @@ void SetCmdASTNode::execute(Store &s) const {
     }
 }
 
-bool GetCmdASTNode::validate() const {
+bool GetCommand::validate() const {
     if (numArgs() < 1) return false;
 
     for (const auto &arg : args_) {
@@ -61,7 +61,7 @@ bool GetCmdASTNode::validate() const {
     return true;
 }
 
-void GetCmdASTNode::execute(Store &s) const {
+void GetCommand::execute(Store &s) const {
     for (const auto &arg : args_) {
         IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
         const std::string &ident = idNode->getValue();
@@ -74,13 +74,13 @@ void GetCmdASTNode::execute(Store &s) const {
     }
 }
 
-void ListCmdASTNode::execute(Store &s) const {
+void ListCommand::execute(Store &s) const {
     if (s.size() < 1) std::cout << T_BYLLW << "(empty)" << T_RESET << std::endl;
     for (const auto &item : s)
         printItem(item.first, item.second);
 }
 
-bool DeleteCmdASTNode::validate() const {
+bool DeleteCommand::validate() const {
     if (numArgs() < 1) return false;
 
     for (const auto &arg : args_) {
@@ -92,7 +92,7 @@ bool DeleteCmdASTNode::validate() const {
     return true;
 }
 
-void DeleteCmdASTNode::execute(Store &s) const {
+void DeleteCommand::execute(Store &s) const {
     for (const auto &arg : args_) {
         if (!arg) continue;
 
@@ -107,7 +107,7 @@ void DeleteCmdASTNode::execute(Store &s) const {
     }
 }
 
-bool UpdateCmdASTNode::validate() const {
+bool UpdateCommand::validate() const {
     if (numArgs() < 2) return false;
 
     for (std::size_t i = 0; i < numArgs(); i += 2) {
@@ -121,7 +121,7 @@ bool UpdateCmdASTNode::validate() const {
     return true;
 }
 
-void UpdateCmdASTNode::execute(Store &s) const {
+void UpdateCommand::execute(Store &s) const {
     for (std::size_t i = 0; i < numArgs(); i += 2) {
         if (!args_[i]) continue;
 
@@ -136,7 +136,7 @@ void UpdateCmdASTNode::execute(Store &s) const {
     }
 }
 
-bool ResolveCmdASTNode::validate() const {
+bool ResolveCommand::validate() const {
     if (numArgs() < 1) return false;
 
     for (const auto &arg : args_) {
@@ -148,7 +148,7 @@ bool ResolveCmdASTNode::validate() const {
     return true;
 }
 
-void ResolveCmdASTNode::execute(Store &s) const {
+void ResolveCommand::execute(Store &s) const {
     for (const auto &arg : args_) {
         if (!arg) continue;
 
@@ -163,7 +163,7 @@ void ResolveCmdASTNode::execute(Store &s) const {
     }
 }
 
-void SaveCmdASTNode::execute(Store &s) const {
+void SaveCommand::execute(Store &s) const {
     std::string &filename = DEFAULT_SAVE_FILE;
     if (numArgs()) filename = getFilename_(args_[0]);
 
@@ -171,7 +171,7 @@ void SaveCmdASTNode::execute(Store &s) const {
     std::cout << T_BGREEN << "SAVED" << T_RESET << std::endl;
 }
 
-void LoadCmdASTNode::execute(Store &s) const {
+void LoadCommand::execute(Store &s) const {
     std::string &filename = DEFAULT_SAVE_FILE;
     if (numArgs()) filename = getFilename_(args_[0]);
 
@@ -179,7 +179,7 @@ void LoadCmdASTNode::execute(Store &s) const {
     std::cout << T_BGREEN << "LOADED" << T_RESET << std::endl;
 }
 
-bool RenameCmdASTNode::validate() const {
+bool RenameCommand::validate() const {
     if (numArgs() < 2) return false;
 
     for (std::size_t i = 0; i < numArgs(); i += 2) {
@@ -193,7 +193,7 @@ bool RenameCmdASTNode::validate() const {
     return true;
 }
 
-void RenameCmdASTNode::execute(Store &s) const {
+void RenameCommand::execute(Store &s) const {
     for (std::size_t i = 0; i < numArgs(); i += 2) {
         if (!args_[i]) continue;
 
@@ -223,7 +223,7 @@ void RenameCmdASTNode::execute(Store &s) const {
     }
 }
 
-bool IncrCmdASTNode::validate() const {
+bool IncrementCommand::validate() const {
     if (numArgs() < 1) return false;
 
     for (const auto &arg : args_) {
@@ -235,7 +235,7 @@ bool IncrCmdASTNode::validate() const {
     return true;
 }
 
-void IncrCmdASTNode::execute(Store &s) const {
+void IncrementCommand::execute(Store &s) const {
     for (const auto &arg : args_) {
         if (!arg) continue;
 
@@ -259,7 +259,7 @@ void IncrCmdASTNode::execute(Store &s) const {
     }
 }
 
-bool DecrCmdASTNode::validate() const {
+bool DecrementCommand::validate() const {
     if (numArgs() < 1) return false;
 
     for (const auto &arg : args_) {
@@ -271,7 +271,7 @@ bool DecrCmdASTNode::validate() const {
     return true;
 }
 
-void DecrCmdASTNode::execute(Store &s) const {
+void DecrementCommand::execute(Store &s) const {
     for (const auto &arg : args_) {
         if (!arg) continue;
 
@@ -295,7 +295,7 @@ void DecrCmdASTNode::execute(Store &s) const {
     }
 }
 
-bool AppendCmdASTNode::validate() const {
+bool AppendCommand::validate() const {
     if (numArgs() < 2) return false;
 
     // First must be an identifier to a list
@@ -304,7 +304,7 @@ bool AppendCmdASTNode::validate() const {
     return true;
 }
 
-void AppendCmdASTNode::execute(Store &s) const {
+void AppendCommand::execute(Store &s) const {
     IdentifierValueSP identNode = std::dynamic_pointer_cast<IdentifierValue>(args_[0]->evaluate());
     StoreValueSP listObj = s.resolve(identNode->getValue());
     if (!listObj) {
@@ -325,7 +325,7 @@ void AppendCmdASTNode::execute(Store &s) const {
     }
 }
 
-bool PrependCmdASTNode::validate() const {
+bool PrependCommand::validate() const {
     if (numArgs() < 2) return false;
 
     // First must be an identifier to a list
@@ -334,7 +334,7 @@ bool PrependCmdASTNode::validate() const {
     return true;
 }
 
-void PrependCmdASTNode::execute(Store &s) const {
+void PrependCommand::execute(Store &s) const {
     IdentifierValueSP identNode = std::dynamic_pointer_cast<IdentifierValue>(args_[0]->evaluate());
     StoreValueSP listObj = s.resolve(identNode->getValue());
     if (!listObj) {
@@ -355,27 +355,27 @@ void PrependCmdASTNode::execute(Store &s) const {
     }
 }
 
-bool SearchCmdASTNode::validate() const {
+bool SearchCommand::validate() const {
     if (numArgs() < 1) return false;
 
     for (const auto &arg : args_) {
         if (!arg) continue;
 
-        IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
-        if (!idNode) return false;
+        IdentifierValueSP idValue = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
+        if (!idValue) return false;
     }
     return true;
 }
 
-void SearchCmdASTNode::execute(Store &s) const {
+void SearchCommand::execute(Store &s) const {
     for (const auto &arg : args_) {
         if (!arg) continue;
 
-        StringValueSP node = std::dynamic_pointer_cast<StringValue>(arg->evaluate());
+        StringValueSP patternVal = std::dynamic_pointer_cast<StringValue>(arg->evaluate());
 
-        const std::string &pattern = node->getValueType() == ValueType::IDENTIFIER
-                                         ? node->getValue()
-                                         : removeQuotations(node->getValue());
+        const std::string &pattern = patternVal->getValueType() == ValueType::IDENTIFIER
+                                         ? patternVal->getValue()
+                                         : removeQuotations(patternVal->getValue());
         std::vector<std::string> keys = s.search(pattern);
 
         std::cout << T_BYLLW << pattern << " (" << keys.size() << ")" << T_RESET << std::endl;
@@ -384,7 +384,7 @@ void SearchCmdASTNode::execute(Store &s) const {
     }
 }
 
-void StatsCmdASTNode::execute(Store &s) const {
+void StatsCommand::execute(Store &s) const {
     std::cout << T_BYLLW << "KeplerKV Statistics" << T_RESET << std::endl;
 
     int totalNum = s.size(), numInts = 0, numFloats = 0, numStrs = 0, numLists = 0, numAliases = 0;

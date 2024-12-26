@@ -20,17 +20,17 @@ bool Handler::handleQuery(std::string &query) {
         for (const auto &t : tokens)
             std::cout << "\t" << *t << std::endl;
 
-    std::vector<CommandASTNodeSP> &nodes = parser_.parse(tokens);
-    for (const CommandASTNodeSP &cmd : nodes) {
+    std::vector<CommandSP> &nodes = parser_.parse(tokens);
+    for (const CommandSP &cmd : nodes) {
         if (DEBUG) std::cout << "\t" << *cmd << std::endl;
 
         // Validate the command
         if (!cmd || !cmd->validate()) throw RuntimeErr(WRONG_CMD_FMT);
 
         // Check what kind of command this is
-        if (SystemCmdASTNodeSP sysCmd = std::dynamic_pointer_cast<SystemCmdASTNode>(cmd)) {
+        if (SystemCommandSP sysCmd = std::dynamic_pointer_cast<SystemCommand>(cmd)) {
             sysCmd->execute();
-        } else if (StoreCmdASTNodeSP storeCmd = std::dynamic_pointer_cast<StoreCmdASTNode>(cmd)) {
+        } else if (StoreCommandSP storeCmd = std::dynamic_pointer_cast<StoreCommand>(cmd)) {
             switch (storeCmd->getCmdType()) {
                 case CommandType::BEGIN:
                     inTransaction_ = true;
@@ -39,7 +39,7 @@ bool Handler::handleQuery(std::string &query) {
                 case CommandType::COMMIT:
                     inTransaction_ = false;
                     while (0 < wal_.size()) {
-                        StoreCmdASTNodeSP frontCmd = wal_.front();
+                        StoreCommandSP frontCmd = wal_.front();
                         wal_.pop_front();
                         frontCmd->execute(store_);
                     }
