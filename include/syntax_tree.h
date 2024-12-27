@@ -1,5 +1,6 @@
 #pragma once
 
+#include "environment_interface.h"
 #include "store.h"
 #include "store_value.h"
 #include "util.h"
@@ -53,8 +54,8 @@ public:
 using ASTNodeSP = std::shared_ptr<ASTNode>;
 
 class Nil : public ASTNode {
-    inline NodeType getNodeType() const { return NodeType::NIL; };
-    std::string string() { return "{node: nil, value: nil}"; }
+    inline NodeType getNodeType() const override { return NodeType::NIL; };
+    std::string string() const override { return "{node: nil, value: nil}"; }
 };
 
 class Value : public ASTNode {
@@ -71,7 +72,7 @@ public:
     IntNode(int i)
         : value_(i) {};
 
-    inline NodeType getNodeType() const { return NodeType::INT; }
+    inline NodeType getNodeType() const override { return NodeType::INT; }
     std::string string() const override;
     StoreValueSP evaluate() const override;
 
@@ -86,7 +87,7 @@ public:
     FloatNode(float f)
         : value_(f) {};
 
-    inline NodeType getNodeType() const { return NodeType::FLOAT; }
+    inline NodeType getNodeType() const override { return NodeType::FLOAT; }
     std::string string() const override;
     StoreValueSP evaluate() const override;
 
@@ -101,7 +102,7 @@ public:
     StringNode(std::string s)
         : value_(s) {};
 
-    inline NodeType getNodeType() const { return NodeType::STRING; }
+    inline NodeType getNodeType() const override { return NodeType::STRING; }
     std::string string() const override;
     StoreValueSP evaluate() const override;
 
@@ -116,7 +117,7 @@ public:
     IdentifierNode(std::string s)
         : StringNode(s) {};
 
-    inline NodeType getNodeType() const { return NodeType::IDENTIFIER; }
+    inline NodeType getNodeType() const override { return NodeType::IDENTIFIER; }
     std::string string() const override;
     StoreValueSP evaluate() const override;
 };
@@ -130,7 +131,7 @@ public:
 
     inline void addNode(ValueSP e) { value_.push_back(std::move(e)); }
 
-    inline NodeType getNodeType() const { return NodeType::LIST; }
+    inline NodeType getNodeType() const override { return NodeType::LIST; }
     std::string string() const override;
     StoreValueSP evaluate() const override;
 
@@ -150,7 +151,7 @@ public:
         : cmdType_(c)
         , args_(std::vector<ValueSP>()) {};
 
-    inline NodeType getNodeType() const { return NodeType::COMMAND; }
+    inline NodeType getNodeType() const override { return NodeType::COMMAND; }
     std::string string() const override;
 
     inline CommandType getCmdType() const { return cmdType_; }
@@ -184,6 +185,7 @@ public:
 };
 
 // System commands do not interact with the store.
+class EnvironmentInterface; // Forward declaration
 class SystemCommand : public Command {
 public:
     SystemCommand()
@@ -196,7 +198,7 @@ public:
     // execute() assumes the node has been validated.
     // Executing non-validated nodes can have undefined behavior.
     // Error-handling is the caller's responsibility.
-    virtual void execute() const = 0;
+    virtual void execute(EnvironmentInterface &) const = 0;
 };
 
 using CommandSP = std::shared_ptr<Command>;

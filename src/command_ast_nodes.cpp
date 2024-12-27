@@ -1,5 +1,6 @@
 #include "command_ast_nodes.h"
 
+#include "environment_interface.h"
 #include "error_msgs.h"
 #include "file_io_macros.h"
 
@@ -14,12 +15,29 @@ std::string getFilename_(const ValueSP node) {
     return fnNode->getValueType() == ValueType::IDENTIFIER ? filename : removeQuotations(filename);
 }
 
-void QuitCommand::execute() const {
-    std::cout << T_BBLUE << "Farewell!" << T_RESET << std::endl;
-    exit(EXIT_SUCCESS);
+void QuitCommand::execute(EnvironmentInterface &e) const {
+    e.printToConsole(T_BBLUE "Farewell!" T_RESET);
+    e.exitSuccess();
 };
 
-void ClearCommand::execute() const { std::cout << "\033[H\033[2J" << std::endl; };
+void ClearCommand::execute(EnvironmentInterface &e) const { e.printToConsole(CLEAR_SCREEN); };
+
+void BeginCommand::execute(EnvironmentInterface &e) const {
+    e.setTransacState(true);
+    e.printToConsole(T_BYLLW "TRANSAC BEGIN" T_RESET);
+}
+
+void CommitCommand::execute(EnvironmentInterface &e) const {
+    e.executeAllWAL(e.getStore());
+    e.setTransacState(false);
+    e.printToConsole(T_BYLLW "TRANSAC COMMITTED" T_RESET);
+}
+
+void RollbackCommand::execute(EnvironmentInterface &e) const {
+    e.clearWAL();
+    e.setTransacState(false);
+    e.printToConsole(T_BYLLW "TRANSAC ROLLBACK" T_RESET);
+}
 
 bool SetCommand::validate() const {
     if (numArgs() < 2) return false;

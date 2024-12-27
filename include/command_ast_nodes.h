@@ -6,14 +6,14 @@ class QuitCommand : public SystemCommand {
 public:
     QuitCommand()
         : SystemCommand(CommandType::QUIT) { }
-    virtual void execute() const override;
+    virtual void execute(EnvironmentInterface &) const override;
 };
 
 class ClearCommand : public SystemCommand {
 public:
     ClearCommand()
         : SystemCommand(CommandType::CLEAR) { }
-    virtual void execute() const override;
+    virtual void execute(EnvironmentInterface &) const override;
 };
 
 class SetCommand : public StoreCommand {
@@ -132,30 +132,23 @@ public:
     virtual void execute(Store &) const override;
 };
 
-class BeginCommand : public StoreCommand {
+class BeginCommand : public SystemCommand {
 public:
     BeginCommand()
-        : StoreCommand(CommandType::BEGIN) { }
-    void execute(Store &s) const override {
-        std::cout << T_BYLLW << "TRANSAC BEGIN" << T_RESET << std::endl;
-    }
+        : SystemCommand(CommandType::BEGIN) { }
+    void execute(EnvironmentInterface &) const override;
 };
 
-class CommitCommand : public StoreCommand {
+class CommitCommand : public SystemCommand {
 public:
     CommitCommand()
-        : StoreCommand(CommandType::COMMIT) { }
-    void execute(Store &s) const override {
-        std::cout << T_BYLLW << "TRANSAC COMMITTED" << T_RESET << std::endl;
-    }
+        : SystemCommand(CommandType::COMMIT) { }
+    void execute(EnvironmentInterface &) const override;
 };
 
-class RollbackCommand : public StoreCommand {
+class RollbackCommand : public SystemCommand {
 public:
     RollbackCommand()
-        : StoreCommand(CommandType::ROLLBACK) { }
-    void execute(Store &s) const override {
-        (void) s;
-        std::cout << T_BYLLW << "TRANSAC ROLLBACK" << T_RESET << std::endl;
-    }
+        : SystemCommand(CommandType::ROLLBACK) { }
+    void execute(EnvironmentInterface &) const override;
 };

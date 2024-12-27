@@ -1,11 +1,9 @@
 #pragma once
 
+#include "environment.h"
 #include "lexer.h"
 #include "parser.h"
-#include "store.h"
 
-#include <deque>
-#include <functional>
 #include <string>
 
 class Handler {
@@ -13,24 +11,26 @@ public:
     Handler()
         : lexer_(Lexer())
         , parser_(Parser())
-        , store_(Store()) {};
-
-    Handler(Lexer &l, Parser &p, Store &s)
-        : lexer_(l)
-        , parser_(p)
-        , store_(s) {};
+        , store_(Store())
+        , env_(Environment(store_)) {};
 
     Handler(Store &s)
         : lexer_(Lexer())
         , parser_(Parser())
-        , store_(s) {};
+        , store_(s)
+        , env_(Environment(s)) {};
 
-    bool handleQuery(std::string &);
+    Handler(Store &s, Environment &e)
+        : lexer_(Lexer())
+        , parser_(Parser())
+        , store_(s)
+        , env_(e) {};
+
+    void handleQuery(std::string &);
 
 private:
     Lexer lexer_;
     Parser parser_;
     Store store_;
-
-    std::deque<StoreCommandSP> wal_;
+    Environment env_;
 };
