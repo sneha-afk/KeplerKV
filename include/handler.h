@@ -8,29 +8,17 @@
 
 class Handler {
 public:
-    Handler()
+    Handler(Store *s_ptr, Environment *e_ptr)
         : lexer_(Lexer())
         , parser_(Parser())
-        , store_(Store())
-        , env_(Environment(store_)) {};
-
-    Handler(Store &s)
-        : lexer_(Lexer())
-        , parser_(Parser())
-        , store_(s)
-        , env_(Environment(s)) {};
-
-    Handler(Store &s, Environment &e)
-        : lexer_(Lexer())
-        , parser_(Parser())
-        , store_(s)
-        , env_(e) {};
+        , store_(s_ptr)
+        , env_(e_ptr) {};
 
     void handleQuery(std::string &);
 
 private:
     Lexer lexer_;
     Parser parser_;
-    Store store_;
-    Environment env_;
+    Store *store_;
+    Environment *env_;
 };

@@ -25,7 +25,7 @@ public:
 
     virtual void printToConsole(const std::string &s) = 0;
 
-    virtual Store &getStore() = 0;
+    virtual Store *getStore() = 0;
 
     // Transaction handling
     void setTransacState(bool t) { transac_ = t; };
@@ -37,7 +37,7 @@ public:
 
     virtual void addCommand(StoreCommandSP &) = 0;
     virtual StoreCommandSP getNextCommand() = 0;
-    virtual void executeAllWAL(Store &) = 0;
+    virtual void executeAllWAL() = 0;
 
     void exitSuccess() { exit(EXIT_SUCCESS); }
 

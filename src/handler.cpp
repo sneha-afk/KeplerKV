@@ -29,16 +29,16 @@ void Handler::handleQuery(std::string &query) {
 
         // Check what kind of command this is
         if (SystemCommandSP sysCmd = std::dynamic_pointer_cast<SystemCommand>(cmd)) {
-            sysCmd->execute(env_);
+            sysCmd->execute(*env_);
         } else if (StoreCommandSP storeCmd = std::dynamic_pointer_cast<StoreCommand>(cmd)) {
-            if (!storeCmd->ignoresTransactions() && env_.inTransaction()) {
-                env_.addCommand(storeCmd);
-                env_.printToConsole(T_BYLLW "LOGGED" T_RESET);
+            if (!storeCmd->ignoresTransactions() && env_->inTransaction()) {
+                env_->addCommand(storeCmd);
+                env_->printToConsole(T_BYLLW "LOGGED" T_RESET);
             } else {
-                storeCmd->execute(store_);
+                storeCmd->execute(*store_);
             }
         }
     }
 
-    env_.setRunning(true);
+    env_->setRunning(true);
 }

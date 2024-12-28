@@ -10,12 +10,12 @@ using WALType = std::deque<StoreCommandSP>;
 
 class Environment : public EnvironmentInterface {
 public:
-    Environment(Store &s)
-        : store_(s) { }
+    Environment(Store *s_ptr)
+        : store_(s_ptr) { }
 
     void printToConsole(const std::string &s) override { std::cout << s << std::endl; }
 
-    Store &getStore() override { return store_; }
+    Store *getStore() override { return store_; }
 
     // Transaction handling
     std::size_t sizeWAL() override { return wal_.size(); }
@@ -30,14 +30,14 @@ public:
         return cmd;
     }
 
-    void executeAllWAL(Store &s) override {
+    void executeAllWAL() override {
         while (!isWALEmpty()) {
             StoreCommandSP walCmd = getNextCommand();
-            walCmd->execute(s);
+            walCmd->execute(*store_);
         }
     }
 
 private:
-    Store store_;
+    Store *store_;
     WALType wal_;
 };

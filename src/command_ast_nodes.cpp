@@ -28,7 +28,7 @@ void BeginCommand::execute(EnvironmentInterface &e) const {
 }
 
 void CommitCommand::execute(EnvironmentInterface &e) const {
-    e.executeAllWAL(e.getStore());
+    e.executeAllWAL();
     e.setTransacState(false);
     e.printToConsole(T_BYLLW "TRANSAC COMMITTED" T_RESET);
 }
