@@ -80,7 +80,7 @@ bool GetCommand::validate() const {
 }
 
 void GetCommand::execute(Store &s) const {
-    for (const auto &arg : args_) {
+    for (const ValueSP &arg : args_) {
         IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
         const std::string &ident = idNode->getValue();
 

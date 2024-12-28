@@ -2,7 +2,6 @@
 
 #include "command_ast_nodes.h"
 #include "error_msgs.h"
-#include "util.h"
 
 std::vector<CommandSP> &Parser::parse(std::vector<TokenSP> &tokens) {
     nodes.clear();

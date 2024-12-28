@@ -3,6 +3,7 @@
 #include "error_msgs.h"
 
 #include <fstream>
+#include <iostream>
 
 void printItem(const std::string &ident, const StoreValueSP &value) {
     std::cout << T_BBLUE << ident << T_RESET << " | " << *value << std::endl;

@@ -5,6 +5,7 @@
 #include "syntax_tree.h"
 
 #include <deque>
+#include <iostream>
 
 using WALType = std::deque<StoreCommandSP>;
 

@@ -2,16 +2,15 @@
 #include "handler.h"
 #include "terminal_colors.h"
 
-#include <iostream>
 #include <stdexcept>
 
 int main() {
     std::string input;
     Store store = Store();
-    Environment env = Environment(store);
-    Handler handler = Handler(store, env);
+    Environment env = Environment(&store);
+    Handler handler = Handler(&store, &env);
 
-    std::cout << T_BBLUE << "Welcome to KeplerKV! Type \\q to quit!" << T_RESET << std::endl;
+    env.printToConsole(T_BBLUE "Welcome to KeplerKV! Type \\q to quit!" T_RESET);
     while (env.isRunning()) {
         std::cout << "> ";
         std::getline(std::cin, input);

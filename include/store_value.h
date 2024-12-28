@@ -1,7 +1,6 @@
 #pragma once
 #include "terminal_colors.h"
 
-#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>

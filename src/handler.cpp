@@ -17,12 +17,12 @@ bool inTransaction_ = false;
 void Handler::handleQuery(std::string &query) {
     std::vector<std::shared_ptr<Token>> &tokens = lexer_.tokenize(query);
     if (DEBUG)
-        for (const auto &t : tokens)
-            std::cout << "\t" << *t << std::endl;
+        for (const TokenSP &t : tokens)
+            env_->printToConsole("\t" + t->string());
 
     std::vector<CommandSP> &nodes = parser_.parse(tokens);
     for (const CommandSP &cmd : nodes) {
-        if (DEBUG) std::cout << "\t" << *cmd << std::endl;
+        if (DEBUG) env_->printToConsole("\t" + cmd->string());
 
         // Validate the command
         if (!cmd || !cmd->validate()) throw RuntimeErr(WRONG_CMD_FMT);
