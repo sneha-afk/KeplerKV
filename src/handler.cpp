@@ -31,7 +31,7 @@ void Handler::handleQuery(std::string &query) {
         if (SystemCommandSP sysCmd = std::dynamic_pointer_cast<SystemCommand>(cmd)) {
             sysCmd->execute(env_);
         } else if (StoreCommandSP storeCmd = std::dynamic_pointer_cast<StoreCommand>(cmd)) {
-            if (env_.inTransaction()) {
+            if (!storeCmd->ignoresTransactions() && env_.inTransaction()) {
                 env_.addCommand(storeCmd);
                 env_.printToConsole(T_BYLLW "LOGGED" T_RESET);
             } else {

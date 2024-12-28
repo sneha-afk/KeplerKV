@@ -35,7 +35,7 @@ public:
 class ListCommand : public StoreCommand {
 public:
     ListCommand()
-        : StoreCommand(CommandType::LIST) { }
+        : StoreCommand(CommandType::LIST, true) { }
     virtual void execute(Store &) const override;
 };
 
@@ -66,14 +66,14 @@ public:
 class SaveCommand : public StoreCommand {
 public:
     SaveCommand()
-        : StoreCommand(CommandType::SAVE) { }
+        : StoreCommand(CommandType::SAVE, true) { }
     virtual void execute(Store &) const override;
 };
 
 class LoadCommand : public StoreCommand {
 public:
     LoadCommand()
-        : StoreCommand(CommandType::LOAD) { }
+        : StoreCommand(CommandType::LOAD, true) { }
     virtual void execute(Store &) const override;
 };
 
@@ -120,7 +120,7 @@ public:
 class SearchCommand : public StoreCommand {
 public:
     SearchCommand()
-        : StoreCommand(CommandType::SEARCH) { }
+        : StoreCommand(CommandType::SEARCH, true) { }
     virtual bool validate() const override;
     virtual void execute(Store &) const override;
 };
@@ -128,7 +128,7 @@ public:
 class StatsCommand : public StoreCommand {
 public:
     StatsCommand()
-        : StoreCommand(CommandType::STATS) { }
+        : StoreCommand(CommandType::STATS, true) { }
     virtual void execute(Store &) const override;
 };
 

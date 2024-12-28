@@ -172,16 +172,28 @@ protected:
 class StoreCommand : public Command {
 public:
     StoreCommand()
-        : Command() { }
+        : Command()
+        , ignoresTransac_(false) { }
     StoreCommand(const std::string &c)
-        : Command(c) { }
+        : Command(c)
+        , ignoresTransac_(false) { }
     StoreCommand(const CommandType &c)
-        : Command(c) { }
+        : Command(c)
+        , ignoresTransac_(false) { }
+    StoreCommand(const CommandType &c, const bool ignoreT)
+        : Command(c)
+        , ignoresTransac_(ignoreT) { }
 
     // execute() assumes the node has been validated.
     // Executing non-validated nodes can have undefined behavior.
     // Error-handling is the caller's responsibility.
     virtual void execute(Store &) const = 0;
+
+    bool ignoresTransactions() { return ignoresTransac_; }
+
+protected:
+    // If this command ignores transactions, it will run regardless
+    bool ignoresTransac_;
 };
 
 // System commands do not interact with the store.
