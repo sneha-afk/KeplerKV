@@ -9,6 +9,7 @@ enum class TokenType {
     IDENTIFIER,
     NUMBER,
     STRING,
+    OPTION,
     LIST_START,
     LIST_END,
     DELIMITER,
@@ -43,6 +44,7 @@ struct Token {
             case TokenType::IDENTIFIER: s += "IDENTIFIER"; break;
             case TokenType::NUMBER: s += "NUMBER"; break;
             case TokenType::STRING: s += "STRING"; break;
+            case TokenType::OPTION: s += "OPTION"; break;
             case TokenType::LIST_START: s += "LIST_START"; break;
             case TokenType::LIST_END: s += "LIST_END"; break;
             case TokenType::DELIMITER: s += "DELIMITER"; break;

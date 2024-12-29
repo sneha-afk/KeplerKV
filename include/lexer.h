@@ -26,4 +26,5 @@ private:
     TokenSP lexIdentifier_();
     TokenSP lexNumber_();
     TokenSP lexString_();
+    TokenSP lexOption_();
 };

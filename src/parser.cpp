@@ -63,6 +63,7 @@ CommandSP Parser::parseCommand_(const TokenSP &cmdTok) {
             case TokenType::DELIMITER: tt_++; break;
             case TokenType::COMMAND: throw RuntimeErr(NESTED_CMD);
             case TokenType::UNKNOWN: throw UNKNOWN_TOKEN(t->value);
+            case TokenType::OPTION: break;
             default:
                 ValueSP val = parseValue_(t);
                 if (val != nullptr) cmd->addArg(val);

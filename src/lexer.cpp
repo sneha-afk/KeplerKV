@@ -67,10 +67,24 @@ std::vector<TokenSP> &Lexer::tokenize(std::string &query) {
                     break;
                 }
 
-                // Signed decimals and integers
-                if (isdigit(c) || c == DASH || c == PLUS || c == PERIOD) {
+                if (isdigit(c) || c == PLUS || c == PERIOD) {
+                    // Signed decimals (negatives dealt below) and integers
                     tokens.push_back(lexNumber_());
                     break;
+                }
+
+                if (c == DASH) {
+                    if (peekNext_() == DASH) {
+                        // Options have double dashes, parse through both
+                        curr_();
+                        curr_();
+                        tokens.push_back(lexOption_());
+                        break;
+                    } else if (isdigit(c) || c == PLUS || c == PERIOD) {
+                        // Signed decimals and integers
+                        tokens.push_back(lexNumber_());
+                        break;
+                    }
                 }
 
                 // Unknown tokens
@@ -143,8 +157,12 @@ TokenSP Lexer::lexNumber_() {
 TokenSP Lexer::lexString_() {
     std::string s;
 
-    const char &quote = *it_;
-    s.push_back(*it_++); // Start quote
+    // Parse start quote
+    char quote = curr_();
+    if (!(quote == SINGLE_QUOTE || quote == DOUBLE_QUOTE)) {
+        return std::make_shared<Token>(TokenType::UNKNOWN, quote);
+    }
+    s.push_back(quote);
 
     char c;
     while ((c = peek_()) != NULL_CHAR && c != quote) {
@@ -152,6 +170,21 @@ TokenSP Lexer::lexString_() {
     }
     if ((c = peek_()) != NULL_CHAR) s.push_back(curr_()); // End quote
 
+    // End quote should match start
     if (*(s.end() - 1) != quote) return std::make_shared<Token>(TokenType::UNKNOWN, s);
     return std::make_shared<Token>(TokenType::STRING, std::move(s));
+}
+
+// Options are applied at the command level, while total behavior is controlled at program start
+TokenSP Lexer::lexOption_() {
+    // Precondition: the double dashes have been iterated over
+    std::string s;
+
+    char c;
+    while ((c = peek_()) != NULL_CHAR && c != WHITESPACE && c != SEMICOLON) {
+        // Represent as uppercase internally
+        s.push_back(toupper(curr_()));
+    }
+
+    return std::make_shared<Token>(TokenType::OPTION, std::move(s));
 }
