@@ -23,7 +23,7 @@ public:
     SetCommand()
         : StoreCommand(CommandType::SET) { }
     virtual bool validate() const override;
-    virtual void execute(Store &) const override;
+    virtual void execute(EnvironmentInterface &, Store &) const override;
 };
 
 class GetCommand : public StoreCommand {
@@ -31,14 +31,14 @@ public:
     GetCommand()
         : StoreCommand(CommandType::GET) { }
     virtual bool validate() const override;
-    virtual void execute(Store &) const override;
+    virtual void execute(EnvironmentInterface &, Store &) const override;
 };
 
 class ListCommand : public StoreCommand {
 public:
     ListCommand()
         : StoreCommand(CommandType::LIST, true) { }
-    virtual void execute(Store &) const override;
+    virtual void execute(EnvironmentInterface &, Store &) const override;
 };
 
 class DeleteCommand : public StoreCommand {
@@ -46,7 +46,7 @@ public:
     DeleteCommand()
         : StoreCommand(CommandType::DELETE) { }
     virtual bool validate() const override;
-    virtual void execute(Store &) const override;
+    virtual void execute(EnvironmentInterface &, Store &) const override;
 };
 
 class UpdateCommand : public StoreCommand {
@@ -54,7 +54,7 @@ public:
     UpdateCommand()
         : StoreCommand(CommandType::UPDATE) { }
     virtual bool validate() const override;
-    virtual void execute(Store &) const override;
+    virtual void execute(EnvironmentInterface &, Store &) const override;
 };
 
 class ResolveCommand : public StoreCommand {
@@ -62,21 +62,21 @@ public:
     ResolveCommand()
         : StoreCommand(CommandType::RESOLVE) { }
     virtual bool validate() const override;
-    virtual void execute(Store &) const override;
+    virtual void execute(EnvironmentInterface &, Store &) const override;
 };
 
 class SaveCommand : public StoreCommand {
 public:
     SaveCommand()
         : StoreCommand(CommandType::SAVE, true) { }
-    virtual void execute(Store &) const override;
+    virtual void execute(EnvironmentInterface &, Store &) const override;
 };
 
 class LoadCommand : public StoreCommand {
 public:
     LoadCommand()
         : StoreCommand(CommandType::LOAD, true) { }
-    virtual void execute(Store &) const override;
+    virtual void execute(EnvironmentInterface &, Store &) const override;
 };
 
 class RenameCommand : public StoreCommand {
@@ -84,7 +84,7 @@ public:
     RenameCommand()
         : StoreCommand(CommandType::RENAME) { }
     virtual bool validate() const override;
-    virtual void execute(Store &) const override;
+    virtual void execute(EnvironmentInterface &, Store &) const override;
 };
 
 class IncrementCommand : public StoreCommand {
@@ -92,7 +92,7 @@ public:
     IncrementCommand()
         : StoreCommand(CommandType::INCR) { }
     virtual bool validate() const override;
-    virtual void execute(Store &) const override;
+    virtual void execute(EnvironmentInterface &, Store &) const override;
 };
 
 class DecrementCommand : public StoreCommand {
@@ -100,7 +100,7 @@ public:
     DecrementCommand()
         : StoreCommand(CommandType::DECR) { }
     virtual bool validate() const override;
-    virtual void execute(Store &) const override;
+    virtual void execute(EnvironmentInterface &, Store &) const override;
 };
 
 class AppendCommand : public StoreCommand {
@@ -108,7 +108,7 @@ public:
     AppendCommand()
         : StoreCommand(CommandType::APPEND) { }
     virtual bool validate() const override;
-    virtual void execute(Store &) const override;
+    virtual void execute(EnvironmentInterface &, Store &) const override;
 };
 
 class PrependCommand : public StoreCommand {
@@ -116,7 +116,7 @@ public:
     PrependCommand()
         : StoreCommand(CommandType::PREPEND) { }
     virtual bool validate() const override;
-    virtual void execute(Store &) const override;
+    virtual void execute(EnvironmentInterface &, Store &) const override;
 };
 
 class SearchCommand : public StoreCommand {
@@ -124,14 +124,14 @@ public:
     SearchCommand()
         : StoreCommand(CommandType::SEARCH, true) { }
     virtual bool validate() const override;
-    virtual void execute(Store &) const override;
+    virtual void execute(EnvironmentInterface &, Store &) const override;
 };
 
 class StatsCommand : public StoreCommand {
 public:
     StatsCommand()
         : StoreCommand(CommandType::STATS, true) { }
-    virtual void execute(Store &) const override;
+    virtual void execute(EnvironmentInterface &, Store &) const override;
 };
 
 class BeginCommand : public SystemCommand {

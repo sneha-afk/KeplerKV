@@ -35,7 +35,7 @@ void Handler::handleQuery(std::string &query) {
                 env_->addCommand(storeCmd);
                 env_->printToConsole(T_BYLLW "LOGGED" T_RESET);
             } else {
-                storeCmd->execute(*store_);
+                storeCmd->execute(*env_, *store_);
             }
         }
     }

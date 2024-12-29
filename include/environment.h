@@ -1,8 +1,8 @@
 #pragma once
 
 #include "environment_interface.h"
-#include "store.h"
 #include "syntax_tree.h"
+#include "terminal_colors.h"
 
 #include <deque>
 #include <iostream>
@@ -18,8 +18,8 @@ public:
         : store_(s_ptr)
         , silentMode_(false) { }
 
-    void printToConsole(const std::string &s) override {
-        if (!silentMode_) std::cout << s << std::endl;
+    void printToConsole(const std::string &s = "", bool ignoreSilent = false) override {
+        if (ignoreSilent || !silentMode_) std::cout << s << std::endl;
     }
     void setSilentMode(bool s) { silentMode_ = s; }
 
@@ -41,7 +41,7 @@ public:
     void executeAllWAL() override {
         while (!isWALEmpty()) {
             StoreCommandSP walCmd = getNextCommand();
-            walCmd->execute(*store_);
+            walCmd->execute(*this, *store_);
         }
     }
 

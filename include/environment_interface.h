@@ -23,7 +23,7 @@ public:
     void setRunning(bool r) { running_ = r; };
     bool isRunning() { return running_; };
 
-    virtual void printToConsole(const std::string &s) = 0;
+    virtual void printToConsole(const std::string & = "", bool ignoreSilent = false) = 0;
 
     virtual Store *getStore() = 0;
 

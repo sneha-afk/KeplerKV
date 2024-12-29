@@ -4,6 +4,8 @@
 #include "error_msgs.h"
 #include "file_io_macros.h"
 
+#define PRINT_ITEM(id, valStr) T_BBLUE + id + T_RESET + " | " + valStr
+
 // Filenames may have been passed in deliminated as strings
 std::string getFilename_(const ValueSP node) {
     std::string &filename = DEFAULT_SAVE_FILE;
@@ -55,7 +57,7 @@ bool SetCommand::validate() const {
     return true;
 }
 
-void SetCommand::execute(Store &s) const {
+void SetCommand::execute(EnvironmentInterface &e, Store &s) const {
     for (std::size_t i = 0; i < numArgs(); i += 2) {
         if (!args_[i]) continue;
 
@@ -63,7 +65,7 @@ void SetCommand::execute(Store &s) const {
         const std::string &ident = idNode->getValue();
 
         s.set(ident, (args_[i + 1])->evaluate());
-        std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
+        e.printToConsole(T_BGREEN "OK" T_RESET);
     }
 }
 
@@ -79,23 +81,23 @@ bool GetCommand::validate() const {
     return true;
 }
 
-void GetCommand::execute(Store &s) const {
+void GetCommand::execute(EnvironmentInterface &e, Store &s) const {
     for (const ValueSP &arg : args_) {
         IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
         const std::string &ident = idNode->getValue();
 
         StoreValueSP value = s.get(ident);
         if (value)
-            printItem(ident, value);
+            e.printToConsole(PRINT_ITEM(ident, value->string()));
         else
-            std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
+            e.printToConsole(T_BYLLW "NOT FOUND" T_RESET);
     }
 }
 
-void ListCommand::execute(Store &s) const {
-    if (s.size() < 1) std::cout << T_BYLLW << "(empty)" << T_RESET << std::endl;
+void ListCommand::execute(EnvironmentInterface &e, Store &s) const {
+    if (s.size() < 1) e.printToConsole(T_BYLLW "(empty)" T_RESET);
     for (const auto &item : s)
-        printItem(item.first, item.second);
+        e.printToConsole(PRINT_ITEM(item.first, item.second->string()));
 }
 
 bool DeleteCommand::validate() const {
@@ -110,7 +112,7 @@ bool DeleteCommand::validate() const {
     return true;
 }
 
-void DeleteCommand::execute(Store &s) const {
+void DeleteCommand::execute(EnvironmentInterface &e, Store &s) const {
     for (const auto &arg : args_) {
         if (!arg) continue;
 
@@ -119,9 +121,9 @@ void DeleteCommand::execute(Store &s) const {
 
         bool deleted = s.del(ident);
         if (deleted)
-            std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
+            e.printToConsole(T_BGREEN "OK" T_RESET);
         else
-            std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
+            e.printToConsole(T_BYLLW "NOT FOUND" T_RESET);
     }
 }
 
@@ -139,7 +141,7 @@ bool UpdateCommand::validate() const {
     return true;
 }
 
-void UpdateCommand::execute(Store &s) const {
+void UpdateCommand::execute(EnvironmentInterface &e, Store &s) const {
     for (std::size_t i = 0; i < numArgs(); i += 2) {
         if (!args_[i]) continue;
 
@@ -148,9 +150,9 @@ void UpdateCommand::execute(Store &s) const {
 
         bool updated = s.update(ident, (args_[i + 1])->evaluate());
         if (updated)
-            std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
+            e.printToConsole(T_BGREEN "OK" T_RESET);
         else
-            std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
+            e.printToConsole(T_BYLLW "NOT FOUND" T_RESET);
     }
 }
 
@@ -166,7 +168,7 @@ bool ResolveCommand::validate() const {
     return true;
 }
 
-void ResolveCommand::execute(Store &s) const {
+void ResolveCommand::execute(EnvironmentInterface &e, Store &s) const {
     for (const auto &arg : args_) {
         if (!arg) continue;
 
@@ -175,26 +177,26 @@ void ResolveCommand::execute(Store &s) const {
 
         StoreValueSP value = s.resolve(ident, true);
         if (value)
-            printItem(ident, value);
+            e.printToConsole(PRINT_ITEM(ident, value->string()));
         else
-            std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
+            e.printToConsole(T_BYLLW "NOT FOUND" T_RESET);
     }
 }
 
-void SaveCommand::execute(Store &s) const {
+void SaveCommand::execute(EnvironmentInterface &e, Store &s) const {
     std::string &filename = DEFAULT_SAVE_FILE;
     if (numArgs()) filename = getFilename_(args_[0]);
 
     s.saveToFile(filename + ".kep");
-    std::cout << T_BGREEN << "SAVED" << T_RESET << std::endl;
+    e.printToConsole(T_BGREEN "SAVED" T_RESET);
 }
 
-void LoadCommand::execute(Store &s) const {
+void LoadCommand::execute(EnvironmentInterface &e, Store &s) const {
     std::string &filename = DEFAULT_SAVE_FILE;
     if (numArgs()) filename = getFilename_(args_[0]);
 
     s.loadFromFile(filename + ".kep");
-    std::cout << T_BGREEN << "LOADED" << T_RESET << std::endl;
+    e.printToConsole(T_BGREEN "LOADED" T_RESET);
 }
 
 bool RenameCommand::validate() const {
@@ -211,7 +213,7 @@ bool RenameCommand::validate() const {
     return true;
 }
 
-void RenameCommand::execute(Store &s) const {
+void RenameCommand::execute(EnvironmentInterface &e, Store &s) const {
     for (std::size_t i = 0; i < numArgs(); i += 2) {
         if (!args_[i]) continue;
 
@@ -225,19 +227,20 @@ void RenameCommand::execute(Store &s) const {
 
         // Make the user confirm overwrites
         if (s.contains(newName)) {
-            std::cout << T_BYLLW << "Warning: key \'" << newName
-                      << "\' already exists. Do you want to overwrite it? (y/n)" << T_RESET
-                      << "\n> ";
+            e.printToConsole(T_BYLLW "Warning: key \'" + newName
+                                 + "\' already exists. Do you want to overwrite it? (y/n)" T_RESET,
+                true);
+
             std::string confirm;
             std::getline(std::cin, confirm);
             if (confirm.size() && confirm[0] != 'y') {
-                std::cout << T_BYLLW << "No changes made to the store." << T_RESET << std::endl;
+                e.printToConsole(T_BYLLW "No changes made to the store." T_RESET);
                 return;
             }
         }
 
         s.rename(oldName, newName);
-        std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
+        e.printToConsole(T_BGREEN "OK" T_RESET);
     }
 }
 
@@ -253,7 +256,7 @@ bool IncrementCommand::validate() const {
     return true;
 }
 
-void IncrementCommand::execute(Store &s) const {
+void IncrementCommand::execute(EnvironmentInterface &e, Store &s) const {
     for (const auto &arg : args_) {
         if (!arg) continue;
 
@@ -262,7 +265,7 @@ void IncrementCommand::execute(Store &s) const {
 
         StoreValueSP value = s.resolve(ident);
         if (value == nullptr) {
-            std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
+            e.printToConsole(T_BYLLW "NOT FOUND" T_RESET);
             continue;
         }
 
@@ -273,7 +276,7 @@ void IncrementCommand::execute(Store &s) const {
         }
 
         number->incr();
-        std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
+        e.printToConsole(T_BGREEN "OK" T_RESET);
     }
 }
 
@@ -289,7 +292,7 @@ bool DecrementCommand::validate() const {
     return true;
 }
 
-void DecrementCommand::execute(Store &s) const {
+void DecrementCommand::execute(EnvironmentInterface &e, Store &s) const {
     for (const auto &arg : args_) {
         if (!arg) continue;
 
@@ -298,18 +301,18 @@ void DecrementCommand::execute(Store &s) const {
 
         StoreValueSP value = s.resolve(ident);
         if (value == nullptr) {
-            std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
+            e.printToConsole(T_BYLLW "NOT FOUND" T_RESET);
             continue;
         }
 
         NumericTypeSP number = std::dynamic_pointer_cast<NumericType>(value);
         if (!number) {
-            std::cout << T_BRED << NOT_NUMERIC << T_RESET << std::endl;
+            e.printToConsole(T_BRED NOT_NUMERIC T_RESET);
             continue;
         }
 
         number->decr();
-        std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
+        e.printToConsole(T_BGREEN "OK" T_RESET);
     }
 }
 
@@ -322,11 +325,11 @@ bool AppendCommand::validate() const {
     return true;
 }
 
-void AppendCommand::execute(Store &s) const {
+void AppendCommand::execute(EnvironmentInterface &e, Store &s) const {
     IdentifierValueSP identNode = std::dynamic_pointer_cast<IdentifierValue>(args_[0]->evaluate());
     StoreValueSP listObj = s.resolve(identNode->getValue());
     if (!listObj) {
-        std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
+        e.printToConsole(T_BYLLW "NOT FOUND" T_RESET);
         return;
     }
 
@@ -339,7 +342,7 @@ void AppendCommand::execute(Store &s) const {
     for (std::size_t i = 1; i < numArgs(); i++) {
         if (!args_[i]) continue;
         list->append((args_[i])->evaluate());
-        std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
+        e.printToConsole(T_BGREEN "OK" T_RESET);
     }
 }
 
@@ -352,11 +355,11 @@ bool PrependCommand::validate() const {
     return true;
 }
 
-void PrependCommand::execute(Store &s) const {
+void PrependCommand::execute(EnvironmentInterface &e, Store &s) const {
     IdentifierValueSP identNode = std::dynamic_pointer_cast<IdentifierValue>(args_[0]->evaluate());
     StoreValueSP listObj = s.resolve(identNode->getValue());
     if (!listObj) {
-        std::cout << T_BYLLW << "NOT FOUND" << T_RESET << std::endl;
+        e.printToConsole(T_BYLLW "NOT FOUND" T_RESET);
         return;
     }
 
@@ -369,7 +372,7 @@ void PrependCommand::execute(Store &s) const {
     for (std::size_t i = 1; i < numArgs(); i++) {
         if (!args_[i]) continue;
         list->prepend((args_[i])->evaluate());
-        std::cout << T_BGREEN << "OK" << T_RESET << std::endl;
+        e.printToConsole(T_BGREEN "OK" T_RESET);
     }
 }
 
@@ -385,7 +388,7 @@ bool SearchCommand::validate() const {
     return true;
 }
 
-void SearchCommand::execute(Store &s) const {
+void SearchCommand::execute(EnvironmentInterface &e, Store &s) const {
     for (const auto &arg : args_) {
         if (!arg) continue;
 
@@ -396,14 +399,15 @@ void SearchCommand::execute(Store &s) const {
                                          : removeQuotations(patternVal->getValue());
         std::vector<std::string> keys = s.search(pattern);
 
-        std::cout << T_BYLLW << pattern << " (" << keys.size() << ")" << T_RESET << std::endl;
+        e.printToConsole(T_BYLLW + pattern + " (" + std::to_string(keys.size()) + ")" T_RESET);
+
         for (const auto &key : keys)
-            std::cout << "  " << key << std::endl;
+            e.printToConsole(" " + key);
     }
 }
 
-void StatsCommand::execute(Store &s) const {
-    std::cout << T_BYLLW << "KeplerKV Statistics" << T_RESET << std::endl;
+void StatsCommand::execute(EnvironmentInterface &e, Store &s) const {
+    e.printToConsole(T_BYLLW "KeplerKV Statistics" T_RESET);
 
     int totalNum = s.size(), numInts = 0, numFloats = 0, numStrs = 0, numLists = 0, numAliases = 0;
     std::size_t totalMem = 0, memInts = 0, memFloats = 0, memStrs = 0, memLists = 0, memAliases = 0,
@@ -439,19 +443,21 @@ void StatsCommand::execute(Store &s) const {
         }
     }
 
-    std::cout << T_BYLLW << "Total keys: " << T_RESET << totalNum << std::endl;
+    e.printToConsole(T_BYLLW "Total keys: " T_RESET + std::to_string(totalNum));
 
-    std::cout << T_BYLLW << "Key Distribution by Type: " << T_RESET << std::endl;
-    std::cout << "\tIntegers: " << numInts << std::endl;
-    std::cout << "\tFloats: " << numFloats << std::endl;
-    std::cout << "\tStrings: " << numStrs << std::endl;
-    std::cout << "\tLists: " << numLists << std::endl;
-    std::cout << "\tAliases: " << numAliases << std::endl;
+    e.printToConsole(T_BYLLW "Key Distribution by Type: " T_RESET);
 
-    std::cout << T_BYLLW << "Usage (including keys) in bytes: " << T_RESET << totalMem << std::endl;
-    std::cout << "\tIntegers: " << memInts << std::endl;
-    std::cout << "\tFloats: " << memFloats << std::endl;
-    std::cout << "\tStrings: " << memStrs << std::endl;
-    std::cout << "\tLists: " << memLists << std::endl;
-    std::cout << "\tAliases: " << memAliases << std::endl;
+    e.printToConsole("\tIntegers: " + std::to_string(numInts));
+    e.printToConsole("\tFloats: " + std::to_string(numFloats));
+    e.printToConsole("\tStrings: " + std::to_string(numStrs));
+    e.printToConsole("\tLists: " + std::to_string(numLists));
+    e.printToConsole("\tAliases: " + std::to_string(numAliases));
+
+    e.printToConsole(
+        T_BYLLW "Usage (including keys) in bytes: " T_RESET + std::to_string(totalMem));
+    e.printToConsole("\tIntegers: " + std::to_string(memInts));
+    e.printToConsole("\tFloats: " + std::to_string(memFloats));
+    e.printToConsole("\tStrings: " + std::to_string(memStrs));
+    e.printToConsole("\tLists: " + std::to_string(memLists));
+    e.printToConsole("\tAliases: " + std::to_string(memAliases));
 }

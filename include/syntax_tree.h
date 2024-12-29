@@ -168,6 +168,8 @@ protected:
     std::vector<ValueSP> args_;
 };
 
+class EnvironmentInterface; // Forward declaration
+
 // Store commands interact with the store itself.
 class StoreCommand : public Command {
 public:
@@ -187,7 +189,7 @@ public:
     // execute() assumes the node has been validated.
     // Executing non-validated nodes can have undefined behavior.
     // Error-handling is the caller's responsibility.
-    virtual void execute(Store &) const = 0;
+    virtual void execute(EnvironmentInterface &, Store &) const = 0;
 
     bool ignoresTransactions() { return ignoresTransac_; }
 
@@ -197,7 +199,6 @@ protected:
 };
 
 // System commands do not interact with the store.
-class EnvironmentInterface; // Forward declaration
 class SystemCommand : public Command {
 public:
     SystemCommand()
