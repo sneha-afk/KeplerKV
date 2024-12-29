@@ -11,10 +11,17 @@ using WALType = std::deque<StoreCommandSP>;
 
 class Environment : public EnvironmentInterface {
 public:
+    // Dummy env with a nullptr Store
+    Environment()
+        : silentMode_(false) { }
     Environment(Store *s_ptr)
-        : store_(s_ptr) { }
+        : store_(s_ptr)
+        , silentMode_(false) { }
 
-    void printToConsole(const std::string &s) override { std::cout << s << std::endl; }
+    void printToConsole(const std::string &s) override {
+        if (!silentMode_) std::cout << s << std::endl;
+    }
+    void setSilentMode(bool s) { silentMode_ = s; }
 
     Store *getStore() override { return store_; }
 
@@ -41,4 +48,5 @@ public:
 private:
     Store *store_;
     WALType wal_;
+    bool silentMode_;
 };

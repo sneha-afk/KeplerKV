@@ -8,6 +8,9 @@
 
 class Handler {
 public:
+    // Dummy handler
+    Handler() {};
+
     Handler(Store *s_ptr, Environment *e_ptr)
         : lexer_(Lexer())
         , parser_(Parser())
