@@ -72,7 +72,7 @@ void SetCommand::execute(EnvironmentInterface &e, Store &s) const {
 bool GetCommand::validate() const {
     if (numArgs() < 1) return false;
 
-    for (const auto &arg : args_) {
+    for (const ValueSP &arg : args_) {
         if (!arg) continue;
 
         IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
@@ -103,7 +103,7 @@ void ListCommand::execute(EnvironmentInterface &e, Store &s) const {
 bool DeleteCommand::validate() const {
     if (numArgs() < 1) return false;
 
-    for (const auto &arg : args_) {
+    for (const ValueSP &arg : args_) {
         if (!arg) continue;
 
         IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
@@ -113,7 +113,7 @@ bool DeleteCommand::validate() const {
 }
 
 void DeleteCommand::execute(EnvironmentInterface &e, Store &s) const {
-    for (const auto &arg : args_) {
+    for (const ValueSP &arg : args_) {
         if (!arg) continue;
 
         IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
@@ -159,7 +159,7 @@ void UpdateCommand::execute(EnvironmentInterface &e, Store &s) const {
 bool ResolveCommand::validate() const {
     if (numArgs() < 1) return false;
 
-    for (const auto &arg : args_) {
+    for (const ValueSP &arg : args_) {
         if (!arg) continue;
 
         IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
@@ -169,7 +169,7 @@ bool ResolveCommand::validate() const {
 }
 
 void ResolveCommand::execute(EnvironmentInterface &e, Store &s) const {
-    for (const auto &arg : args_) {
+    for (const ValueSP &arg : args_) {
         if (!arg) continue;
 
         IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
@@ -225,6 +225,7 @@ void RenameCommand::execute(EnvironmentInterface &e, Store &s) const {
         const std::string &oldName = oldNode->getValue();
         const std::string &newName = newNode->getValue();
 
+        // TODO: implement for non-inter mode: dry-runs, extra args in cmd
         // Make the user confirm overwrites
         if (s.contains(newName)) {
             e.printToConsole(T_BYLLW "Warning: key \'" + newName
@@ -247,7 +248,7 @@ void RenameCommand::execute(EnvironmentInterface &e, Store &s) const {
 bool IncrementCommand::validate() const {
     if (numArgs() < 1) return false;
 
-    for (const auto &arg : args_) {
+    for (const ValueSP &arg : args_) {
         if (!arg) continue;
 
         IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
@@ -257,7 +258,7 @@ bool IncrementCommand::validate() const {
 }
 
 void IncrementCommand::execute(EnvironmentInterface &e, Store &s) const {
-    for (const auto &arg : args_) {
+    for (const ValueSP &arg : args_) {
         if (!arg) continue;
 
         IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
@@ -283,7 +284,7 @@ void IncrementCommand::execute(EnvironmentInterface &e, Store &s) const {
 bool DecrementCommand::validate() const {
     if (numArgs() < 1) return false;
 
-    for (const auto &arg : args_) {
+    for (const ValueSP &arg : args_) {
         if (!arg) continue;
 
         IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
@@ -293,7 +294,7 @@ bool DecrementCommand::validate() const {
 }
 
 void DecrementCommand::execute(EnvironmentInterface &e, Store &s) const {
-    for (const auto &arg : args_) {
+    for (const ValueSP &arg : args_) {
         if (!arg) continue;
 
         IdentifierValueSP idNode = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
@@ -379,7 +380,7 @@ void PrependCommand::execute(EnvironmentInterface &e, Store &s) const {
 bool SearchCommand::validate() const {
     if (numArgs() < 1) return false;
 
-    for (const auto &arg : args_) {
+    for (const ValueSP &arg : args_) {
         if (!arg) continue;
 
         IdentifierValueSP idValue = std::dynamic_pointer_cast<IdentifierValue>(arg->evaluate());
@@ -389,7 +390,7 @@ bool SearchCommand::validate() const {
 }
 
 void SearchCommand::execute(EnvironmentInterface &e, Store &s) const {
-    for (const auto &arg : args_) {
+    for (const ValueSP &arg : args_) {
         if (!arg) continue;
 
         StringValueSP patternVal = std::dynamic_pointer_cast<StringValue>(arg->evaluate());

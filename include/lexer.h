@@ -15,6 +15,10 @@ public:
     std::vector<TokenSP> &tokenize(std::string &);
 
 private:
+    char curr_();
+    char peek_();
+    char peekNext_();
+
     std::string::iterator it_;
     std::string::iterator iend_;
 
