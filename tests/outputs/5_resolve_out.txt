@@ -1,4 +1,3 @@
-Welcome to KeplerKV! Type \q to quit!
 OK
 OK
 OK
@@ -22,4 +21,3 @@ OK
 cirlist | list: [<nil>, <nil>]
 OK
 Error: circular reference detected
-Farewell!

@@ -1,0 +1,18 @@
+\set a 1;
+\set b 2.3;
+\list;
+\incr a;
+\decr b;
+\list;
+\decr a;
+\incr b;
+\list;
+\decr a b;
+\incr a b;
+\list;
+\set string "hello";
+\incr string;
+\decr string;
+\set c a;
+\incr c;
+\resolve c;
