@@ -9,6 +9,5 @@ Warning: key 'b' already exists. Do you want to overwrite it? (y/n)
 No changes made to the store.
 c | int: 1
 b | float: 5.200000
-Warning: key 'b' already exists. Do you want to overwrite it? (y/n)
 OK
 b | int: 1

@@ -24,6 +24,11 @@ enum class CommandType {
 };
 // clang-format on
 
+enum CommandOption : std::uint8_t {
+    YES = 1 << 1,
+    NO = 1 << 2,
+};
+
 static const std::unordered_map<std::string, CommandType> mapToCmd = { { "SET", CommandType::SET },
     { "S", CommandType::SET }, { "GET", CommandType::GET }, { "G", CommandType::GET },
     { "DELETE", CommandType::DELETE }, { "DEL", CommandType::DELETE }, { "D", CommandType::DELETE },
@@ -143,18 +148,26 @@ class Command : public ASTNode {
 public:
     Command()
         : cmdType_(CommandType::UNKNOWN)
-        , args_(std::vector<ValueSP>()) {};
+        , args_(std::vector<ValueSP>())
+        , options_(0) {};
     Command(const std::string &c)
         : cmdType_(mapGet(mapToCmd, c, CommandType::UNKNOWN))
-        , args_(std::vector<ValueSP>()) {};
+        , args_(std::vector<ValueSP>())
+        , options_(0) {};
     Command(const CommandType &c)
         : cmdType_(c)
-        , args_(std::vector<ValueSP>()) {};
+        , args_(std::vector<ValueSP>())
+        , options_(0) {};
 
     inline NodeType getNodeType() const override { return NodeType::COMMAND; }
     std::string string() const override;
 
     inline CommandType getCmdType() const { return cmdType_; }
+
+    inline bool hasOption(CommandOption op) const { return (options_ & op) != 0; }
+    inline void setOption(CommandOption op) { options_ |= op; }
+    inline void clearOptions() { options_ = 0; }
+
     inline void addArg(ValueSP &a) { args_.push_back(std::move(a)); }
     inline std::vector<ValueSP> &getArgs() { return args_; }
     inline std::size_t numArgs() const { return args_.size(); }
@@ -166,6 +179,7 @@ public:
 protected:
     const CommandType cmdType_;
     std::vector<ValueSP> args_;
+    std::uint8_t options_;
 };
 
 class EnvironmentInterface; // Forward declaration

@@ -13,6 +13,10 @@ public:
     std::vector<CommandSP> &parse(std::vector<TokenSP> &);
 
 private:
+    TokenSP curr_();
+    TokenSP peek_();
+    TokenSP peekNext_();
+
     std::vector<TokenSP>::iterator tt_;
     std::vector<TokenSP>::iterator tend_;
 

@@ -2,6 +2,26 @@
 
 #include "command_ast_nodes.h"
 #include "error_msgs.h"
+#include "syntax_tree.h"
+#include "token.h"
+
+// Returns current character (or null char if no more) and increments.
+TokenSP Parser::curr_() {
+    if (tt_ == tend_) return nullptr;
+    return *tt_++;
+}
+
+// Returns current character (or null if no more), does NOT increment.
+TokenSP Parser::peek_() {
+    if (tt_ == tend_) return nullptr;
+    return *tt_;
+}
+
+// Returns next character (or null if no more), does NOT increment.
+TokenSP Parser::peekNext_() {
+    if ((tt_ + 1) == tend_) return nullptr;
+    return *(tt_ + 1);
+}
 
 std::vector<CommandSP> &Parser::parse(std::vector<TokenSP> &tokens) {
     nodes.clear();
@@ -11,15 +31,15 @@ std::vector<CommandSP> &Parser::parse(std::vector<TokenSP> &tokens) {
     tend_ = tokens.end();
 
     // First token must be a command
-    if ((*tt_)->type != TokenType::COMMAND) throw INVALID_CMD((*tt_)->value);
+    TokenSP tok = peek_();
+    if (!tok || tok->type != TokenType::COMMAND) throw INVALID_CMD(tok->value);
 
-    while (tt_ != tend_) {
-        TokenSP &t = *tt_;
-        if (t->type == TokenType::END || t->type != TokenType::COMMAND) {
+    while ((tok = peek_())) {
+        if (tok->type == TokenType::END || tok->type != TokenType::COMMAND) {
             tt_++;
             continue;
         }
-        nodes.push_back(parseCommand_(t));
+        nodes.push_back(parseCommand_(tok));
     }
 
     return nodes;
@@ -55,21 +75,28 @@ CommandSP Parser::parseCommand_(const TokenSP &cmdTok) {
         default: return nullptr; break;
     }
 
-    while (tt_ != tend_ && (*tt_)->type != TokenType::END) {
-        TokenSP &t = *tt_;
-        switch (t->type) {
+    TokenSP tok = nullptr;
+    while ((tok = peek_()) && tok->type != TokenType::END) {
+        switch (tok->type) {
             case TokenType::END:
             case TokenType::LIST_END:
-            case TokenType::DELIMITER: tt_++; break;
+            case TokenType::DELIMITER: curr_(); break;
             case TokenType::COMMAND: throw RuntimeErr(NESTED_CMD);
-            case TokenType::UNKNOWN: throw UNKNOWN_TOKEN(t->value);
-            case TokenType::OPTION: break;
+            case TokenType::UNKNOWN: throw UNKNOWN_TOKEN(tok->value);
+            case TokenType::OPTION:
+                if (tok->value == "Y" || tok->value == "YES") {
+                    cmd->setOption(CommandOption::YES);
+                } else if (tok->value == "N" || tok->value == "NO") {
+                    cmd->setOption(CommandOption::NO);
+                }
+                curr_();
+                break;
             default:
-                ValueSP val = parseValue_(t);
+                ValueSP val = parseValue_(tok);
                 if (val != nullptr) cmd->addArg(val);
 
                 // Wary of where parseValue() ended up
-                if (tt_ != tend_) tt_++;
+                curr_();
                 break;
         }
     }
@@ -95,7 +122,7 @@ ValueSP Parser::parseValue_(const TokenSP &t) {
             }
         case TokenType::IDENTIFIER: return std::make_shared<IdentifierNode>(tValue);
         case TokenType::STRING: return std::make_shared<StringNode>(tValue);
-        case TokenType::LIST_START: tt_++; return parseList_();
+        case TokenType::LIST_START: curr_(); return parseList_();
         default: throw UNKNOWN_TOKEN(t->value); break;
     }
     return nullptr;
@@ -104,19 +131,19 @@ ValueSP Parser::parseValue_(const TokenSP &t) {
 ValueSP Parser::parseList_() {
     std::shared_ptr<ListNode> lstNode = std::make_shared<ListNode>();
 
-    while (tt_ != tend_ && (*tt_)->type != TokenType::END && (*tt_)->type != TokenType::LIST_END) {
-        TokenSP &t = *tt_;
-        switch (t->type) {
+    TokenSP tok = nullptr;
+    while ((tok = peek_()) && tok->type != TokenType::END && tok->type != TokenType::LIST_END) {
+        switch (tok->type) {
             case TokenType::END:
-            case TokenType::LIST_END: break;
-            case TokenType::DELIMITER: tt_++; break;
+            case TokenType::LIST_END:
+            case TokenType::DELIMITER: curr_(); break;
             case TokenType::COMMAND: throw RuntimeErr(CMD_IN_LIST);
-            case TokenType::UNKNOWN: throw UNKNOWN_TOKEN(t->value);
+            case TokenType::UNKNOWN: throw UNKNOWN_TOKEN(tok->value);
             default:
-                ValueSP val = parseValue_(t);
+                ValueSP val = parseValue_(tok);
                 if (val != nullptr) lstNode->addNode(val);
 
-                if (tt_ != tend_) tt_++;
+                curr_();
                 break;
         }
     }

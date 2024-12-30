@@ -8,8 +8,6 @@
 
 static constexpr bool DEBUG = false;
 
-bool inTransaction_ = false;
-
 /**
  * Processes a query and hands it off to the store to execute.
  * Returns whether to keep running the program.
@@ -33,7 +31,7 @@ void Handler::handleQuery(std::string &query) {
         } else if (StoreCommandSP storeCmd = std::dynamic_pointer_cast<StoreCommand>(cmd)) {
             if (!storeCmd->ignoresTransactions() && env_->inTransaction()) {
                 env_->addCommand(storeCmd);
-                env_->printToConsole(T_BYLLW "LOGGED" T_RESET);
+                env_->printToConsole(PRINT_YELLOW("LOGGED"));
             } else {
                 storeCmd->execute(*env_, *store_);
             }

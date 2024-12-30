@@ -3,8 +3,13 @@
 #include "environment_interface.h"
 #include "error_msgs.h"
 #include "file_io_macros.h"
+#include "syntax_tree.h"
+#include "terminal_colors.h"
 
 #define PRINT_ITEM(id, valStr) T_BBLUE + id + T_RESET + " | " + valStr
+
+#define OK_MSG        PRINT_GREEN("OK")
+#define NOT_FOUND_MSG PRINT_YELLOW("NOT FOUND")
 
 // Filenames may have been passed in deliminated as strings
 std::string getFilename_(const ValueSP node) {
@@ -18,7 +23,7 @@ std::string getFilename_(const ValueSP node) {
 }
 
 void QuitCommand::execute(EnvironmentInterface &e) const {
-    e.printToConsole(T_BBLUE "Farewell!" T_RESET);
+    e.printToConsole(PRINT_BLUE("Farewell!"));
     e.exitSuccess();
 };
 
@@ -26,19 +31,19 @@ void ClearCommand::execute(EnvironmentInterface &e) const { e.printToConsole(CLE
 
 void BeginCommand::execute(EnvironmentInterface &e) const {
     e.setTransacState(true);
-    e.printToConsole(T_BYLLW "TRANSAC BEGIN" T_RESET);
+    e.printToConsole(PRINT_YELLOW("TRANSAC BEGIN"));
 }
 
 void CommitCommand::execute(EnvironmentInterface &e) const {
     e.executeAllWAL();
     e.setTransacState(false);
-    e.printToConsole(T_BYLLW "TRANSAC COMMITTED" T_RESET);
+    e.printToConsole(PRINT_YELLOW("TRANSAC COMMITTED"));
 }
 
 void RollbackCommand::execute(EnvironmentInterface &e) const {
     e.clearWAL();
     e.setTransacState(false);
-    e.printToConsole(T_BYLLW "TRANSAC ROLLBACK" T_RESET);
+    e.printToConsole(PRINT_YELLOW("TRANSAC ROLLBACK"));
 }
 
 bool SetCommand::validate() const {
@@ -65,7 +70,7 @@ void SetCommand::execute(EnvironmentInterface &e, Store &s) const {
         const std::string &ident = idNode->getValue();
 
         s.set(ident, (args_[i + 1])->evaluate());
-        e.printToConsole(T_BGREEN "OK" T_RESET);
+        e.printToConsole(OK_MSG);
     }
 }
 
@@ -87,16 +92,19 @@ void GetCommand::execute(EnvironmentInterface &e, Store &s) const {
         const std::string &ident = idNode->getValue();
 
         StoreValueSP value = s.get(ident);
-        if (value)
+        if (value) {
+
             e.printToConsole(PRINT_ITEM(ident, value->string()));
-        else
-            e.printToConsole(T_BYLLW "NOT FOUND" T_RESET);
+        } else {
+            e.printToConsole(NOT_FOUND_MSG);
+        }
     }
 }
 
 void ListCommand::execute(EnvironmentInterface &e, Store &s) const {
-    if (s.size() < 1) e.printToConsole(T_BYLLW "(empty)" T_RESET);
+    if (s.size() < 1) e.printToConsole(PRINT_YELLOW("(empty)"));
     for (const auto &item : s)
+
         e.printToConsole(PRINT_ITEM(item.first, item.second->string()));
 }
 
@@ -120,10 +128,11 @@ void DeleteCommand::execute(EnvironmentInterface &e, Store &s) const {
         const std::string &ident = idNode->getValue();
 
         bool deleted = s.del(ident);
-        if (deleted)
-            e.printToConsole(T_BGREEN "OK" T_RESET);
-        else
-            e.printToConsole(T_BYLLW "NOT FOUND" T_RESET);
+        if (deleted) {
+            e.printToConsole(OK_MSG);
+        } else {
+            e.printToConsole(NOT_FOUND_MSG);
+        }
     }
 }
 
@@ -149,10 +158,11 @@ void UpdateCommand::execute(EnvironmentInterface &e, Store &s) const {
         const std::string &ident = idNode->getValue();
 
         bool updated = s.update(ident, (args_[i + 1])->evaluate());
-        if (updated)
-            e.printToConsole(T_BGREEN "OK" T_RESET);
-        else
-            e.printToConsole(T_BYLLW "NOT FOUND" T_RESET);
+        if (updated) {
+            e.printToConsole(OK_MSG);
+        } else {
+            e.printToConsole(NOT_FOUND_MSG);
+        }
     }
 }
 
@@ -176,10 +186,12 @@ void ResolveCommand::execute(EnvironmentInterface &e, Store &s) const {
         const std::string &ident = idNode->getValue();
 
         StoreValueSP value = s.resolve(ident, true);
-        if (value)
+        if (value) {
+
             e.printToConsole(PRINT_ITEM(ident, value->string()));
-        else
-            e.printToConsole(T_BYLLW "NOT FOUND" T_RESET);
+        } else {
+            e.printToConsole(NOT_FOUND_MSG);
+        }
     }
 }
 
@@ -188,7 +200,7 @@ void SaveCommand::execute(EnvironmentInterface &e, Store &s) const {
     if (numArgs()) filename = getFilename_(args_[0]);
 
     s.saveToFile(filename + ".kep");
-    e.printToConsole(T_BGREEN "SAVED" T_RESET);
+    e.printToConsole(PRINT_GREEN("SAVED"));
 }
 
 void LoadCommand::execute(EnvironmentInterface &e, Store &s) const {
@@ -196,7 +208,7 @@ void LoadCommand::execute(EnvironmentInterface &e, Store &s) const {
     if (numArgs()) filename = getFilename_(args_[0]);
 
     s.loadFromFile(filename + ".kep");
-    e.printToConsole(T_BGREEN "LOADED" T_RESET);
+    e.printToConsole(PRINT_GREEN("LOADED"));
 }
 
 bool RenameCommand::validate() const {
@@ -227,21 +239,26 @@ void RenameCommand::execute(EnvironmentInterface &e, Store &s) const {
 
         // TODO: implement for non-inter mode: dry-runs, extra args in cmd
         // Make the user confirm overwrites
-        if (s.contains(newName)) {
+        if (s.contains(newName) && !hasOption(CommandOption::YES)) {
             e.printToConsole(T_BYLLW "Warning: key \'" + newName
                                  + "\' already exists. Do you want to overwrite it? (y/n)" T_RESET,
                 true);
 
+            if (hasOption(CommandOption::NO)) {
+                e.printToConsole(PRINT_YELLOW("No changes made to the store."));
+                return;
+            }
+
             std::string confirm;
             std::getline(std::cin, confirm);
             if (confirm.size() && confirm[0] != 'y') {
-                e.printToConsole(T_BYLLW "No changes made to the store." T_RESET);
+                e.printToConsole(PRINT_YELLOW("No changes made to the store."));
                 return;
             }
         }
 
         s.rename(oldName, newName);
-        e.printToConsole(T_BGREEN "OK" T_RESET);
+        e.printToConsole(OK_MSG);
     }
 }
 
@@ -266,18 +283,18 @@ void IncrementCommand::execute(EnvironmentInterface &e, Store &s) const {
 
         StoreValueSP value = s.resolve(ident);
         if (value == nullptr) {
-            e.printToConsole(T_BYLLW "NOT FOUND" T_RESET);
+            e.printToConsole(NOT_FOUND_MSG);
             continue;
         }
 
         NumericTypeSP number = std::dynamic_pointer_cast<NumericType>(value);
         if (!number) {
-            std::cout << T_BRED << NOT_NUMERIC << T_RESET << std::endl;
+            e.printToConsole(PRINT_RED(NOT_NUMERIC));
             continue;
         }
 
         number->incr();
-        e.printToConsole(T_BGREEN "OK" T_RESET);
+        e.printToConsole(OK_MSG);
     }
 }
 
@@ -302,18 +319,18 @@ void DecrementCommand::execute(EnvironmentInterface &e, Store &s) const {
 
         StoreValueSP value = s.resolve(ident);
         if (value == nullptr) {
-            e.printToConsole(T_BYLLW "NOT FOUND" T_RESET);
+            e.printToConsole(NOT_FOUND_MSG);
             continue;
         }
 
         NumericTypeSP number = std::dynamic_pointer_cast<NumericType>(value);
         if (!number) {
-            e.printToConsole(T_BRED NOT_NUMERIC T_RESET);
+            e.printToConsole(PRINT_RED(NOT_NUMERIC));
             continue;
         }
 
         number->decr();
-        e.printToConsole(T_BGREEN "OK" T_RESET);
+        e.printToConsole(OK_MSG);
     }
 }
 
@@ -330,20 +347,20 @@ void AppendCommand::execute(EnvironmentInterface &e, Store &s) const {
     IdentifierValueSP identNode = std::dynamic_pointer_cast<IdentifierValue>(args_[0]->evaluate());
     StoreValueSP listObj = s.resolve(identNode->getValue());
     if (!listObj) {
-        e.printToConsole(T_BYLLW "NOT FOUND" T_RESET);
+        e.printToConsole(NOT_FOUND_MSG);
         return;
     }
 
     ListValueSP list = std::dynamic_pointer_cast<ListValue>(listObj);
     if (!list) {
-        std::cout << T_BYLLW << NOT_LIST << T_RESET << std::endl;
+        e.printToConsole(PRINT_YELLOW(NOT_LIST));
         return;
     }
 
     for (std::size_t i = 1; i < numArgs(); i++) {
         if (!args_[i]) continue;
         list->append((args_[i])->evaluate());
-        e.printToConsole(T_BGREEN "OK" T_RESET);
+        e.printToConsole(OK_MSG);
     }
 }
 
@@ -360,20 +377,20 @@ void PrependCommand::execute(EnvironmentInterface &e, Store &s) const {
     IdentifierValueSP identNode = std::dynamic_pointer_cast<IdentifierValue>(args_[0]->evaluate());
     StoreValueSP listObj = s.resolve(identNode->getValue());
     if (!listObj) {
-        e.printToConsole(T_BYLLW "NOT FOUND" T_RESET);
+        e.printToConsole(NOT_FOUND_MSG);
         return;
     }
 
     ListValueSP list = std::dynamic_pointer_cast<ListValue>(listObj);
     if (!list) {
-        std::cout << T_BYLLW << NOT_LIST << T_RESET << std::endl;
+        e.printToConsole(PRINT_YELLOW(NOT_LIST));
         return;
     }
 
     for (std::size_t i = 1; i < numArgs(); i++) {
         if (!args_[i]) continue;
         list->prepend((args_[i])->evaluate());
-        e.printToConsole(T_BGREEN "OK" T_RESET);
+        e.printToConsole(OK_MSG);
     }
 }
 
@@ -408,7 +425,7 @@ void SearchCommand::execute(EnvironmentInterface &e, Store &s) const {
 }
 
 void StatsCommand::execute(EnvironmentInterface &e, Store &s) const {
-    e.printToConsole(T_BYLLW "KeplerKV Statistics" T_RESET);
+    e.printToConsole(PRINT_YELLOW("KeplerKV Statistics"));
 
     int totalNum = s.size(), numInts = 0, numFloats = 0, numStrs = 0, numLists = 0, numAliases = 0;
     std::size_t totalMem = 0, memInts = 0, memFloats = 0, memStrs = 0, memLists = 0, memAliases = 0,
@@ -444,9 +461,9 @@ void StatsCommand::execute(EnvironmentInterface &e, Store &s) const {
         }
     }
 
-    e.printToConsole(T_BYLLW "Total keys: " T_RESET + std::to_string(totalNum));
+    e.printToConsole(PRINT_YELLOW("Total keys: ") + std::to_string(totalNum));
 
-    e.printToConsole(T_BYLLW "Key Distribution by Type: " T_RESET);
+    e.printToConsole(PRINT_YELLOW("Key Distribution by Type: "));
 
     e.printToConsole("\tIntegers: " + std::to_string(numInts));
     e.printToConsole("\tFloats: " + std::to_string(numFloats));
@@ -454,8 +471,7 @@ void StatsCommand::execute(EnvironmentInterface &e, Store &s) const {
     e.printToConsole("\tLists: " + std::to_string(numLists));
     e.printToConsole("\tAliases: " + std::to_string(numAliases));
 
-    e.printToConsole(
-        T_BYLLW "Usage (including keys) in bytes: " T_RESET + std::to_string(totalMem));
+    e.printToConsole(PRINT_YELLOW("Usage (including keys) in bytes: ") + std::to_string(totalMem));
     e.printToConsole("\tIntegers: " + std::to_string(memInts));
     e.printToConsole("\tFloats: " + std::to_string(memFloats));
     e.printToConsole("\tStrings: " + std::to_string(memStrs));

@@ -3,9 +3,7 @@
 \list;
 \rename a c;
 \list;
-\rename c b;
-n;
+\rename c b --no;
 \list;
-\rename c b;
-y;
+\rename c b --yes;
 \list;
