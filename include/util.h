@@ -1,11 +1,7 @@
 #pragma once
 
-#include "terminal_colors.h"
-
-#include <iostream>
 #include <string>
 #include <unordered_map>
-#include <vector>
 
 // Returns the value of the key in the map if it exists, else returns the provided default
 template <typename K, typename V>
@@ -20,4 +16,4 @@ inline bool strContains(const std::string &s, const char &c) {
 }
 
 // Removes quotation marks without affecting original string
-std::string removeQuotations(const std::string &s);
+std::string removeQuotations(const std::string &);

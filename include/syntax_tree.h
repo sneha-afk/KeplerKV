@@ -1,5 +1,6 @@
 #pragma once
 
+#include "environment_interface.h"
 #include "store.h"
 #include "store_value.h"
 #include "util.h"
@@ -22,6 +23,11 @@ enum class CommandType {
     BEGIN,      COMMIT,         ROLLBACK,
 };
 // clang-format on
+
+enum CommandOption : std::uint8_t {
+    YES = 1 << 1,
+    NO = 1 << 2,
+};
 
 static const std::unordered_map<std::string, CommandType> mapToCmd = { { "SET", CommandType::SET },
     { "S", CommandType::SET }, { "GET", CommandType::GET }, { "G", CommandType::GET },
@@ -53,8 +59,8 @@ public:
 using ASTNodeSP = std::shared_ptr<ASTNode>;
 
 class Nil : public ASTNode {
-    inline NodeType getNodeType() const { return NodeType::NIL; };
-    std::string string() { return "{node: nil, value: nil}"; }
+    inline NodeType getNodeType() const override { return NodeType::NIL; };
+    std::string string() const override { return "{node: nil, value: nil}"; }
 };
 
 class Value : public ASTNode {
@@ -71,7 +77,7 @@ public:
     IntNode(int i)
         : value_(i) {};
 
-    inline NodeType getNodeType() const { return NodeType::INT; }
+    inline NodeType getNodeType() const override { return NodeType::INT; }
     std::string string() const override;
     StoreValueSP evaluate() const override;
 
@@ -86,7 +92,7 @@ public:
     FloatNode(float f)
         : value_(f) {};
 
-    inline NodeType getNodeType() const { return NodeType::FLOAT; }
+    inline NodeType getNodeType() const override { return NodeType::FLOAT; }
     std::string string() const override;
     StoreValueSP evaluate() const override;
 
@@ -101,7 +107,7 @@ public:
     StringNode(std::string s)
         : value_(s) {};
 
-    inline NodeType getNodeType() const { return NodeType::STRING; }
+    inline NodeType getNodeType() const override { return NodeType::STRING; }
     std::string string() const override;
     StoreValueSP evaluate() const override;
 
@@ -116,7 +122,7 @@ public:
     IdentifierNode(std::string s)
         : StringNode(s) {};
 
-    inline NodeType getNodeType() const { return NodeType::IDENTIFIER; }
+    inline NodeType getNodeType() const override { return NodeType::IDENTIFIER; }
     std::string string() const override;
     StoreValueSP evaluate() const override;
 };
@@ -130,7 +136,7 @@ public:
 
     inline void addNode(ValueSP e) { value_.push_back(std::move(e)); }
 
-    inline NodeType getNodeType() const { return NodeType::LIST; }
+    inline NodeType getNodeType() const override { return NodeType::LIST; }
     std::string string() const override;
     StoreValueSP evaluate() const override;
 
@@ -142,18 +148,26 @@ class Command : public ASTNode {
 public:
     Command()
         : cmdType_(CommandType::UNKNOWN)
-        , args_(std::vector<ValueSP>()) {};
+        , args_(std::vector<ValueSP>())
+        , options_(0) {};
     Command(const std::string &c)
         : cmdType_(mapGet(mapToCmd, c, CommandType::UNKNOWN))
-        , args_(std::vector<ValueSP>()) {};
+        , args_(std::vector<ValueSP>())
+        , options_(0) {};
     Command(const CommandType &c)
         : cmdType_(c)
-        , args_(std::vector<ValueSP>()) {};
+        , args_(std::vector<ValueSP>())
+        , options_(0) {};
 
-    inline NodeType getNodeType() const { return NodeType::COMMAND; }
+    inline NodeType getNodeType() const override { return NodeType::COMMAND; }
     std::string string() const override;
 
     inline CommandType getCmdType() const { return cmdType_; }
+
+    inline bool hasOption(CommandOption op) const { return (options_ & op) != 0; }
+    inline void setOption(CommandOption op) { options_ |= op; }
+    inline void clearOptions() { options_ = 0; }
+
     inline void addArg(ValueSP &a) { args_.push_back(std::move(a)); }
     inline std::vector<ValueSP> &getArgs() { return args_; }
     inline std::size_t numArgs() const { return args_.size(); }
@@ -165,22 +179,37 @@ public:
 protected:
     const CommandType cmdType_;
     std::vector<ValueSP> args_;
+    std::uint8_t options_;
 };
+
+class EnvironmentInterface; // Forward declaration
 
 // Store commands interact with the store itself.
 class StoreCommand : public Command {
 public:
     StoreCommand()
-        : Command() { }
+        : Command()
+        , ignoresTransac_(false) { }
     StoreCommand(const std::string &c)
-        : Command(c) { }
+        : Command(c)
+        , ignoresTransac_(false) { }
     StoreCommand(const CommandType &c)
-        : Command(c) { }
+        : Command(c)
+        , ignoresTransac_(false) { }
+    StoreCommand(const CommandType &c, const bool ignoreT)
+        : Command(c)
+        , ignoresTransac_(ignoreT) { }
 
     // execute() assumes the node has been validated.
     // Executing non-validated nodes can have undefined behavior.
     // Error-handling is the caller's responsibility.
-    virtual void execute(Store &) const = 0;
+    virtual void execute(EnvironmentInterface &, Store &) const = 0;
+
+    bool ignoresTransactions() { return ignoresTransac_; }
+
+protected:
+    // If this command ignores transactions, it will run regardless
+    bool ignoresTransac_;
 };
 
 // System commands do not interact with the store.
@@ -196,7 +225,7 @@ public:
     // execute() assumes the node has been validated.
     // Executing non-validated nodes can have undefined behavior.
     // Error-handling is the caller's responsibility.
-    virtual void execute() const = 0;
+    virtual void execute(EnvironmentInterface &) const = 0;
 };
 
 using CommandSP = std::shared_ptr<Command>;

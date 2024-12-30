@@ -8,60 +8,35 @@
 
 static constexpr bool DEBUG = false;
 
-bool inTransaction_ = false;
-
 /**
  * Processes a query and hands it off to the store to execute.
  * Returns whether to keep running the program.
  */
-bool Handler::handleQuery(std::string &query) {
+void Handler::handleQuery(std::string &query) {
     std::vector<std::shared_ptr<Token>> &tokens = lexer_.tokenize(query);
     if (DEBUG)
-        for (const auto &t : tokens)
-            std::cout << "\t" << *t << std::endl;
+        for (const TokenSP &t : tokens)
+            env_->printToConsole("\t" + t->string());
 
     std::vector<CommandSP> &nodes = parser_.parse(tokens);
     for (const CommandSP &cmd : nodes) {
-        if (DEBUG) std::cout << "\t" << *cmd << std::endl;
+        if (DEBUG) env_->printToConsole("\t" + cmd->string());
 
         // Validate the command
         if (!cmd || !cmd->validate()) throw RuntimeErr(WRONG_CMD_FMT);
 
         // Check what kind of command this is
         if (SystemCommandSP sysCmd = std::dynamic_pointer_cast<SystemCommand>(cmd)) {
-            sysCmd->execute();
+            sysCmd->execute(*env_);
         } else if (StoreCommandSP storeCmd = std::dynamic_pointer_cast<StoreCommand>(cmd)) {
-            switch (storeCmd->getCmdType()) {
-                case CommandType::BEGIN:
-                    inTransaction_ = true;
-                    storeCmd->execute(store_);
-                    break;
-                case CommandType::COMMIT:
-                    inTransaction_ = false;
-                    while (0 < wal_.size()) {
-                        StoreCommandSP frontCmd = wal_.front();
-                        wal_.pop_front();
-                        frontCmd->execute(store_);
-                    }
-                    storeCmd->execute(store_);
-                    break;
-                case CommandType::ROLLBACK:
-                    inTransaction_ = false;
-                    wal_.clear();
-                    storeCmd->execute(store_);
-                    break;
-                default:
-                    if (inTransaction_) {
-                        wal_.push_back(storeCmd);
-                        std::cout << T_BYLLW << "LOGGED" << T_RESET << std::endl;
-                    } else {
-                        storeCmd->execute(store_);
-                    }
-                    break;
+            if (!storeCmd->ignoresTransactions() && env_->inTransaction()) {
+                env_->addCommand(storeCmd);
+                env_->printToConsole(PRINT_YELLOW("LOGGED"));
+            } else {
+                storeCmd->execute(*env_, *store_);
             }
-
-            break;
         }
     }
-    return true;
+
+    env_->setRunning(true);
 }

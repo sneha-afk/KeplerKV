@@ -1,0 +1,11 @@
+\set a 1;
+\begin;
+\list;
+\set b 3;
+\list;
+\rollback;
+\list;
+\begin;
+\set b 3;
+\commit;
+\list;

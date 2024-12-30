@@ -5,8 +5,6 @@
 #include "util.h"
 
 #include <fstream>
-#include <iostream>
-#include <ostream>
 #include <regex>
 
 Store::Store() {

@@ -2,37 +2,64 @@
 
 The full manual for KeplerKV including syntax and command specifics.
 
-Last updated: 2024-09-06
+Last updated: 2024-12-29
 
 ## Contents
 
 - [General syntax](#general-syntax)
-    - [Tokenization](#tokenization)
-    - [Command syntax](#command-syntax)
-    - [Identifiers](#identifiers)
+
+  - [Tokenization](#tokenization)
+  - [Command syntax](#command-syntax)
+  - [Identifiers](#identifiers)
+  - [Running mode](#running-mode)
+  - [Options](#options)
+
 - Commands: [System](#commands-system)
-    - [QUIT](#quit): quitting the program.
-    - [CLEAR](#clear): clearing the screen
-    - [SAVE](#save): save the store into file
-        - [Valid filenames](#valid-filenames)
-    - [LOAD](#load): load a store from file
-    - [STATS](#stats): gives basic statistics
+
+  - [QUIT](#quit): quitting the program.
+  - [CLEAR](#clear): clearing the screen
+  - [SAVE](#save): save the store into file
+
+    - [Valid filenames](#valid-filenames)
+
+  - [LOAD](#load): load a store from file
+
+  - [STATS](#stats): gives basic statistics
+
 - Commands: [Data](#commands-data)
-    - [SET](#set): setting a key
-        - [Supported datatypes](#supported-types)
-    - [GET](#get): retrieving a key
-    - [DEL](#del): deleting a key
-    - [UPDATE](#update): updating a key
-    - [LIST](#list): lists out all values in the store currently
-    - [RESOLVE](#resolve): resolve nested/recursive references
-        - [Explanation of lazy evaluation](#lazy-evaluation)
-    - [RENAME](#rename): rename a key
-    - [SEARCH](#search): use regex to search keys
+
+  - [SET](#set): setting a key
+
+    - [Supported datatypes](#supported-types)
+
+  - [GET](#get): retrieving a key
+
+  - [DEL](#del): deleting a key
+
+  - [UPDATE](#update): updating a key
+
+  - [LIST](#list): lists out all values in the store currently
+
+  - [RESOLVE](#resolve): resolve nested/recursive references
+
+    - [Explanation of lazy evaluation](#lazy-evaluation)
+
+  - [RENAME](#rename): rename a key
+
+  - [SEARCH](#search): use regex to search keys
+
 - Commands: [Data Manipulation](#commands-data-manipulation)
-    - [INCR](#incr): increment a numeric key
-    - [DECR](#decr): decrement a numeric key
-    - [APPEND](#append): append to a list
-    - [PREPEND](#prepend): prepend to a list
+
+  - [INCR](#incr): increment a numeric key
+  - [DECR](#decr): decrement a numeric key
+  - [APPEND](#append): append to a list
+  - [PREPEND](#prepend): prepend to a list
+
+- Commands: [Transactions](#commands-transactions)
+
+  - [BEGIN](#begin): begin a transaction
+  - [COMMIT](#commit): commit a transaction
+  - [ROLLBACK](#rollback): rollback on a transaction
 
 ## General syntax
 
@@ -41,6 +68,7 @@ Last updated: 2024-09-06
 All tokens are assumed space-delimited and whitespace is ignored.
 
 Optional comma delimiters can be used for clarity, be sure to separate distinct tokens by **spaces** when required. For example, the following examples show equivalent commands:
+
 ```bash
 \set apple 1 banana 2
 \set apple 1, banana 2
@@ -53,22 +81,25 @@ Optional comma delimiters can be used for clarity, be sure to separate distinct 
 ```
 
 Multiple commands can be completed at once by separating them with semicolons:
+
 ```bash
 \set a 1 ; \get a
     OK              # confirmation of \set
     a | int: 1      # output of \get
 ```
 
----
+--------------------------------------------------------------------------------
 
 ### Command syntax
 
 Commands are **case-insensitive** and may have alternate syntax. This documentation denotes commands and their arguments as:
+
 ```
 {set of equivalent invocations} required-argument [optional-arguments]
 ```
 
 Many commands allow for batching such that multiple of the same command can be invoked:
+
 ```bash
 \get a b
     a | ...
@@ -80,6 +111,7 @@ Many commands allow for batching such that multiple of the same command can be i
 Identifiers are **case-sensitive** and must begin with an alphabetical character or an underscore, with any alphanumeric or underscore characters permitted afterwards.
 
 #### Examples of allowed identifiers
+
 |              |            |
 |:------------:|:----------:|
 | `_name`      |   |
@@ -87,12 +119,49 @@ Identifiers are **case-sensitive** and must begin with an alphabetical character
 | `_patient0`  |   |
 
 #### Examples of disallowed identifiers
+
 |            |                                                          |
 |:----------:|----------------------------------------------------------|
 | `0patient` | Cannot start with a number                               |
 | `hash#`    | Only alphanumeric characters and underscores are allowed |
 
-## Commands: System 
+### Running mode
+KeplerKV can be ran interactively simply by not passing in any `.kep` files. When at least one is passed in, the program runs these script files.
+
+```bash
+./KeplerKV              # Interactive mode
+./KeplerKV script.kep   # Non-interactive mode
+```
+
+**All commands in a `.kep` file must be ended with a semicolon.**
+
+### Options
+**Global** options are ran at the program-level. That is, these are command-line arguments passed in when running the executable:
+- `-h`: View the help menu
+- `-s, --silent`: Run the program silently, with some exceptions
+
+**Command options** are applicable to each command specifically. These should be **double-dashed** always.
+- `--y, --yes`: Say YES to any prompts that may spawn during execution
+- `--y, --yes`: Say NO to any prompts that may spawn during execution
+
+#### Example: name conflict
+```
+\set a 1
+\set b 2
+\rename b a             # Will get prompted to confirm this overwrite
+> Warning: key 'a' already exists. Do you want to overwrite it? (y/n)
+
+---
+\rename b a --yes       # Will answer prompt
+    OK
+
+\rename b a --no   
+    No changes made to the store.
+
+```
+
+## Commands: System
+
 ### QUIT
 
 **`{\q, \quit}`**
@@ -149,34 +218,44 @@ Displays basic statistics about the current instance of KeplerKV, including the 
 Set a key-value pair to the store.
 
 #### Supported types
+
 1. Integers
-    ```bash
-    \set num 1
-    ```
+
+  ```bash
+  \set num 1
+  ```
+
 2. Floats
-    ```bash
-    \set num 1.2
-    ```
+
+  ```bash
+  \set num 1.2
+  ```
+
 3. Strings
-    ```bash
-    \set str "hello world!"
-    ```
 
-    **Strings must be denoted with starting and closing quotation single or double quotation marks.**
+  ```bash
+  \set str "hello world!"
+  ```
 
-    To have a quotation mark inside of a string, the inner must be of the opposite kind of the outer.
-    ```bash
-    \set str 'look its a "string", nice'
-    ```
+  **Strings must be denoted with starting and closing quotation single or double quotation marks.**
+
+  To have a quotation mark inside of a string, the inner must be of the opposite kind of the outer.
+
+  ```bash
+  \set str 'look its a "string", nice'
+  ```
+
 4. Lists
-    ```bash
-    \set list [1, 2, 3]
-    ```
 
-    Multidimensional lists are supported.
-    ```bash
-    \set matrix [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-    ```
+  ```bash
+  \set list [1, 2, 3]
+  ```
+
+  Multidimensional lists are supported.
+
+  ```bash
+  \set matrix [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+  ```
 
 ### GET
 
@@ -197,6 +276,7 @@ If the key is not present in the store, `NOT FOUND` is returned.
 **`{\del, \delete \d} key [k2 k3 ...]`**
 
 Delete a key from the store if it is present.
+
 ```bash
 \set num 1
 \del num
@@ -204,7 +284,6 @@ Delete a key from the store if it is present.
 ```
 
 If the key is not present in the store, `NOT FOUND` is returned and no effect is done to the store.
-
 
 ### UPDATE
 
@@ -240,7 +319,9 @@ List out all items that are currently in the store.
 Resolve the values of keys that reference another key (or form a key-chain!). **`RESOLVE` works identically to `GET` when keys are not recursive.**
 
 #### Lazy evaluation
+
 Recursive keys are **lazily evaluated**, which means the value of the key being referenced need not be defined until resolution is required.
+
 ```bash
 \set a b        # a -> b
 \get a
@@ -257,6 +338,7 @@ Recursive keys are **lazily evaluated**, which means the value of the key being 
 In short: `GET` only evaluates one level of the key-value pair, while `RESOLVE` evaluates until a primitive is found.
 
 Similar to C++ references, affecting `b` also affects `a` since `a` is an alias for `b`.
+
 ```bash
 \update b 2
 \resolve b
@@ -310,6 +392,7 @@ Searches for keys using typical [C++ regex](https://en.cppreference.com/w/cpp/re
 ```
 
 ## Commands: Data Manipulation
+
 ### INCR
 
 **`\incr key [k2 k3 ...]`**
@@ -361,3 +444,38 @@ Prepend elements to a list. Throws an error if invoked on other types
 \prepend a 2
     a | list: [int: 2, int: 1]
 ```
+
+## Commands: Transactions
+
+### BEGIN
+
+**`\begin`**
+
+Begins a transaction.
+
+All commands will still be validated. If a command is incorrect, errors will be reported and the command will _not_ be logged.
+
+Certain commands occur in real-time regardless of whether you are in a transaction or not. These include:
+
+- `QUIT`
+- `LIST`
+- `SAVE`
+- `LOAD`
+- `SEARCH`
+- `STATS`
+
+### COMMIT
+
+**`\commit`**
+
+Commits a transaction.
+
+Each logged command will be performed at this time.
+
+### ROLLBACK
+
+**`\rollback`**
+
+Rollbacks a transaction.
+
+All commands that were logged are discarded.

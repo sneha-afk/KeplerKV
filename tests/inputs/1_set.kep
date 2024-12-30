@@ -1,0 +1,6 @@
+\set a 1;
+\set b 5.2;
+\set c "hello, world!";
+\set d [1, 2, 3];
+\set e, [1, 2, [3]];
+\list;

@@ -1,0 +1,6 @@
+\set a 1;
+\get a;
+\list;
+\delete a;
+\get a;
+\list;

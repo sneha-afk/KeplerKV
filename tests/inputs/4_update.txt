@@ -1,7 +1,0 @@
-\set a 1
-\get a
-\update a 2
-\get a
-\update a [1, 2, 3]
-\get a
-\q

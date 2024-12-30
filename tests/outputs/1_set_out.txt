@@ -1,4 +1,3 @@
-Welcome to KeplerKV! Type \q to quit!
 OK
 OK
 OK
@@ -9,4 +8,3 @@ d | list: [int: 1, int: 2, int: 3]
 c | str: "hello, world!"
 b | float: 5.200000
 a | int: 1
-Farewell!

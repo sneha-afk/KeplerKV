@@ -27,7 +27,7 @@ fi
 KEPLER="../build/KeplerKV"
 
 INPUT_DIR="./inputs/"
-INPUT_FILES="${INPUT_DIR}*.txt"
+INPUT_FILES="${INPUT_DIR}*.kep"
 CLEAN_OUT="../scripts/sanitize_text.sh"
 
 # Make a directory for storing the results
@@ -44,22 +44,22 @@ do
     res_file="${RESULTS_DIR}${name_base}_result.txt"
     diff_file="${RESULTS_DIR}${name_base}_diff.txt"
 
-    $KEPLER < "$input_file" 2>&1| ${CLEAN_OUT} &> "$res_file"
+    $KEPLER "$input_file" 2>&1| ${CLEAN_OUT} &> "$res_file"
     
     # Find any error messages
     grep -qE "Segmentation fault|Aborted|Assertion failed|\
     Illegal instruction|Floating point exception|Bus error|Memory error|\
     File not found|Permission denied|Command not found|Invalid argument|terminate called" "$res_file"
     if [ $? -eq 0 ]; then
-        printf "%-25s %s\n" "$name_base" "${T_BRED}FAILED: program crash${T_RESET}"
+        printf "%-25s %s\n" "$no_path" "${T_BRED}FAILED: program crash${T_RESET}"
         continue
     fi
 
     diff -wB $out_file "$res_file" > "$diff_file"
     if [ $? -eq 0 ]; then
-        printf "%-25s %s\n" "$name_base" "${T_BGREEN}PASSED${T_RESET}"
+        printf "%-25s %s\n" "$no_path" "${T_BGREEN}PASSED${T_RESET}"
     else
-        printf "%-25s %s\n" "$name_base" "${T_BRED}FAILED: wrong output${T_RESET}"
+        printf "%-25s %s\n" "$no_path" "${T_BRED}FAILED: wrong output${T_RESET}"
     fi
     
 done

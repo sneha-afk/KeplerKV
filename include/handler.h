@@ -1,36 +1,27 @@
 #pragma once
 
+#include "environment.h"
 #include "lexer.h"
 #include "parser.h"
-#include "store.h"
 
-#include <deque>
-#include <functional>
 #include <string>
 
 class Handler {
 public:
-    Handler()
+    // Dummy handler
+    Handler() {};
+
+    Handler(Store *s_ptr, Environment *e_ptr)
         : lexer_(Lexer())
         , parser_(Parser())
-        , store_(Store()) {};
+        , store_(s_ptr)
+        , env_(e_ptr) {};
 
-    Handler(Lexer &l, Parser &p, Store &s)
-        : lexer_(l)
-        , parser_(p)
-        , store_(s) {};
-
-    Handler(Store &s)
-        : lexer_(Lexer())
-        , parser_(Parser())
-        , store_(s) {};
-
-    bool handleQuery(std::string &);
+    void handleQuery(std::string &);
 
 private:
     Lexer lexer_;
     Parser parser_;
-    Store store_;
-
-    std::deque<StoreCommandSP> wal_;
+    Store *store_;
+    Environment *env_;
 };

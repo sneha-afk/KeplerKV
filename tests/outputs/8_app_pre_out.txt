@@ -1,4 +1,3 @@
-Welcome to KeplerKV! Type \q to quit!
 OK
 OK
 a | list: [int: 1, int: 2]
@@ -9,4 +8,3 @@ a | list: [int: 2, int: 1, int: 2, list: [int: 1, int: 2, int: 3]]
 OK
 OK
 a | list: [str: "list contents:", list: [int: 1, int: 2, int: 3], int: 2, int: 1, int: 2, list: [int: 1, int: 2, int: 3]]
-Farewell!

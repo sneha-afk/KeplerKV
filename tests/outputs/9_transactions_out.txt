@@ -1,0 +1,13 @@
+OK
+TRANSAC BEGIN
+a | int: 1
+LOGGED
+a | int: 1
+TRANSAC ROLLBACK
+a | int: 1
+TRANSAC BEGIN
+LOGGED
+OK
+TRANSAC COMMITTED
+b | int: 3
+a | int: 1

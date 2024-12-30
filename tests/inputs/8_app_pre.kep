@@ -1,0 +1,9 @@
+\set a [1];
+\append a 2;
+\get a;
+\append a [1, 2, 3];
+\get a;
+\prepend a 2;
+\get a;
+\prepend a [1, 2, 3]  "list contents:";
+\get a;

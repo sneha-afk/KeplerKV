@@ -9,6 +9,7 @@ enum class TokenType {
     IDENTIFIER,
     NUMBER,
     STRING,
+    OPTION,
     LIST_START,
     LIST_END,
     DELIMITER,
@@ -36,21 +37,27 @@ struct Token {
         : type(type)
         , value(std::string(1, c)) {};
 
-    friend std::ostream &operator<<(std::ostream &os, const Token &t) {
-        os << "{token: ";
-        switch (t.type) {
-            case TokenType::COMMAND: os << "CMD"; break;
-            case TokenType::IDENTIFIER: os << "IDENTIFIER"; break;
-            case TokenType::NUMBER: os << "NUMBER"; break;
-            case TokenType::STRING: os << "STRING"; break;
-            case TokenType::LIST_START: os << "LIST_START"; break;
-            case TokenType::LIST_END: os << "LIST_END"; break;
-            case TokenType::DELIMITER: os << "DELIMITER"; break;
-            case TokenType::END: os << "END"; break;
+    std::string string() const {
+        std::string s = "{token: ";
+        switch (type) {
+            case TokenType::COMMAND: s += "CMD"; break;
+            case TokenType::IDENTIFIER: s += "IDENTIFIER"; break;
+            case TokenType::NUMBER: s += "NUMBER"; break;
+            case TokenType::STRING: s += "STRING"; break;
+            case TokenType::OPTION: s += "OPTION"; break;
+            case TokenType::LIST_START: s += "LIST_START"; break;
+            case TokenType::LIST_END: s += "LIST_END"; break;
+            case TokenType::DELIMITER: s += "DELIMITER"; break;
+            case TokenType::END: s += "END"; break;
             case TokenType::UNKNOWN:
-            default: os << "UNKNOWN"; break;
+            default: s += "UNKNOWN"; break;
         }
-        os << ", value: `" << t.value << "`}";
+        s += ", value: `" + value + "`}";
+        return s;
+    }
+
+    friend std::ostream &operator<<(std::ostream &os, const Token &t) {
+        os << t.string();
         return os;
     };
 };

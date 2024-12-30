@@ -1,7 +1,6 @@
 #pragma once
 #include "terminal_colors.h"
 
-#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -10,8 +9,6 @@ enum class ValueType { INT, FLOAT, STRING, LIST, IDENTIFIER };
 
 class StoreValue;
 using StoreValueSP = std::shared_ptr<StoreValue>;
-
-void printItem(const std::string &, const StoreValueSP &);
 
 class StoreValue {
 public:
