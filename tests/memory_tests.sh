@@ -27,7 +27,7 @@ fi
 KEPLER="../build/KeplerKV"
 
 INPUT_DIR="./inputs/"
-INPUT_FILES="${INPUT_DIR}*.txt"
+INPUT_FILES="${INPUT_DIR}*.kep"
 CLEAN_OUT="../scripts/sanitize_text.sh"
 
 # Make a directory for storing the results
@@ -42,12 +42,12 @@ do
 
     res_file="${RESULTS_DIR}${name_base}_memory_result.txt"
 
-    valgrind -s --leak-check=full $KEPLER < "$input_file" 2>&1| ${CLEAN_OUT} &> "$res_file"
+    valgrind -s --leak-check=full $KEPLER "$input_file" 2>&1| ${CLEAN_OUT} &> "$res_file"
 
     if [ $? -eq 0 ]; then
-        printf "%-25s %s\n" "$name_base" "${T_BGREEN}PASSED${T_RESET}"
+        printf "%-25s %s\n" "$no_path" "${T_BGREEN}PASSED${T_RESET}"
     else
-        printf "%-25s %s\n" "$name_base" "${T_BRED}FAILED: wrong output${T_RESET}"
+        printf "%-25s %s\n" "$no_path" "${T_BRED}FAILED: wrong output${T_RESET}"
     fi
     
 done

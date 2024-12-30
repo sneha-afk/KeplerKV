@@ -39,16 +39,16 @@ std::vector<CommandSP> &Parser::parse(std::vector<TokenSP> &tokens) {
             tt_++;
             continue;
         }
-        nodes.push_back(parseCommand_(tok));
+        nodes.push_back(parseCommand_());
     }
 
     return nodes;
 }
 
-CommandSP Parser::parseCommand_(const TokenSP &cmdTok) {
+CommandSP Parser::parseCommand_() {
+    TokenSP cmdTok = curr_();
     CommandType cmdType = mapGet(mapToCmd, cmdTok->value, CommandType::UNKNOWN);
     if (cmdType == CommandType::UNKNOWN) throw INVALID_CMD(cmdTok->value);
-    tt_++;
 
     CommandSP cmd;
     switch (cmdType) {
@@ -92,22 +92,20 @@ CommandSP Parser::parseCommand_(const TokenSP &cmdTok) {
                 curr_();
                 break;
             default:
-                ValueSP val = parseValue_(tok);
+                ValueSP val = parseValue_();
                 if (val != nullptr) cmd->addArg(val);
-
-                // Wary of where parseValue() ended up
-                curr_();
                 break;
         }
     }
     return cmd;
 }
 
-ValueSP Parser::parseValue_(const TokenSP &t) {
-    std::string &tValue = t->value;
-    switch (t->type) {
+ValueSP Parser::parseValue_() {
+    TokenSP tok = curr_();
+    const std::string &tValue = tok->value;
+    switch (tok->type) {
         case TokenType::NUMBER:
-            if (strContains(tValue, '.')) {
+            if (strContains(tok->value, '.')) {
                 try {
                     return std::make_shared<FloatNode>(std::stof(tValue));
                 } catch (Exception &e) {
@@ -122,8 +120,8 @@ ValueSP Parser::parseValue_(const TokenSP &t) {
             }
         case TokenType::IDENTIFIER: return std::make_shared<IdentifierNode>(tValue);
         case TokenType::STRING: return std::make_shared<StringNode>(tValue);
-        case TokenType::LIST_START: curr_(); return parseList_();
-        default: throw UNKNOWN_TOKEN(t->value); break;
+        case TokenType::LIST_START: return parseList_();
+        default: throw UNKNOWN_TOKEN(tValue); break;
     }
     return nullptr;
 }
@@ -140,10 +138,8 @@ ValueSP Parser::parseList_() {
             case TokenType::COMMAND: throw RuntimeErr(CMD_IN_LIST);
             case TokenType::UNKNOWN: throw UNKNOWN_TOKEN(tok->value);
             default:
-                ValueSP val = parseValue_(tok);
+                ValueSP val = parseValue_();
                 if (val != nullptr) lstNode->addNode(val);
-
-                curr_();
                 break;
         }
     }

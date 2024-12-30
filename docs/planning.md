@@ -36,7 +36,7 @@ A NoSQL key-value pair store for quick access.
 - [X] Validate user input and operations
 
 ### feature ideas
-- [ ] Allow for transactions, commits, rollbacks
+- [X] Allow for transactions, commits, rollbacks
 - [ ] API to a common language?
 - [ ] Allow for folders/indices to group together keys
 - [ ] User credentials and encryption of data
@@ -64,6 +64,8 @@ A NoSQL key-value pair store for quick access.
 * Data manipulation for certain types
     * Integers, floats: INCR, DECR
     * Lists: APPEND, PREPEND
+* Basic transactions: BEGIN, COMMIT, ROLLBACK
+* Invoke in interactive mode or not `KeplerKV [file.kep]`
 
 ## sources
 - [How to Write a Programming Language](https://accu.org/journals/overload/26/145/balaam_2510/) series by Andy Balaam
@@ -83,6 +85,32 @@ A NoSQL key-value pair store for quick access.
 
 ---
 ## dev journal
+### December 29, 2024
+Tons of changes have been done the past week or so, non-exhaustively:
+- Made an `Environment` to control global state, print stuff through it (relevant for later when potentially outputting elsewhere)
+    - Done to decouple away from `Handler` and let commands have the most control over their operations
+    - Centralizes global logic instead of worrying who's controlling who
+    - Also where the WAL lives
+- Added command-level options such as for RENAME's YES/NO confirmation for overwrites
+- Commands have been revamped to use these mechanisms now
+- Transactions!
+    - Once validated, commands are added to the WAL to be committed at a later time
+    - Some commands have been programmed to ignore a transaction env, maybe make this an option later?
+- `Lexer` and `Parser` have had a major cleanup to be more readable and follow some of the stuff mentioned in "Crafting Interpreters," great book
+- Non-interactive mode
+    - `*.kep` files are now scripts that can be ran when passed into the binary: `KeplerKV file1 file2`
+    - Also options for global silencing of operation output
+    - Test files also had to be revamped as a result
+- An inordinate amount of macros for a project of this size, haha.
+
+Nearly all of these changes are from encountering obstacles when implementing transactions. I sense a growing need to completely revamp the AST representation and hope to smoothen some of the global state logic.
+
+As for next steps:
+- Continue on the million dollar question on AST representation
+- Implement more rigorous testing
+- Feature: dry-runs of a script file
+- Feature: save-states for a transaction
+
 ### November 14, 2024
 Slowed development after starting a new degree program.
 - Moving over to the [Command](https://refactoring.guru/design-patterns/command) pattern

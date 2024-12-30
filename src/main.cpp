@@ -55,7 +55,7 @@ void printHelp() {
 void interactive() {
     std::string input;
 
-    env.printToConsole(T_BBLUE "Welcome to KeplerKV! Type \\q to quit!" T_RESET);
+    env.printToConsole(PRINT_BLUE("Welcome to KeplerKV! Type \\q to quit!"));
     while (env.isRunning()) {
         std::cout << "> ";
         std::getline(std::cin, input);

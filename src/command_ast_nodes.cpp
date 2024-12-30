@@ -237,7 +237,6 @@ void RenameCommand::execute(EnvironmentInterface &e, Store &s) const {
         const std::string &oldName = oldNode->getValue();
         const std::string &newName = newNode->getValue();
 
-        // TODO: implement for non-inter mode: dry-runs, extra args in cmd
         // Make the user confirm overwrites
         if (s.contains(newName) && !hasOption(CommandOption::YES)) {
             e.printToConsole(T_BYLLW "Warning: key \'" + newName
