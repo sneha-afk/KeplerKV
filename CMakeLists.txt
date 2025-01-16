@@ -25,3 +25,6 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     -Wextra
     -pedantic
 )
+
+include_directories(/usr/include/readline)
+target_link_libraries(KeplerKV readline)

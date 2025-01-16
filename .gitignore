@@ -36,8 +36,10 @@
 # Exclude build directory
 build/
 .cache
+KeplerKV
 
 .vscode/
+*.swp
 
 # Results directory of tests
 tests/results

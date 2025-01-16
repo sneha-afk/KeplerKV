@@ -4,6 +4,8 @@
 
 #include <fstream>
 #include <getopt.h>
+#include <readline/history.h>
+#include <readline/readline.h>
 #include <stdexcept>
 #include <vector>
 
@@ -53,19 +55,25 @@ void printHelp() {
 }
 
 void interactive() {
-    std::string input;
+    char *input;
 
     env.printToConsole(PRINT_BLUE("Welcome to KeplerKV! Type \\q to quit!"));
     while (env.isRunning()) {
-        std::cout << "> ";
-        std::getline(std::cin, input);
+        input = readline("> ");
+        if (input == NULL) continue;
+        add_history(input);
 
         try {
-            handler.handleQuery(input);
+            std::string convert(input);
+            handler.handleQuery(convert);
         } catch (std::exception &e) {
             std::cerr << T_BRED << e.what() << T_RESET << std::endl;
         }
+
+        free(input);
     }
+
+    clear_history();
 }
 
 void fromFile(std::vector<std::string> &files) {

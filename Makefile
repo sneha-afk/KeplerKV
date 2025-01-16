@@ -1,6 +1,6 @@
 CC		= g++ -std=c++11
 CFLAGS	= -Wall -Wextra -pedantic -Iinclude
-LFLAGS	=
+LFLAGS	= -lreadline
 
 CFORMAT = clang-format
 
