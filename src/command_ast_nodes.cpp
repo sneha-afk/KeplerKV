@@ -6,6 +6,8 @@
 #include "syntax_tree.h"
 #include "terminal_colors.h"
 
+#include <iostream>
+
 #define PRINT_ITEM(id, valStr) T_BBLUE + id + T_RESET + " | " + valStr
 
 #define OK_MSG        PRINT_GREEN("OK")

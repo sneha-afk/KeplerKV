@@ -2,8 +2,6 @@
 
 #include "syntax_tree.h"
 
-#include <iostream>
-
 class QuitCommand : public SystemCommand {
 public:
     QuitCommand()

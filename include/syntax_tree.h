@@ -24,7 +24,7 @@ enum class CommandType {
 };
 // clang-format on
 
-enum CommandOption : std::uint8_t {
+enum CommandOption : uint8_t {
     YES = 1 << 1,
     NO = 1 << 2,
 };
@@ -179,7 +179,7 @@ public:
 protected:
     const CommandType cmdType_;
     std::vector<ValueSP> args_;
-    std::uint8_t options_;
+    uint8_t options_;
 };
 
 class EnvironmentInterface; // Forward declaration

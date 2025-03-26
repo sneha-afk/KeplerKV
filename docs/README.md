@@ -1,7 +1,7 @@
 # docs
 
-## Index
+An online version of the manual is available [at the wiki](https://github.com/sneha-afk/KeplerKV/wiki), a copy of this.
 
-1. [manual](manual.md): command and syntax guide
-2. [examples](examples.md): showcase of example usage
-3. [planning](planning.md): log and planning of features
+## Index
+- [manual](manual.md): command and syntax guide
+- [planning](planning.md): log and planning of features
