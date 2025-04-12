@@ -1,5 +1,4 @@
 #pragma once
-#include "terminal_colors.h"
 
 #include <memory>
 #include <string>

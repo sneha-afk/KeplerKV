@@ -1,10 +1,7 @@
 #include "handler.h"
 
 #include "error_msgs.h"
-#include "file_io_macros.h"
 #include "terminal_colors.h"
-
-#include <iostream>
 
 static constexpr bool DEBUG = false;
 

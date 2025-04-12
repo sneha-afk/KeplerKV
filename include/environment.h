@@ -2,7 +2,6 @@
 
 #include "environment_interface.h"
 #include "syntax_tree.h"
-#include "terminal_colors.h"
 
 #include <deque>
 #include <iostream>

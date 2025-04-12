@@ -1,8 +1,5 @@
 #include "syntax_tree.h"
 
-#include "error_msgs.h"
-#include "file_io_macros.h"
-
 std::string Command::string() const {
     std::string s = "{node: Command, cmd: " + std::to_string((int) cmdType_) + ", args: [";
     for (const auto &a : args_) {

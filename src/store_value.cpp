@@ -3,7 +3,6 @@
 #include "error_msgs.h"
 
 #include <fstream>
-#include <iostream>
 
 std::vector<uint8_t> IntValue::serialize() const {
     std::vector<uint8_t> buf;
